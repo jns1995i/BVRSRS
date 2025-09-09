@@ -39,15 +39,28 @@ app.use(express.static("public"));
 app.use('/uploads', express.static('public/uploads'));
 
 
+// New: Configure MongoDB session store
+const store = new MongoDBStore({
+    uri: process.env.MONGO_URI,
+    collection: "sessions"
+});
+
+// New: Catch session store errors
+store.on("error", function(error) {
+    console.error("Session Store Error:", error);
+});
+
 app.use(session({
-    secret: process.env.SESSION_SECRET || "your_secret_key",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true
-    }
+    secret: process.env.SESSION_SECRET || "your_secret_key",
+    resave: false,
+    saveUninitialized: false,
+    store: store, // New: Use the MongoDB store
+    cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true
+    }
 }));
+
 
 const client = new MongoClient(process.env.MONGO_URI);
 let db;
