@@ -502,7 +502,7 @@ app.get("/1", isLogin, (req, res) => res.render("1", { layout: "design", title: 
 app.get("/complaintChart", isLogin, (req, res) => res.render("complaintChart", { layout: "layout", title: "Dashboard", activePage: "dsb" }));
 
 app.get("/design", isLogin, myReq, isAnn, (req, res) => res.render("design", { layout: "design", title: "Design", activePage: "design" }));
-const RECAPTCHA_SECRET_KEY = "6Ldhle8qAAAAADd8a18EwvfWZND4zhRH-ytfFMRN"; // Replace with your actual reCAPTCHA Secret Key
+const RECAPTCHA_SECRET_KEY = "6LcqZMMrAAAAAHlyZaFL5DZXJ-8VCjxzfsvtSIy_";
 
 app.post("/login", async (req, res) => {
     try {
