@@ -3,7 +3,8 @@ const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const engine = require("ejs-mate"); // Import ejs-mate
+const MongoDBStore = require("connect-mongodb-session")(session); // Fix: Pass the session object
+const engine = require("ejs-mate");
 const multer = require("multer");
 const path = require("path");
 const crypto = require("crypto");
@@ -11,8 +12,6 @@ const axios = require("axios");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 const nodemailer = require('nodemailer');
-
-
 
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
@@ -54,12 +53,17 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
+<<<<<<< HEAD
     store: store, // New: Use the MongoDB store
+=======
+    store: store,
+>>>>>>> 79d1b0d92a539245ea42fa86b2e8b5c39ec136ac
     cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true
     }
 }));
+
 
 const client = new MongoClient(process.env.MONGO_URI);
 let db;
