@@ -49,6 +49,8 @@ store.on("error", function(error) {
     console.error("Session Store Error:", error);
 });
 
+app.set('trust proxy', 1);
+
 app.use(session({
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
