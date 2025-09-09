@@ -53,17 +53,12 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
-<<<<<<< HEAD
     store: store, // New: Use the MongoDB store
-=======
-    store: store,
->>>>>>> 79d1b0d92a539245ea42fa86b2e8b5c39ec136ac
     cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true
     }
 }));
-
 
 const client = new MongoClient(process.env.MONGO_URI);
 let db;
