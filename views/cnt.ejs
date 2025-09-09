@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRSRS</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+        textarea {
+            background-color: white;
+        }
+        label {
+            margin-top: 20px;
+        }
+        .headf {
+            border: none;
+        }
+        .card.keyPlain {
+            position: relative;
+            align-items: center;
+            padding: 20px;
+            height: 140px;
+            width: 400px;
+            justify-content: center;
+            gap: 5px;
+            border-radius: 20px !important;
+            box-shadow: none;
+        }
+
+
+table td {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+}
+
+        
+@media screen and (max-width: 1025px) {
+    .mobile {
+        display: none;
+    }
+    .responsive {
+        display: none;
+    }
+    body {
+        padding: 0;
+    }
+    .EmerText {
+        display: flex;
+    }
+    #mainBody {
+        padding: 0 !important;
+    }
+    #mainCardM {
+        width: 100% !important;
+    }
+    .abstractBG {
+        align-items: center;
+        p {
+            text-align: center;
+        }
+    }
+    .modalCard form {
+        width: 100%;
+    }
+    #sidePanel, #sidePanel2 {
+        position: relative;
+        width: 100%;
+        top: 0;
+        left: 0;
+        margin-block: 10px;
+        background-color: rgb(237, 237, 237);
+        border: 0.5px solid gray;
+        box-shadow: none;
+    }
+    #perCard {
+        position: relative;
+        width: 100%;
+        top: 0;
+        left: 0;
+        box-shadow: none;
+        padding: 0;
+        flex-wrap: wrap;
+        flex-direction: row;
+    }
+    .sub {
+        height: auto;
+        flex-direction: column;
+    }
+    .subRight {
+        flex-direction: column;
+    }
+    #headBanger {
+        flex-direction: column;
+        justify-items: center;
+        gap: 5px;
+        background-color: white;
+        padding: 5px 10px 20px 10px;
+        p {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        span {
+            width: 100%;
+        }
+    }
+    .card.keyPlain {
+        position: relative;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 20px;
+        height: 120px;
+        max-width: 200px;
+        gap: 5px;
+        box-shadow: none;
+        border-radius: 10px !important;
+        p {
+            font-size: 14px;
+        }
+    }
+}
+    </style>
+<body class="block bgWhite">
+    <div class="height95 gap20 bgSoft padding20 borderRadius10 alignStart overflow-y1 relative" id="mainBody">
+        <a href="/hom" class="nav absolute left20 top20 responsive"><i class="fas fa-chevron-left"></i> GO BACK</a>
+        <div class="bgWhite borderRadius10 padding20 col justifyStart width55 height0 gap10" id="mainCardM">
+
+            <div class="height0 justifyStart hidden EmerText gap10">
+                <a href="/hom" class="nav cnav"><i class="fas fa-chevron-left"></i></a>
+                <p class="size28 str500">Emergency Hotlines</p>
+            </div>
+            
+
+            <div class="height0 col alignStart gap10 absolute right20 top20 width20 borderRadius10" id="perCard">
+                <% hotlineData.forEach(function(hotline) { %>
+                    <% if (["City Health Office", "PNP Cabanatuan", "BFP Cabanatuan", "CDRRMO"].includes(hotline.office)) { %>
+                        <div class="card keyPlain white 
+                            <% if (hotline.office === 'City Health Office') { %>
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                witch
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                witch
+                            <% } %>
+                             abstractBG col" style="width: 100% !important; align-items: start; justify-content: space-between;">
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas 
+                            <% if (hotline.office === 'City Health Office') { %>
+                                fa-heartbeat
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                fa-shield-alt
+                            <% } else if (hotline.office === 'BFP Cabanatuan') { %>
+                                fa-fire-extinguisher
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                fa-cloud-showers-heavy
+                            <% } %>
+                            "></i></a>
+                            <p class="size20 str400 marginBottom10"><%= hotline.office %></p>
+                            <div class="height0 col alignStart">
+                                <p class="size14 str300"><%= hotline.phone1 %></p>
+                                <p class="size14 str300"><%= hotline.phone2 %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
+
+            <div class="bgWhite darkShadow borderRadius10 height0 padding20 size12 textCenter col absolute left20 top80 width20" id="sidePanel">
+                
+                <p class="size20 str500">Hello <%= user.firstName %></p>
+                <p class="size14 str400">📞 Need Help? Reach out faster with our list of community essential and emergency hotlines.</p>
+                <br>
+                <p class="size14 str400">
+                    Whether it's an emergency, a health concern, or a simple inquiry, having the right contact information can make all the difference.</p>
+                <br>
+                <div class="height0 padding20 abstractBG borderRadius10 textCenter size20 white">
+                    Your safety is our Top Priority!
+                </div>
+            </div>
+            
+            
+            <div class="height0 alignStart justifyBetween white gap5 padding20 abstractBG borderRadius10 relative" id="headBanger">
+                <p class="size24 str400 width0">Full List Directory</p>
+                
+            
+                <span class="flex justifyStart alignCenter gap0 snav paddingInline20 paddingBlock0 borderRadius10">
+                    <i class="fas fa-search" style="font-size: 12px;"></i>
+                    <input type="search" class="border0 width100 univ" id="univ" placeholder="Search hotline here ..">
+                </span>
+            </div>
+            
+
+
+            <div class="h420 padding10 col bgSoft gap10 borderRadius10 alignCenter justifyStart overflow-y1" id="hshCard">
+                    <div id="noRecords" class="noFound size20 height0 width0 padding30 borderRadius10 str500  shadowNone hidden bgSoft col">
+                        <div class="h85 w88 relative borderRadius500 borderBlack">
+                            <i class="fas fa-frown size60 gray h65 w65 absolute right10 bottom10"  style="transform: rotate(-10deg);"></i>
+                            <i class="fas fa-frown size28 black h35 w35 absolute left20 bottom5" style="transform: rotate(-10deg);"></i>
+                        </div>
+                        Sorry, No record Found!
+                    </div>
+                    
+                    <table id="dirTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Office/Agency</th>
+                                <th onclick="sortTable(1)">Contact No.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% hotlineData.forEach(function(hotline) { %>
+                                <tr>
+                                    <td class="str600"><%= hotline.office %></td>
+                                    <td>
+                                        <%= hotline.phone1 %>
+                                        <%= hotline.phone1 && hotline.phone2 ? ', ' + hotline.phone2 : hotline.phone2 || '' %>
+                                        <%= (hotline.phone2 || hotline.phone1) && hotline.phone3 ? ', ' + hotline.phone3 : hotline.phone3 || '' %>
+                                    </td>
+
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                                        
+                    
+            </div>
+            <div class="sub height10 gap20 justifyBetween">
+                        <div class="justifyStart height0 width0 subLeft">
+                            <span id="totalRecords" class="totalRecords colorPrimary width100 responsive"></span>
+                        </div>
+                        <div class="justifyEnd height0 width0 gap10 subRight">
+                            <div class="height0 gap5 width0">
+                                <p class="size14 width0">
+                                    Display Per Page:
+                                </p>
+                                <div class="selectBar width0 height0 widthMax0"> 
+                                    <select id="rowsPerPage" class="width0" onchange="updateRowsPerPage()">
+                                        <option value="8">8</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="100">100</option>
+                                        <option value="1000000000000">All</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="pagination" id="pagination"></div>
+                        </div>
+                    </div>
+
+          
+        </div>
+
+    </div>
+
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "flex";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 8) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+
+        if (searchInput.value.trim()) return;
+
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        rowsPerPageSelect.style.display = query ? "none" : "flex";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRAR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+        .horizon {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 20px;
+            padding: 15px 0;
+            justify-content: start;
+            scroll-snap-type: x mandatory;
+            border: 1px solid rgba(255, 255, 255, 0);
+            border-radius: 10px;
+        }
+        .horCard {
+            flex: 0 0 auto;
+            padding: 20px;
+            width: 23%;
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease-in-out, opacity 0.8s ease-in-out, padding 0.4s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .details.show {
+            max-height: fit-content;
+            opacity: 1;
+            padding: 10px 0;
+        }
+
+        .newsCard {
+            transition: all 0.8s ease-in-out;
+        }
+        #assignDepCard {
+            max-width: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: 100;
+        }
+        #assignDepCard.active {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            padding: 0;
+            position: absolute;
+            z-index: 100;
+        }
+        .unseen {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        .seen2 {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0;
+            transition: max-height 0.1s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        textarea {
+            background-color: white;
+        }
+        .headf {
+            border: none;
+        }
+        #statLabel {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background-color: transparent;
+            padding: 5px;
+            border: 0.5px solid gray;
+        }
+        #skip {
+            position: fixed;
+            right: 35px;
+            bottom: 35px;
+            border-radius:  10px;
+        }
+        #prev {
+            position: fixed;
+            left: 35px;
+            bottom: 35px;
+            border-radius:  10px;
+        }
+
+@media screen and (max-width: 1025px) {
+    .mobile {
+        display: none;
+    }
+    .responsive {
+        display: none;
+    }
+    body {
+        padding: 0;
+    }
+    #MainFrame {
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 5px;
+        height: 90%;
+        display: block;
+    }
+    #VideoFrame {
+        position: initial;
+        width: 100%;
+        height: auto !important;
+        flex-direction: row !important;
+        box-shadow: none;
+    }
+    #VideoFrame2 {
+        flex-direction: row-reverse;
+    }
+    #leftVideo {
+        width: 50% !important;
+    }
+    #rightVideo {
+        width: 50% !important;
+    }
+    .annCrd {
+        width: 100% !important;
+    }
+    #annFrame {
+        padding-inline: 5% !important;
+        height: auto !important;
+        overflow-y: hidden;
+    }
+    #headFrame {
+        flex-direction: column-reverse !important;
+        height: auto !important;
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+    #navFrame {
+        display: none;
+    }
+    #navFrame2 {
+        display: flex;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto !important;
+        z-index: 600;
+    background: 
+        radial-gradient(circle at 10% 5%, var(--shade15), transparent 25%),  /* Light Gray */
+        radial-gradient(circle at 80% 95%,  var(--green2), transparent 30%),  /* Very Light Blue */
+        radial-gradient(circle at 50% 50%,  var(--green3), transparent 80%); /* White */
+    background-blend-mode: lighten;
+    backdrop-filter: blur(10px);
+    background-color: var(--shade10);
+        justify-content: space-between;
+        padding: 10px;
+        color: white !important;
+    }
+    #navFrame2 p {
+        color: white;
+    }
+    #titleText {
+        font-size: 18px;
+    }
+    .EmerText {
+        display: flex;
+    }
+}
+    </style>
+<body class="block abstractBG relative padding10">
+            <a href="/reqM" class="nav darkShadow" id="skip">Skip <i class="fas fa-chevron-right"></i> </a>
+            <a href="/hom" class="nav darkShadow" id="prev"><i class="fas fa-chevron-left"></i> Go Back</a>
+            <div class="height90 padding10 col width100 justifyStart">
+                <div class="padding25 col borderPrimary borderRadius10 bgWhite blockX overflow-y1" style="display: block;">
+                    <p class="size14 str600 textCenter">Terms and Conditions for Document Request</p>
+                    <br>
+                    <p class="size14 textJustify">
+                        By submitting a document request through this system, you agree to the following terms and conditions:
+                        <br><br>
+                        1. Eligibility
+                        <br>
+                        You must be a registered resident of Barangay Valdefuente to request documents.
+                        All information provided must be accurate and up to date.
+                        Residents with pending case involvement are not eligible to request Barangay Clearance and Barangay Indigency.
+                        <br><br>
+                        2. Document Request Process
+                        <br>
+                        Only the document type, purpose, and number of copies are required when submitting a request.
+                        All requests are subject to approval by the Barangay Secretary and Punong Barangay.
+                        Requests that do not meet the barangay’s requirements may be denied.
+                        Residents can request up to five (5) documents per transaction, regardless of their purpose, with a limit of three (3) copies per document.
+                        <br><br>
+                        3. Request Approval & Status
+                        <br>
+                        All submitted requests will be initially marked as "Pending."
+                        Requests will be reviewed and processed, then either approved or denied based on eligibility and barangay policies.
+                        Applicants will be notified once the request has been approved, denied, or requires additional information.
+                        <br><br>
+                        4. No Payment Required
+                        <br>
+                        There are no fees for requesting documents.
+                        This system does not involve any payment processing.
+                        <br><br>
+                        5. Data Privacy
+                        <br>
+                        Personal information provided in this system will be used only for processing document requests.
+                        The barangay will not share any personal data with third parties unless required by law.
+                        <br>
+                        6. Changes to Terms
+                        These terms and conditions may be updated at any time.
+                        Continued use of the system after updates implies your acceptance of the revised terms.
+                        <br><br>
+                        7. Agreement
+                        <br>
+                        By checking the box and submitting your request, you confirm that you have read, understood, and agreed to the terms and conditions outlined above.
+                    </p>
+                </div>
+            </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".showBtn").forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default <a> behavior
+    
+                let newsCard = this.closest(".newsCard"); // Get parent newsCard
+                let details = newsCard.querySelector(".details"); // Get details inside the card
+                let icon = this.querySelector("i"); // Get icon inside the button
+    
+                details.classList.toggle("show"); // Toggle visibility
+                
+                // Toggle icon class
+                if (details.classList.contains("show")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+    });
+    
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Select ALL elements with the class "univ"
+    const univInputs = document.querySelectorAll(".univ");
+    const newsCards = document.querySelectorAll(".newsCard");
+    const notFoundMessage = document.getElementById("notFound");
+
+    function handleFilter(event) {
+        // Get the value from the input the user is currently typing in
+        const filter = event.target.value.toLowerCase();
+        let found = false;
+
+        // If the search field is empty, show all cards and hide "NOT FOUND"
+        if (filter === "") {
+            newsCards.forEach(card => card.style.display = "block");
+            notFoundMessage.style.display = "none";
+            return;
+        }
+
+        // Hide cards that don't match the filter and show matching ones
+        newsCards.forEach(card => {
+            if (card.textContent.toLowerCase().includes(filter)) {
+                card.style.display = "block";
+                found = true;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        // Show "NOT FOUND" if no matches are found
+        notFoundMessage.style.display = found ? "none" : "block";
+    }
+
+    // Attach the same filter function to both inputs
+    univInputs.forEach(univInput => {
+        univInput.addEventListener("input", handleFilter);
+    });
+});
+    </script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(?<!\S)(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|net|org|gov|edu|ph)\b)(?!\S)/g, '<a href="http://$1" target="_blank" class="inline blue str500">$1</a>');
+});
+</script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(^|\s)(#\w+)/g, '$1<span class="green str500">$2</span>');
+});
+</script>
+<script>
+document.getElementById("assignBtn").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent default link behavior
+    
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Toggle 'active' class
+    assignCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (assignCard.classList.contains("active")) {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    } else {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    }
+});
+
+// Hide #assignDepCard when #closeNav is clicked
+document.getElementById("closeNav").addEventListener("click", function() {
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Remove 'active' class
+    assignCard.classList.remove("active");
+
+    // Reset button text & icon
+    assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+});
+</script>
+
+</body>
+</html>

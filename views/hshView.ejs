@@ -1,0 +1,178 @@
+<% layout('layout') %>
+<head>
+
+    <style>
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4caf50;
+            border-radius: 8px;
+            transition: width 0.5s ease-in-out;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<div class="borderRadius10 bgSoft padding10 gap10 relative">
+
+    <div class="width75 blockX col overflow-y1 borderRadius10">
+        <div class="h0 width99 bgWhite borderRadius10 col padding10">
+            <div class="height0 relative col">
+                <img src="/images/house.png" alt="" class="absolute bottom10 right10 h230 w230 index50">
+                <div class="height5 padding10 justifyStart">
+                    <a href="/hsh" class="width0 str500">Households  <i class="fas fa-chevron-left paddingInline10"></i>  Go Back</a>
+                </div>
+                <div class="h180 abstractBG borderRadius10 padding25 justifyStart col alignStart relative">
+                    <a href="/newFml/<%= household._id %>" class="nav borderNone absolute left25 bottom25 paddingBlock10 borderRadius10"><i class="fas fa-plus"></i>New Family</a>
+                    <div class="height0 justifyStart alignStart col">
+                        <p class="size34 white"><%= household.houseNo %> <%= household.purok %> Residence</p>
+                        <p class="size12 str400 white upperCase"><%= household.ownership %></p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="height0 col padding10 gap20">
+                <% if (families.length > 0) { %>
+                    <% families.forEach((family, index) => { %>
+                        <div class="family-section col padding20 bgWhite borderRadius10 gap10 darkShadow">
+                            <div class="height0 justifyBetween paddingInline5">
+                                <div class="height0 alignStart paddingInline5 col width50">
+                                    <p class="size18 str500 hidden">FAMILY <%= index + 1 %></p>
+                                    <p class="size14 str400 colorPrimary"><%= family.poverty %> Family</p>
+                                    <p class="size12 str400 gray">Family Monthly Income: <%= new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2 }).format(family.familyIncome).replace('₱', 'P') %></p>
+                                </div>
+                                <a href="/newMem/<%= family._id %>?householdId=<%= household._id %>" class="nav borderRadius10"><i class="fas fa-plus"></i> Member</a>
+                            </div>
+                            <div class="height0 wrap gap15 padding20 bgSoft borderRadius10 justifyStart">
+                                <% if (family.residents.length > 0) { %>
+                                    <% family.residents.forEach(resident => { %>
+
+                                            <div class="height0 col bgWhite borderRadius10 paddingInline5 paddingBlock15" style="width: 23%;">
+                                                <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h70 w70 borderRadius500 borderPrimary">
+                                                <a href="/rsdView2/<%= resident._id %>" class="nav padding5 border0 size12"><%= resident.firstName %> &nbsp;<i class="fas fa-chevron-right"></i></a>  
+                                                <p class="size12 str400"><%= resident.rel %></p>
+                                                <p class="size12 str400 hidden"><%= resident.employmentStatus || "--" %></p>
+                                            </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="3" style="text-align: center;">No residents found</td>
+                                    </tr>
+                                <% } %>
+                            </div>
+            
+                            <table width="100%" class="hidden">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20%;">Name</th>
+                                        <th style="width: 10%;">Role</th>
+                                        <th style="width: 20%;">Employement Status</th>
+                                        <th class="thCtrl">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (family.residents.length > 0) { %>
+                                        <% family.residents.forEach(resident => { %>
+                                            <tr>
+                                                <td>
+                                                    <div class="height0 width0 justifyStart gap5">
+                                                        <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h25 w25 borderRadius500 borderPrimary"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>
+                                                    </div>
+                                                </td>
+                                                <td><%= resident.role %></td>
+                                                <td><%= resident.employmentStatus || "--" %></td>
+                                                <td class="tdCtrl">
+                                                    <a href="/rsdView/<%= resident._id %>" class="nav"><i class="fas fa-eye"></i>Details</a>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="3" style="text-align: center;">No residents found</td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p>No families found in this household.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <div class="width25 borderRadius10 col justifyStart gap10 relative">
+        <div class="height8 justifyBetween padding10">
+            <p class="size18 str500">House Condition</p>
+            <a href="/hshUpdate/<%= household._id %>" class="nav tnav borderRadius10"><i class="fas fa-edit"></i> Update</a>
+        </div>
+        <div class="height92 gap10 padding20 col bgWhite borderRadius10 hidden">
+            <div class="gap10 padding10">
+                <div class="darkShadow borderRadius10"></div>
+                <div class="darkShadow borderRadius10"></div>
+            </div>
+            <div class="gap10 padding10">
+                <div class="darkShadow borderRadius10"></div>
+                <div class="darkShadow borderRadius10"></div>
+            </div>
+            <div class="gap10 padding10">
+                <div class="darkShadow borderRadius10"></div>
+                <div class="darkShadow borderRadius10"></div>
+            </div>
+            <div class="gap10 padding10">
+                <div class="darkShadow borderRadius10"></div>
+                <div class="darkShadow borderRadius10"></div>
+            </div>
+        </div>
+        <div class="height0 bgWhite borderRadius10 col padding20 justifyStart alignStart relative">
+            <p class="size12">House Type</p>
+            <p class="size16 str500 marginBottom15"><%= household.houseType %></p>
+            <p class="size12">Wall Material</p>
+            <p class="size16 str500 marginBottom15"><%= household.wallMaterial %></p>
+            <p class="size12">Roof Material</p>
+            <p class="size16 str500 marginBottom15"><%= household.roofMaterial %></p>
+            <p class="size12">Flooring Material</p>
+            <p class="size16 str500"><%= household.flooringMaterial %></p>
+        </div>
+        <div class="height0 gap10">
+            <div class="height0 bgWhite borderRadius10 col padding20 justifyStart alignStart relative gap10">
+                <i class="fas fa-toilet size16 absolute right10 top10  bgSoft padding10 borderRadius500"></i>
+                <p class="size12">Toilet Type</p>
+                <p class="size16 str500"><%= household.toiletType %></p>
+            </div>
+            <div class="height0 bgWhite borderRadius10 col padding20 justifyEnd alignStart relative gap10">
+                <i class="fas fa-door-open size16 absolute right10 top10 bgSoft padding10 borderRadius500"></i>
+                <p class="size12">Rooms</p>
+                <p class="size16 str500">Total of <%= household.numRooms %></p>
+            </div>
+        </div>
+            <div class="height0 bgWhite brown borderRadius10 col padding20 justifyEnd alignStart relative gap10">
+                <i class="fas fa-lightbulb size16 absolute right10 top10 yellow h34 w35 bgSoft padding10 borderRadius500"></i>
+            <p class="size12">Lighting</p>
+            <p class="size16 str500"><%= household.electricity %></p>
+        </div>
+            <div class="height0 bgWhite borderRadius10 col padding20 justifyEnd alignStart relative gap10">
+                <i class="fas fa-droplet size16 absolute right10 top10  blue h34 w35  bgSoft padding10 borderRadius500"></i>
+            <p class="size12">Water</p>
+            <p class="size16 str500"><%= household.waterSource %></p>
+        </div>
+    </div>
+</div>

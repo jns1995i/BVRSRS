@@ -1,0 +1,323 @@
+<% layout('layout') %>
+
+<style>
+    input {
+        min-height: 42px;
+    }
+</style>
+
+<div class="height bgSoft padding10 borderRadius15 relative">
+    <a href="/rsdView/<%= resident._id %>" class="nav absolute left20 top20"><i class="fas fa-chevron-left"></i>Go Back</a>    
+    <div class="height100 blockX overflow-y1 padding10 borderRadius15">
+        <div class="height0 padding10">
+            <form id="residentForm" action="/update-resident/<%= resident._id %>" method="POST" class="height0 width80">
+                <div class="gap10 justifyStart alignStart height0">
+                    <div class="height0 col justifyStart alignStart">
+                        <p class="size30 str500 colorPrimary">UPDATE INFORMATION</p>
+                        <br>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">First Name</label>
+                            <input type="text" name="firstName" required value="<%= resident.firstName %>">
+                        </div>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">Middle Name</label>
+                            <input type="text" name="middleName" value="<%= resident.middleName %>">
+                        </div>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">Last Name</label>
+                            <input type="text" name="lastName" required value="<%= resident.lastName %>">
+                        </div>
+                        <div class="height0 col gap5 alignStart width30">
+                            <label for="">Ext Name</label>
+                            <input type="text" name="extName" value="<%= resident.extName %>">
+                        </div>
+                        <br>
+                        <label for="">Birthday</label>
+                        <div class="height0 gap5">
+                            <div class="height0 col alignStart width40">
+                                <div class="selectBar widthMax100"> 
+                                    <select id="bMonth" required name="bMonth">
+                                        <option value="" disabled>Month</option>
+                                        <option value="1" <%= resident.bMonth == 1 ? 'selected' : '' %>>January</option>
+                                        <option value="2" <%= resident.bMonth == 2 ? 'selected' : '' %>>February</option>
+                                        <option value="3" <%= resident.bMonth == 3 ? 'selected' : '' %>>March</option>
+                                        <option value="4" <%= resident.bMonth == 4 ? 'selected' : '' %>>April</option>
+                                        <option value="5" <%= resident.bMonth == 5 ? 'selected' : '' %>>May</option>
+                                        <option value="6" <%= resident.bMonth == 6 ? 'selected' : '' %>>June</option>
+                                        <option value="7" <%= resident.bMonth == 7 ? 'selected' : '' %>>July</option>
+                                        <option value="8" <%= resident.bMonth == 8 ? 'selected' : '' %>>August</option>
+                                        <option value="9" <%= resident.bMonth == 9 ? 'selected' : '' %>>September</option>
+                                        <option value="10" <%= resident.bMonth == 10 ? 'selected' : '' %>>October</option>
+                                        <option value="11" <%= resident.bMonth == 11 ? 'selected' : '' %>>November</option>
+                                        <option value="12" <%= resident.bMonth == 12 ? 'selected' : '' %>>December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart width20">
+                                <input name="bDay" type="number" id="bDay" min="1" max="31" placeholder="Day" required value="<%= resident.bDay %>">
+                            </div>
+                            <div class="height0 col alignStart width40">
+                                <input name="bYear" type="number" id="bYear" min="1900" placeholder="Year" required value="<%= resident.bYear %>">
+                            </div>
+                        </div>                        
+                        <label class="colorPrimary" id="ageWarning" style="display: none;"></label>
+                        <br>
+                        <div class="height0 col alignStart">
+                            <label for="birthPlace">Birth Place</label>
+                            <div class="selectBar widthMin100">
+                                <select name="birthPlace" id="birthPlace" required>
+                                    <option value="">--Select City--</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <script>
+                            // Array of Philippine cities
+                            const cities = [
+                                "Alaminos", "Angeles", "Antipolo", "Bacolod", "Bacoor", "Bago", "Baguio",
+                                "Bais", "Balanga", "Batac", "Batangas City", "Bayawan", "Baybay", "Bayugan",
+                                "Biñan", "Bislig", "Bogo", "Borongan", "Bulacan", "Butuan", "Cabadbaran",
+                                "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calaca", "Calamba",
+                                "Calapan", "Calbayog", "Caloocan", "Candon", "Canlaon", "Carcar", "Carmona",
+                                "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City",
+                                "Dagupan", "Danao", "Dapitan", "Dasmariñas", "Davao City", "Digos",
+                                "Dipolog", "Dumaguete", "El Salvador", "Escalante", "Gapan", "General Santos",
+                                "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan",
+                                "Iloilo City", "Imus", "Iriga", "Isabela", "Kabankalan", "Kidapawan",
+                                "Koronadal", "La Carlota", "Lamitan", "Laoag", "Lapu-Lapu", "Las Piñas",
+                                "Legazpi", "Ligao", "Lipa", "Lucena", "Maasin", "Mabalacat", "Makati",
+                                "Malabon", "Malaybalay", "Malolos", "Mandaluyong", "Mandaue", "Manila",
+                                "Marawi", "Marikina", "Masbate City", "Mati", "Meycauayan", "Muñoz",
+                                "Muntinlupa", "Naga", "Navotas", "Olongapo", "Ormoc", "Oroquieta", "Ozamiz",
+                                "Pagadian", "Palayan", "Panabo", "Parañaque", "Pasay", "Pasig", "Passi",
+                                "Puerto Princesa", "Quezon City", "Roxas", "Sagay", "Samal", "San Carlos",
+                                "San Fernando", "San Jose", "San Jose del Monte", "San Pablo", "San Pedro",
+                                "Santa Rosa", "Santo Tomas", "Santiago", "Silay", "Sipalay", "Sorsogon City",
+                                "Surigao City", "Tabaco", "Tabuk", "Tacloban", "Tacurong", "Tagaytay",
+                                "Tagbilaran", "Taguig", "Tagum", "Talisay", "Tanauan", "Tandag", "Tangub",
+                                "Tanjay", "Tarlac City", "Tayabas", "Toledo", "Trece Martires", "Tuguegarao",
+                                "Urdaneta", "Valencia", "Valenzuela", "Victorias", "Vigan", "Zamboanga City"
+                            ];
+                        
+                            const birthPlaceSelect = document.getElementById("birthPlace");
+                            const savedBirthPlace = "<%= resident.birthPlace %>"; // Assuming `resident.birthPlace` holds the value
+                        
+                            // Populate dropdown with cities
+                            cities.forEach(city => {
+                                let option = document.createElement("option");
+                                option.value = city;
+                                option.textContent = city;
+                                if (city === savedBirthPlace) {
+                                    option.selected = true; // Pre-select the saved birth place
+                                }
+                                birthPlaceSelect.appendChild(option);
+                            });
+                        </script>
+                        
+                    </div>
+                    <div class="height0 col justifyStart alignStart">
+                        <div class="height0 gap10">
+                            <div class="height0 col alignStart">
+                                <label for="gender">Gender</label>
+                                <div class="selectBar">
+                                    <select id="gender" name="gender" required>
+                                        <option value="Male" <%= resident.gender === "Male" ? "selected" : "" %>>Male</option>
+                                        <option value="Female" <%= resident.gender === "Female" ? "selected" : "" %>>Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <label for="civilStatus">Civil Status</label>
+                                <div class="selectBar">
+                                    <select name="civilStatus" id="civilStatus" required>
+                                        <option value="Single" <%= resident.civilStatus === "Single" ? "selected" : "" %>>Single</option>
+                                        <option value="Married" <%= resident.civilStatus === "Married" ? "selected" : "" %>>Married</option>
+                                        <option value="Widowed" <%= resident.civilStatus === "Widowed" ? "selected" : "" %>>Widowed</option>
+                                        <option value="Separated" <%= resident.civilStatus === "Separated" ? "selected" : "" %>>Separated</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <label for="precinct">Precinct</label>
+                                <div class="selectBar">
+                                    <select name="precinct" id="precinct" required>
+                                        <option value="Non-Voter" <%= resident.precinct === "Non-Voter" ? "selected" : "" %>>Non-Voter</option>
+                                        <option value="Registered Voter" <%= resident.precinct === "Registered Voter" ? "selected" : "" %>>Registered Voter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <div class="height0 gap10 marginBlock15" id="emailField">
+                            <div class="height0 col justifyStart alignStart">
+                                <label for="phone">Phone</label>
+                                <input type="text" name="phone" id="phone" value="<%= resident.phone || '' %>">
+                            </div>
+                            <div class="height0 col justifyStart alignStart">
+                                <label for="email">Email</label>
+                                <input type="email" name="email" id="email" value="<%= resident.email || '' %>">
+                            </div>
+                        </div>
+                    
+                        <div class="height0 gap10">
+                            <div class="height0 justifyStart gap10 bgSoft paddingInline10 borderRadius10" id="soloParent">
+                                <input type="checkbox" name="soloParent" id="soloParentCheckbox" <%= resident.soloParent ? "checked" : "" %>>
+                                <label for="soloParentCheckbox">Solo Parent (Optional)</label>
+                            </div>
+                            <div class="height0 justifyStart gap10 bgSoft paddingInline10 borderRadius10" id="pregnantLabel">
+                                <input type="checkbox" name="pregnant" id="pregnant" <%= resident.pregnant ? "checked" : "" %>>
+                                <label for="pregnant">Pregnant (Optional)</label>
+                            </div>
+                        </div>
+                    
+                        <br>
+                        <div class="height0 gap10 bgSoft borderRadius10 paddingBlock5">
+                            <div class="height0 justifyStart gap10 paddingInline10">
+                                <input type="checkbox" id="pwdCheckbox" name="pwd" <%= resident.pwd ? "checked" : "" %>>
+                                <label for="pwdCheckbox">PWD (Optional)</label>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <div class="selectBar">
+                                    <select id="pwdType" name="pwdType" <%= resident.pwd ? "" : "" %>>
+                                        <option value="" <%= !resident.pwdType ? "selected" : "" %>>Select Disability Type</option>
+                                        <option value="Visual" <%= resident.pwdType === "Visual" ? "selected" : "" %>>Visual</option>
+                                        <option value="Hearing" <%= resident.pwdType === "Hearing" ? "selected" : "" %>>Hearing</option>
+                                        <option value="Mobility" <%= resident.pwdType === "Mobility" ? "selected" : "" %>>Mobility</option>
+                                        <option value="Mental" <%= resident.pwdType === "Mental" ? "selected" : "" %>>Mental</option>
+                                        <option value="Speech" <%= resident.pwdType === "Speech" ? "selected" : "" %>>Speech</option>
+                                        <option value="Intellectual" <%= resident.pwdType === "Intellectual" ? "selected" : "" %>>Intellectual</option>
+                                        <option value="Psychosocial" <%= resident.pwdType === "Psychosocial" ? "selected" : "" %>>Psychosocial</option>
+                                        <option value="Learning" <%= resident.pwdType === "Learning" ? "selected" : "" %>>Learning</option>
+                                        <option value="Multiple" <%= resident.pwdType === "Multiple" ? "selected" : "" %>>Multiple Disabilities</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        <br>
+                        <div class="height0 gap10">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="employmentStatus">Employment Status</label>
+                                <div class="selectBar"> 
+                                    <select id="employmentStatus" name="employmentStatus" required>
+                                        <option value="Unemployed" <%= resident.employmentStatus === "Unemployed" ? "selected" : "" %>>Unemployed</option>
+                                        <option value="Employed" <%= resident.employmentStatus === "Employed" ? "selected" : "" %>>Employed</option>
+                                        <option value="Self-Employed" <%= resident.employmentStatus === "Self-Employed" ? "selected" : "" %>>Self-Employed</option>
+                                        <option value="Student" <%= resident.employmentStatus === "Student" ? "selected" : "" %>>Student</option>
+                                        <option value="Dependent" <%= resident.employmentStatus === "Dependent" ? "selected" : "" %>>Dependent</option>
+                                        <option value="Retired" <%= resident.employmentStatus === "Retired" ? "selected" : "" %>>Retired</option>
+                                        <option value="Pensioner" <%= resident.employmentStatus === "Pensioner" ? "selected" : "" %>>Pensioner</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    
+                        
+                        <div class="height0 gap10 marginTop15" id="">
+                            <div class="height0 col gap5 alignStart  borderRadius10 bgSoft padding5"  id="workField">
+                                <label for="">Work or Source of Income</label>
+                                <input type="text" id="work" name="work"  value="<%= resident.work %>">
+                            </div>
+                            <div class="height0 col gap5 alignStart  borderRadius10 bgSoft padding5"  id="incomeField">
+                                <label for="">Monthly Income</label>
+                                <input type="number" id="monthlyIncome" name="monthlyIncome"  value="<%= resident.monthlyIncome %>">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 gap5">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="role">Family Membership</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="role" id="role" required>
+                                        <option value="" disabled <%= !resident.role ? "selected" : "" %>>Select Membership</option>
+                                        
+                                        <!-- Immediate Family -->
+                                        <option value="Head" <%= resident.role === "Head" ? "selected" : "" %>>Head</option>
+                                        <option value="Member" <%= resident.role === "Member" ? "selected" : "" %>>Member</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br><div class="height0 gap5">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="rel">Family Role</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="rel" id="rel" required>
+                                        <option value="" disabled <%= !resident.rel ? "selected" : "" %>>Select Role</option>
+                                        
+                                        <!-- Immediate Family -->
+                                        <option value="Father" <%= resident.rel === "Father" ? "selected" : "" %>>Father</option>
+                                        <option value="Mother" <%= resident.rel === "Mother" ? "selected" : "" %>>Mother</option>
+                                        <option value="Siblings" <%= resident.rel === "Siblings" ? "selected" : "" %>>Siblings</option>
+                                        
+                                        <!-- Extended Family -->
+                                        <option value="Grand Parent" <%= resident.rel === "Grand Parent" ? "selected" : "" %>>Grand Parent</option>
+                                        <option value="Grandchild" <%= resident.rel === "Grandchild" ? "selected" : "" %>>Grandchild</option>
+                        
+                                        <!-- Household Members -->
+                                        <option value="Relative" <%= resident.rel === "Relative" ? "selected" : "" %>>Relative</option>
+                                    </select>
+                                </div>
+                            </div>
+                        
+                            <br>
+                        
+                            <div class="height0 col gap5 alignStart">
+                                <label for="position">Position</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="position" id="position">
+                                        <option value="Resident" <%= resident.position === "Resident" ? "selected" : "" %>>Resident</option>
+                                        <option value="Punong Barangay" <%= resident.position === "Punong Barangay" ? "selected" : "" %>>Punong Barangay</option>
+                                        <option value="Barangay Kagawad" <%= resident.position === "Barangay Kagawad" ? "selected" : "" %>>Barangay Kagawad</option>
+                                        <option value="Barangay Secretary" <%= resident.position === "Barangay Secretary" ? "selected" : "" %>>Barangay Secretary</option>
+                                        <option value="Barangay Treasurer" <%= resident.position === "Barangay Treasurer" ? "selected" : "" %>>Barangay Treasurer</option>
+                                        <option value="Sk Chairman/Chairwoman" <%= resident.position === "Sk Chairman/Chairwoman" ? "selected" : "" %>>Sk Chairman/Chairwoman</option>
+                                        <option value="Barangay BHW" <%= resident.position === "Barangay BHW" ? "selected" : "" %>>Barangay BHW</option>
+                                        <option value="Barangay BIC" <%= resident.position === "Barangay BIC" ? "selected" : "" %>>Barangay BIC</option>
+                                        <option value="Barangay BNS" <%= resident.position === "Barangay BNS" ? "selected" : "" %>>Barangay BNS</option>
+                                        <option value="Barangay BPO" <%= resident.position === "Barangay BPO" ? "selected" : "" %>>Barangay BPO</option>
+                                        <option value="Barangay Clerk" <%= resident.position === "Barangay Clerk" ? "selected" : "" %>>Barangay Clerk</option>
+                                        <option value="Barangay DCW" <%= resident.position === "Barangay DCW" ? "selected" : "" %>>Barangay DCW</option>
+                                        <option value="Barangay Driver" <%= resident.position === "Barangay Driver" ? "selected" : "" %>>Barangay Driver</option>
+                                        <option value="Barangay Electrician" <%= resident.position === "Barangay Electrician" ? "selected" : "" %>>Barangay Electrician</option>
+                                        <option value="Barangay Justice" <%= resident.position === "Barangay Justice" ? "selected" : "" %>>Barangay Justice</option>
+                                        <option value="Barangay Tanod" <%= resident.position === "Barangay Tanod" ? "selected" : "" %>>Barangay Tanod</option>
+                                        <option value="Barangay Tanod-Chief" <%= resident.position === "Barangay Tanod-Chief" ? "selected" : "" %>>Barangay Tanod-Chief</option>
+                                        <option value="Barangay Tanod-Deputy" <%= resident.position === "Barangay Tanod-Deputy" ? "selected" : "" %>>Barangay Tanod-Deputy</option>
+                                        <option value="Barangay Worker" <%= resident.position === "Barangay Worker" ? "selected" : "" %>>Barangay Worker</option>
+                                        <option value="BARC Chairman" <%= resident.position === "BARC Chairman" ? "selected" : "" %>>BARC Chairman</option>
+                                        <option value="Environment Officer" <%= resident.position === "Environment Officer" ? "selected" : "" %>>Environment Officer</option>
+                                        <option value="Safety Officer" <%= resident.position === "Safety Officer" ? "selected" : "" %>>Safety Officer</option>
+                                        <option value="Vawc Desk Officer" <%= resident.position === "Vawc Desk Officer" ? "selected" : "" %>>Vawc Desk Officer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>                        
+                        <br>
+                        <div class="height0 col bgSoft borderRadius10 padding10 gap10" id="childCare">
+                            <div class="height0 gap5">
+                                <div class="height0 col gap5 alignStart">
+                                    <label for="">Birth Height</label>
+                                    <input type="text" name="birthHeight" value="<%= resident.birthHeight %>">
+                                </div>
+                                <div class="height0 col gap5 alignStart">
+                                    <label for="">Birth Weight</label>
+                                    <input type="text" name="birthWeight" value="<%= resident.birthWeight %>">
+                                </div>
+                            </div>
+                            <div class="height0 col gap5 alignStart">
+                                <label for="">Health Center</label>
+                                <input type="text" name="healthCenter" value="<%= resident.healthCenter %>">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 justifyEnd"><button type="submit" class="nav pnav"><i class="fas fa-check-square"></i>Update Record</button></div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        
+    </div>
+</div>

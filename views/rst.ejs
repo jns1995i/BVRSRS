@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRSRS</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+
+    <style>
+        body { position: relative; overflow-y: auto; }
+        .fnav { color: white; max-width: 100%; }
+        .pnav { background: var(--primaryBGDark) }
+        .pnav:hover { color: white; }
+        .homeCard {
+            width: 40%; height: 60%;
+            backdrop-filter: blur(15px) saturate(150%);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white; text-align: center;
+        }
+        form { width: 30%; padding-inline: 50px; border-radius: 24px; }
+        .homePhoto { height: 210px; width: 210px; }
+
+        @media (max-width: 1024px) {
+            .homePhoto { height: 140px; width: 140px; }
+            .g-recaptcha {
+                transform: scale(0.5);
+                width: 200px;
+            }
+            form { display: block; height: auto; width: 80%; border-radius: 0; }
+            .homeSec2 { border-left: 0; padding-left: 0; }
+            .fnav { font-size: 12px; }
+            .p10 { font-size: 10px; }
+            p.title { font-size: 12px; }
+        }
+        .g-recaptcha {
+        padding: 0;  /* Optional padding for better spacing */
+        display: block; /* Ensure the reCAPTCHA element is a block element */
+        width: fit-content !important;
+        height: fit-content !important;
+        max-width: 100%;
+    }
+        div { width: auto;}
+    </style>
+</head>
+<body class="abstractBG relative overflow-y" style="background-size: 100% 100%;">
+    <form action="/myPasswordRST" method="POST" id="changePassForm" class="flex bgWhite borderRadius10 col height0 padding30 gap15 width35 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size18 str500 green">Reset Password</p>
+                <input type="hidden" name="userId" value="<%= userId %>">
+
+                <div class="height0 col alignStart padding10 borderRadius10 borderPrimary">
+                    <p class="size12">Take Note! Password must contain the following:</p>
+                    <p class="size12">&bull; Atleast 1 Special Character</p>
+                    <p class="size12">&bull; Atleast 1 Upper Case Letter</p>
+                    <p class="size12">&bull; Combination of Letter and Numbers</p>
+                    <p class="size12">&bull; Minimum of 8 characters</p>
+                </div>
+                <hr>
+
+                <!-- Current password (hidden) -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="currentPassword" class="marginTop0">Current Password</label>
+                        <div class="width0 success1 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Verified</div>
+                    </div>
+                    <input type="password" id="currentPassword" name="currentPassword" value="<%= currentPassword %>" required>
+                    <div class="error1 red size12 justifyStart height0" style="display:none;">Wrong Password!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match current -->
+
+                <!-- New password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="newPassword" class="marginTop0">Create Password </label>                        
+                        <div class="width0 success3 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Strong Password</div>
+                        <div class="width0 success4 colorPrimary size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Good but Too Short</div>
+                    </div>
+                    <input type="password" id="newPassword" name="password" required>
+                    <div class="error3 red size12 justifyStart height0" style="display:none;">
+                        Weak Password!
+                    </div>
+                </div>
+
+                <!-- Error if password is weak -->
+
+                <!-- Confirm new password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="confirmPassword" class="marginTop0">Confirm Password</label>
+                        <div class="width0 success2 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Passwords Matched</div>
+                    </div>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <div class="error2 red size12 justifyStart height0" style="display:none;">Passwords do not match!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match new password -->
+
+                <!-- Show/hide -->
+                <div class="height0 justifyStart">
+                    <label class="showPass size12 marginTop0" style="cursor:pointer;" onclick="togglePasswords()"><i class="fas fa-eye"></i> Show Password</label>
+                </div>
+
+                <div class="textCenter size12 red str500 warning padding10 borderPrimary borderRadius10" style="display: none;">
+                    Please ensure all inputs are valid!
+                </div>
+                <!-- Submit -->
+                <div class="height0 justifyEnd faded2" id="submitBtn">
+                    <button type="submit" class="nav fnav width0 bgGreen white border0">Update</button>
+                </div>
+            </form>
+    
+<script>
+const newPass = document.getElementById("newPassword");
+const confirmPass = document.getElementById("confirmPassword");
+const form = document.getElementById("changePassForm");
+const warningDiv = document.querySelector(".warning");
+
+const error2 = document.querySelector(".error2");
+const error3 = document.querySelector(".error3");
+
+const success2 = document.querySelector(".success2");
+const success3 = document.querySelector(".success3");
+const success4 = document.querySelector(".success4");
+
+const showToggle = document.querySelector(".showPass");
+const submitBtnDiv = document.getElementById("submitBtn");
+
+let debounceTimerNewConfirm;
+
+function isStrong(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+}
+
+function isGood(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{4,}$/.test(password);
+}
+
+// ✅ Checks if all conditions are met before showing submit button
+function checkFormValidity() {
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    if (passwordsMatch && passwordIsStrong) {
+        submitBtnDiv.classList.remove("faded2");
+        warningDiv.style.display = "none"; // ✅ Hide warning if everything is valid
+    } else {
+        submitBtnDiv.classList.add("faded2");
+    }
+}
+
+form.addEventListener("submit", (e) => {
+    // Always hide warning first
+    warningDiv.style.display = "none";
+
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    // If inputs are invalid
+    if (!(passwordsMatch && passwordIsStrong)) {
+        e.preventDefault(); // prevent form from submitting
+        warningDiv.style.display = "flex"; // show warning
+    } else {
+        // ✅ Show confirmation before submitting
+        const confirmReset = confirm("Are you sure you want to reset your password?");
+        if (!confirmReset) {
+            e.preventDefault(); // cancel submission if user clicks "Cancel"
+        }
+    }
+});
+
+// ✅ Debounced new/confirm password validation
+function validateNewPasswords() {
+    clearTimeout(debounceTimerNewConfirm);
+    debounceTimerNewConfirm = setTimeout(() => {
+        const newVal = newPass.value.trim();
+        const confVal = confirmPass.value.trim();
+
+        // Error 2: New and confirm password mismatch
+        if (newVal && confVal) {
+            if (newVal !== confVal) {
+                error2.style.display = "flex";
+                success2.style.display = "none";
+            } else {
+                error2.style.display = "none";
+                success2.style.display = "inline";
+            }
+        } else {
+            error2.style.display = "none";
+            success2.style.display = "none";
+        }
+
+        // Error 3: Weak password
+        if (newVal) {
+            if (!isGood(newVal)) {
+                error3.style.display = "flex";
+                success3.style.display = "none";
+                success4.style.display = "none";
+            } else if (!isStrong(newVal)) {
+                error3.style.display = "none";
+                success3.style.display = "none";
+                success4.style.display = "inline";
+            } else {
+                error3.style.display = "none";
+                success3.style.display = "inline";
+                success4.style.display = "none";
+            }
+        } else {
+            error3.style.display = "none";
+            success3.style.display = "none";
+            success4.style.display = "none";
+        }
+
+        checkFormValidity();
+    }, 500);
+}
+
+newPass.addEventListener("input", validateNewPasswords);
+confirmPass.addEventListener("input", validateNewPasswords);
+
+// ✅ Show/Hide toggle
+showToggle.addEventListener("click", () => {
+    const isHidden = newPass.type === "password";
+
+    [newPass, confirmPass].forEach(input => {
+        input.type = isHidden ? "text" : "password";
+    });
+
+    showToggle.innerHTML = isHidden
+        ? '<i class="fas fa-eye-slash"></i> Hide Password'
+        : '<i class="fas fa-eye"></i> Show Password';
+});
+</script>
+
+</body>
+</html>

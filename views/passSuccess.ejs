@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRSRS</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+
+    <style>
+        body { position: relative; overflow-y: auto; }
+        .fnav { color: white; max-width: 100%; }
+        .pnav { background: var(--primaryBGDark) }
+        .pnav:hover { color: white; }
+        .homeCard {
+            width: 40%; height: 60%;
+            backdrop-filter: blur(15px) saturate(150%);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: white; text-align: center;
+        }
+        form { width: 50%; padding-inline: 50px; border-radius: 24px; }
+        .hpCard {
+            height: 210px; 
+            width: 210px;
+            padding: 12px;
+            background: 
+                radial-gradient(circle at 20% 10%, var(--green2), transparent 40%),
+                radial-gradient(circle at 80% 80%,  var(--green2), transparent 40%),
+                radial-gradient(circle at 50% 50%,  var(--green3), transparent 80%);
+            background-blend-mode: lighten;
+            backdrop-filter: blur(10px);
+            background-color: var(--shade8);
+            border-radius: 50%;
+        }
+        .hpCard img {
+            border: 6px solid white !important;
+        }
+        .homeSec2 { border-left: 1px solid black; padding-left: 30px; }
+        #server-error {
+            border: 0.5px solid rgba(255, 0, 0, 0.625);
+            color: rgb(100, 1, 1);
+            background-color: rgb(255, 248, 248);
+        }
+
+        @media (max-width: 1024px) {
+        body { position: relative; overflow-y: auto; }
+            .hpCard { height: 110px; width: 110px; padding: 5px; }
+            .hpCard img { border: 3px solid white !important;}
+            .g-recaptcha {
+                transform: scale(1);
+                width: 200px;
+            }
+            form { gap: 0; display: block; height: auto; width: 95%; border-radius: 10px; padding: 20px; }
+            .homeSec { gap: 5px; padding:0;}
+            .homeSec2 { border-left: 0; padding-left: 0; padding-inline: 40px; padding-block:0; }
+            .fnav { font-size: 12px; }
+            .p10 { font-size: 10px; }
+            p.title { font-size: 30px; font-weight: 400; }
+            #indexT { font-size: 14px; }
+            #secretBtn { color: transparent;}
+            button#loginBtn {
+                transform: scale(1);
+                transition: none;
+            }
+            button#loginBtn.fnav:hover {
+                border: none;
+                outline: none;
+                box-shadow: none;
+            }
+            #frgBtn:hover { transform: scale(1.02);}
+            .watermark1, .watermark2 {
+                transform: scale(2) !important;
+            }
+        }
+        .g-recaptcha {
+        padding: 0;  /* Optional padding for better spacing */
+        display: block; /* Ensure the reCAPTCHA element is a block element */
+        width: fit-content !important;
+        height: fit-content !important;
+        max-width: 100%;
+    }
+        div { width: auto;}
+    </style>
+</head>
+<body class="abstractBG relative" style="background-size: 100% 100%;">
+    <div class="watermark1 absolute bottom50 right50 borderRadius500 h200 w200 padding30" style="transform: scale(3); opacity: 0.04; filter: blur(0.5px) brightness(01) grayscale(0.8); background-color: rgba(255, 255, 255, 0.641);"><img src="/images/logo.jpg" class="borderRadius500" alt=""></div>
+    <a href="" class="hidden watermark2 nav cnav disabled marginBottom15 absolute left50 top50" style="opacity: 0.02; transform: scale(12);"><i class="fas fa-bell"></i></a>
+    <form class="gap20" style="flex-direction: row;" action="/login" method="POST" onsubmit="return validateRecaptcha()">
+        <div class="gap20 col homeSec width100">
+            
+            <div class="height0 hpCard">
+                <img src="/images/logo.png" alt="Logo" class="homePhoto borderWhite borderRadius500">
+            </div>
+            <p class="p10 str500" style="text-align: center;" id="indexT">
+                Barangay Valdefuente Record<br> & Service Request System
+            </p>
+            <a class="white height0 width0 size14" href="/index2" id="secretBtn">SECRET</a>
+        </div>
+    
+        <div class="gap20 col homeSec2 width100 relative">
+                <p class="title">Please Login Again</p> 
+            <% if (error) { %>
+                <div id="server-error" class="height0 error padding10 str600 borderRadius5 textCenter"><i class="fas fa-exclamation-circle"></i> &nbsp; <%= error %></div>
+            <% } else { %>
+                <div id="server-error" class="height0 error padding10 str600 borderRadius5 textCenter" style="display:none;"></div>
+            <% } %>
+            <div class="col gap10 width100">
+                <div class="field width100">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="field password width100">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <span class="showPass faded" id="showPass">show</span>
+                </div>
+            </div>
+    
+            <!-- Include reCAPTCHA v2 script -->
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    
+            <!-- reCAPTCHA Widget -->
+            <div class="g-recaptcha" data-sitekey="6Ldhle8qAAAAAGrOJ4A-xvmMtUJwy-omGKf_DJt3"></div>
+<script>
+    function validateRecaptcha() {
+        var response = grecaptcha.getResponse();
+        if (!response) {
+            var errorDiv = document.getElementById("server-error");
+            if (errorDiv) {
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please complete the reCAPTCHA before logging in.';
+                errorDiv.style.display = "block";
+            }
+            return false;
+        }
+        return true;
+    }
+</script>
+    
+            <button type="submit" class="nav fnav size16 str400 abstractBG" id="loginBtn">Login</button>
+            <a href="/forgot" id="frgBtn">Forgot Password</a>
+        </div>
+    </form>
+    
+
+
+    <script>
+        document.querySelectorAll('.showPass').forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

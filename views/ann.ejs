@@ -1,0 +1,331 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .main { padding-left: 45%; padding-right: 2%; }
+        .annCard {
+            height: auto;
+            min-height: 300px;
+            border-radius: 10px;
+            flex-direction: column;
+            justify-content: start;
+            align-items: start;
+            gap: 10px;
+            padding: 10px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .annCard .section { justify-content: start; padding: 5px; }
+        .annDate { position: absolute; top: 10px; right: 10px; width: auto; height: auto; margin-bottom: 10px; font-size: 0.8vw; }
+        .annPhoto { width: 100%; height: auto; }
+        .annPhoto img { width: 100%; height: 100%; border-radius: 0.5vw; }
+    </style>
+</head>
+
+<!-- New Announcement Form -->
+<div class="height100 unseen borderRadius20 abstractBG" id="newCard">
+    <form class="annCard" method="POST" action="/newAnn" enctype="multipart/form-data">
+        <div class="height0 justifyEnd">
+            <a href="javascript:void(0);" class="nav" id="closeBtn"><i class="fas fa-times"></i> Close</a>
+        </div>
+        <div class="row">
+            <input type="text" name="title" placeholder="Title" required>
+        </div>
+        <div class="section mainCN">
+            <textarea name="description" placeholder="Description" required></textarea>
+        </div>
+        <div class="height0 flex justifyCenter width100">
+            <img id="previewImage" src="/images/annphoto1.jpg" alt="Preview" class="width0 h300 borderRadius20">
+        </div>
+        <div class="row">
+            <div class="field">
+                <input type="file" name="image" accept="image/*" onchange="previewFile()" required>
+            </div>
+            <div class="field btn" style="width: 35%; justify-content: end; align-items: end;">
+                <button class="nav" type="reset">
+                    <i class="fas fa-arrows-rotate"></i> Reset
+                </button>
+                <button class="nav pnav" type="submit">
+                    <i class="fa-solid fa-paper-plane"></i> Share
+                </button>
+            </div>
+        </div>
+    </form>
+        <div id="loadingMessage" class="" style="display: none; margin-top:20px; font-weight:bold; color:blue;">
+            <i class="fa fa-spinner fa-spin"></i> &nbsp; Posting New Announcement...
+        </div>
+</div>
+
+
+
+<script>
+document.getElementById('announcementForm').addEventListener('submit', function() {
+    document.getElementById('loadingMessage').style.display = 'block';
+});
+</script>
+
+
+<% announcements.forEach(function(announcement) { %>
+    <div id="editCard<%= announcement._id %>" class="height100 borderRadius20 unseen abstractBG">
+        <form class="annCard" id="editForm<%= announcement._id %>" method="POST" action="/editAnn/<%= announcement._id %>" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="editId<%= announcement._id %>" value="<%= announcement._id %>">
+            <div class="height0 justifyEnd">
+                <a href="javascript:void()" class="nav" id="closeEditForm<%= announcement._id %>" onclick="closeEditForm('<%= announcement._id %>')">
+                    <i class="fas fa-times"></i> Close
+                </a>
+            </div>
+            <div class="row">
+                <input type="text" name="title" id="editTitle<%= announcement._id %>" placeholder="Title" value="<%= announcement.title %>" required>
+            </div>
+            <div class="section mainCN">
+                <textarea name="description" id="editDescription<%= announcement._id %>" placeholder="Description" required><%= announcement.description %></textarea>
+            </div>
+            <div class="section">
+                <img id="editPreviewImage<%= announcement._id %>" src="/images/default.jpg" alt="Preview" class="w150 h150">
+            </div>
+            <div class="row">
+                <div class="field">
+                    <input type="file" name="image" accept="image/*" onchange="previewFile('<%= announcement._id %>')">
+                </div>
+                <div class="field btn" style="width: 35%; justify-content: end; align-items: end;">
+                    <button class="nav pnav" type="submit">
+                        <i class="fa-solid fa-paper-plane"></i> Update
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+<% }); %>
+
+<script>
+    // Function to edit the announcement
+    function editAnnouncement(id, title, description, imageSrc) {
+        // Populate the form fields with the announcement data
+        document.getElementById("editId" + id).value = id;
+        document.getElementById("editTitle" + id).value = title;
+        document.getElementById("editDescription" + id).value = description;
+        document.getElementById("editPreviewImage" + id).src = imageSrc;
+
+        // Show the form by removing the 'unseen' class and adding 'seen' class
+        const editCard = document.getElementById("editCard" + id);
+        if (editCard) {
+            editCard.classList.remove('unseen');
+            editCard.classList.add('seen');
+        }
+    }
+
+    // Function to close the edit form
+    function closeEditForm(id) {
+        // Hide the form by adding 'unseen' and removing 'seen'
+        const editCard = document.getElementById("editCard" + id);
+        if (editCard) {
+            editCard.classList.remove('seen');
+            editCard.classList.add('unseen');
+        }
+    }
+
+    // Function to preview the image
+    function previewFile(id) {
+        // Get the file input specific to the announcement ID
+        const fileInput = document.getElementById("imageInput" + id); // Unique id for the file input
+        const preview = document.getElementById("editPreviewImage" + id); // Preview image element
+
+        const file = fileInput.files[0]; // Get the first file
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onloadend = function() {
+                preview.src = reader.result; // Set the preview image
+            };
+
+            reader.readAsDataURL(file); // Read the file as data URL for preview
+        }
+    }
+</script>
+
+<div class="main bgSoft borderRadius15 relative height100">
+
+
+<div class="height0 padding10 bgWhite borderRadius15 col fixed darkShadow alignStart" style="left: 17%; width: 33%; top: 27px;">
+
+    <div class="height0 justifyStart alignStart padding30 col relative">
+                    <% 
+                    const today = new Date(); 
+                    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                    const dayName = daysOfWeek[today.getDay()]; 
+                    const thisDay = new Date();
+                    %>
+        <div class="height0 justifyEnd padding5 absolute right20 top10">
+            <div class="searchBar">
+                <input type="search" id="univ">
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+      <br><br>
+      <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
+      <img src="/images/sun2.png" id="weatherIcon" alt="" class="absolute bottom0 h200" style="left: 40px; transform: rotate(-10deg);">
+        <div class="height0 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
+          <p class="size14 str400">
+                Awesome! Today Is
+          </p>
+          <p class="size34 str500 upperCase colorPrimary"><%= dayName %></p>
+          <div class="height0 width0 col alignStart bgTint7 colorPrimary padding5 borderRadius5">
+            <span class="height0 inline width0" id="weatherLabel"></span></p>
+          </div>
+      </div>
+    </div>
+    <div class="height0 paddingInline30 paddingBottom30 col alignStart">
+      <p class="size38 str400">Announcements</p>
+        <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+            <div class="h50 col justifyCenter alignStart padding5">
+                <a href="javascript:void(0);" class="nav pnav borderRadius15" id="newBtn">
+                    <i class="fa-solid fa-paper-plane"></i> Post New Announcement
+                </a>
+            </div>
+        <% } %>
+    </div>
+  </div>
+
+  
+<script>
+const code = <%= weatherCode %>; // from backend
+
+// Map codes to label + icon
+const weatherMap = {
+0:  { label: "Clear Sky", icon: "/images/sun2.png" },
+1:  { label: "Mainly Clear", icon: "/images/sun2.png" },
+2:  { label: "Partly Cloudy", icon: "/images/sun2.png" },
+3:  { label: "Overcast", icon: "/images/sun2.png" },
+45: { label: "Fog", icon: "/images/sun2.png" },
+48: { label: "Depositing Rime Fog", icon: "/images/sun2.png" },
+51: { label: "Light Drizzle", icon: "/images/sun2.png" },
+53: { label: "Moderate Drizzle", icon: "/images/sun2.png" },
+55: { label: "Dense Drizzle", icon: "/images/sun2.png" },
+56: { label: "Light Freezing Drizzle", icon: "/images/sun2.png" },
+57: { label: "Dense Freezing Drizzle", icon: "/images/sun2.png" },
+61: { label: "Slight Rain", icon: "/images/rain.png" },
+63: { label: "Moderate Rain", icon: "/images/rain.png" },
+65: { label: "Heavy Rain", icon: "/images/rain.png" },
+66: { label: "Light Freezing Rain", icon: "/images/rain.png" },
+67: { label: "Heavy Freezing Rain", icon: "/images/rain.png" },
+71: { label: "Slight Snowfall", icon: "/images/snow.png" },
+73: { label: "Moderate Snowfall", icon: "/images/thunder.png" },
+75: { label: "Heavy Snowfall", icon: "/images/thunder.png" },
+77: { label: "Snow Grains", icon: "/images/thunder.png" },
+80: { label: "Slight Rain Showers", icon: "/images/thunder.png" },
+81: { label: "Moderate Rain Showers", icon: "/images/thunder.png" },
+82: { label: "Violent Rain Showers", icon: "/images/thunder.png" },
+85: { label: "Slight Snow Showers", icon: "/images/thunder.png" },
+86: { label: "Heavy Snow Showers", icon: "/images/thunder.png" },
+95: { label: "Thunderstorm", icon: "/images/thunder.png" },
+96: { label: "Thunderstorm with Slight Hail", icon: "/images/thunder.png" },
+99: { label: "Thunderstorm with Heavy Hail", icon: "/images/thunder.png" }
+};
+const weather = weatherMap[code] || { label: "Usual Weather", icon: "/images/sun2.png" };
+
+document.getElementById("weatherIcon").src = weather.icon;
+document.getElementById("weatherLabel").innerText = weather.label;
+</script>
+
+
+    <div id="notFound" class="size20 height0 width100 padding20 borderRadius10 hidden">Sorry, No record Found!</div>
+    <br>
+    <% if (announcements && announcements.length > 0) { %>
+        <% announcements.forEach(ann => { %>
+            <div class="card annCard darkShadow">
+                
+                <div class="section">
+                    <p class="title"><%= ann.title %></p>
+                </div>
+                <div class="section annDate">
+                    <%= ann.createdAt.toDateString() %>
+                </div>
+                <div class="section mainCN">
+                    <p><%= ann.description %></p>
+                </div>
+                <div class="section annPhoto">
+                    <% if (ann.image) { %>
+                        <img src="<%= ann.image %>" alt="Announcement Image" width="100px" height="100px">
+                    <% } else { %>
+                        <p>No Image Available</p>
+                    <% } %>
+                </div>
+                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary") { %>
+                <div class="height0 right gap10">
+                    <a href="javascript:void(0)" class="nav" onclick="editAnnouncement('<%= ann._id %>', '<%= ann.title %>', '<%= ann.description %>', '<%= ann.image %>')">
+                        <i class="fas fa-edit"></i> Modify
+                    </a>                                
+                    <form action="/deleteAnn/<%= ann._id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this?');" class="width0 height0 transparent vers">
+                        <button type="submit" class="nav dnav-fill">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                    
+                </div>
+                <% } %>
+            </div>
+        <% }); %>
+    <% } else { %>
+        <p>No announcements available.</p>
+    <% } %>
+</div>
+<script>
+    // Preview Image for both new and edit forms
+    function previewFile() {
+        const preview = document.getElementById("previewImage");
+        const file = document.querySelector('input[name="image"]').files[0];
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            preview.src = reader.result;
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Show new announcement form when "Post News" button is clicked
+    document.getElementById("newBtn").addEventListener("click", function(event) {
+        event.preventDefault();
+        document.getElementById("newCard").classList.remove("unseen");
+        document.getElementById("newCard").classList.add("seen");
+    });
+
+    // Close the form and hide it when the close button is clicked
+    document.getElementById('closeBtn').addEventListener('click', function() {
+        document.getElementById("newCard").classList.remove("seen");
+        document.getElementById("newCard").classList.add("unseen");
+    });
+</script>
+<script>
+    document.getElementById("univ").addEventListener("input", function () {
+        let filter = this.value.toLowerCase();
+        let annCards = document.querySelectorAll(".annCard");
+        let found = false;
+
+        // If the search field is empty, show all cards and hide "NOT FOUND"
+        if (filter === "") {
+            annCards.forEach(card => card.style.display = "flex");
+            document.getElementById("notFound").style.display = "none";
+            return;
+        }
+
+        // Hide cards that don't match the filter and show matching ones
+        annCards.forEach(card => {
+            let title = card.querySelector(".title") ? card.querySelector(".title").textContent.toLowerCase() : '';
+            let description = card.querySelector(".mainCN p") ? card.querySelector(".mainCN p").textContent.toLowerCase() : '';
+            
+            // Check if either title or description matches the filter
+            if (title.includes(filter) || description.includes(filter)) {
+                card.style.display = "flex";
+                found = true;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        // Show "NOT FOUND" if no matches are found
+        document.getElementById("notFound").style.display = found ? "none" : "flex";
+    });
+</script>

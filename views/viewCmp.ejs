@@ -1,0 +1,1174 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+                flex-direction: column-reverse;
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: column;
+                width: 100%;
+                height: 90%;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 10px;
+                width: 100%;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .docBtn {
+                transform: scale(1);
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                height: 60px;
+                padding: 20px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+            .docBtn i {
+                width: 14px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 0 10px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: center;
+                justify-items: center;
+                padding-block: 50px;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                height: 100px;
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 100px;
+                width: 100%;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            .redBG {
+                background-color: #ffede6;
+                padding: 4px 8px;
+                border-radius: 8px;
+                color: rgb(65, 0, 0);
+            }
+            .key {
+                width: 30%;
+            }
+            .caseInfo {
+                font-size: 16px;
+                color: var(--darkBG);
+                text-align: center;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            #doc1 .tnr, #doc1 .parag,  #doc1 .paragStr {
+                font-family: 'Courier New', Courier, monospace;
+            }
+            #doc2 .tnr, #doc2 .parag,  #doc2 .paragStr {
+                font-family: 'Courier New', Courier, monospace;
+            }
+            .hidden {
+                display: none !important;
+            }
+            #optionCard.seen {
+                padding-inline: 10px;
+            }
+        </style>
+    </head>
+    <% if (typeof success !== "undefined") { %>
+        <div class="alert alert-success">
+            <%= success %>
+        </div>
+    <% } %>
+    
+    <div class="absolute width60 height99 index100 unseen" id="newCard">
+        
+      
+        <form action="/add-schedule" method="POST" class="width95 height95 padding50 justifyStart alignStart col relative gap5 darkShadow">
+            <input type="text" value="<%= caseData._id %>" name="caseId" class="hidden">
+            <a href="" class="nav absolute right10 top10" id="closeBtn"><i class="fas fa-times"></i>Cancel</a>
+            <p class="size30 green">SCHEDULE A HEARING</p>
+            <br>        <% if (error) { %>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        let newCard = document.getElementById("newCard");
+                        if (newCard) {
+                            newCard.classList.add("seen");
+                            newCard.classList.remove("unseen");
+                        }
+                    });
+                </script>
+                <p style="color: red;"><%= error %></p>
+                <br>
+            <% } %>
+    
+            <div class="height0 padding20 borderRadius10 col alignStart borderPrimary bgSoft">
+                <p class="size18 str500">Presiding officers</p>
+                <br><% 
+var filteredResidents = residents.filter(resident => 
+    resident.position === "Punong Barangay" || resident.position === "Barangay Justice"
+); 
+%>
+
+<label for="">Choose Chairperson</label>
+<div class="selectBar widthMax100">
+    <select name="chair" id="chair" class="resident-select">
+        <option value="" disabled selected>Select</option>
+        <% filteredResidents.forEach(resident => { %>
+            <option value="<%= resident._id %>">
+                <%= resident.firstName %> <%= resident.lastName %> <%= resident.extName || '' %>
+            </option>
+        <% }) %>
+    </select>
+</div>
+
+<label for="">Choose Secretary</label>
+<div class="selectBar widthMax100">
+    <select name="secretary" id="secretary" class="resident-select">
+        <option value="" disabled selected>Select</option>
+        <% filteredResidents.forEach(resident => { %>
+            <option value="<%= resident._id %>">
+                <%= resident.firstName %> <%= resident.lastName %> <%= resident.extName || '' %>
+            </option>
+        <% }) %>
+    </select>
+</div>
+
+<label for="">Choose Member</label>
+<div class="selectBar widthMax100">
+    <select name="member" id="member" class="resident-select">
+        <option value="" disabled selected>Select</option>
+        <% filteredResidents.forEach(resident => { %>
+            <option value="<%= resident._id %>">
+                <%= resident.firstName %> <%= resident.lastName %> <%= resident.extName || '' %>
+            </option>
+        <% }) %>
+    </select>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const selects = document.querySelectorAll(".resident-select");
+
+    function updateOptions() {
+        // Get selected values
+        let selectedValues = new Set();
+        selects.forEach(select => {
+            if (select.value) {
+                selectedValues.add(select.value);
+            }
+        });
+
+        // Loop through all select elements
+        selects.forEach(select => {
+            Array.from(select.options).forEach(option => {
+                if (option.value && option.value !== "") {
+                    option.hidden = selectedValues.has(option.value) && option.value !== select.value;
+                }
+            });
+        });
+    }
+
+    // Attach event listener to all selects
+    selects.forEach(select => {
+        select.addEventListener("change", updateOptions);
+    });
+
+    updateOptions(); // Run on load in case values are pre-filled
+});
+</script>
+
+            </div>
+            <br>
+            <div class="height0 padding20 borderRadius10 col alignStart borderPrimary bgSoft">
+                <p class="size18 str500">Schedule</p>
+                <div class="height0 gap10">
+                    <div class="height0 width80 col alignStart">
+                        <label for="">Date</label>
+                        <div class="height0 gap10">
+                            <div class="selectBar width100 widthMax100">
+                                <select id="month" required name="month">
+                                    <option value="" disabled selected>Month</option>
+                                </select>
+                            </div>
+                            <div class="selectBar width100 widthMax100">
+                                <select id="day" required name="day">
+                                    <option value="" disabled selected>Day</option>
+                                </select>
+                            </div>
+                            <div class="selectBar width100 widthMax100">
+                                <select id="year" required name="year">
+                                    <option value="" disabled selected>Year</option>
+                                </select>
+                            </div>
+                            
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function() {
+                                    let today = new Date();
+                                    let nextYear = today.getFullYear() + 1;
+                            
+                                    let monthSelect = document.getElementById("month");
+                                    let daySelect = document.getElementById("day");
+                                    let yearSelect = document.getElementById("year");
+                            
+                                    // Populate months with full names as values
+                                    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                                    for (let m = 0; m < 12; m++) {
+                                        let option = document.createElement("option");
+                                        option.value = months[m];
+                                        option.textContent = months[m];
+                                        monthSelect.appendChild(option);
+                                    }
+                            
+                                    // Populate days (1 to 31)
+                                    for (let d = 1; d <= 31; d++) {
+                                        let option = document.createElement("option");
+                                        option.value = d;
+                                        option.textContent = d;
+                                        daySelect.appendChild(option);
+                                    }
+                            
+                                    // Populate years (current year and next year)
+                                    for (let y = today.getFullYear(); y <= nextYear; y++) {
+                                        let option = document.createElement("option");
+                                        option.value = y;
+                                        option.textContent = y;
+                                        yearSelect.appendChild(option);
+                                    }
+                                });
+                            </script>
+                            
+                        </div>
+                    </div>
+                    <div class="height0 gap5 width20 col alignStart">
+                        <label for="">Time</label>
+                        <div class="selectBar width100 widthMax100">
+                            <select name="time" required>
+                                <option value="" disabled selected>Select</option>
+                                <option value="08:00">08:00 AM</option>
+                                <option value="09:00">09:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="01:00">01:00 PM</option>
+                                <option value="02:00">02:00 PM</option>
+                                <option value="03:00">03:00 PM</option>
+                                <option value="04:00">04:00 PM</option>
+                                <option value="05:00">05:00 PM</option>
+                                <option value="06:00">06:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="height0 justifyEnd">
+                <button type="submit" class="nav pnav"><i class="fas fa-check-square"></i>Submit</button>
+            </div>
+        </form>
+    </div>
+
+
+        <div class="main bgSoft">
+
+            <div class="block col" id="trayCard" style="position: relative;">
+                <div class="card col tray bgSoft" style="padding: 0;">
+                    <div class="gap20 alignEnd padding10">
+                        <div class="width60 height100 blockX overflow-y1 paddingRight15">
+                            <div class="height0 justifyBetween">
+                                <a href="/cmp" class="nav">
+                                    <i class="fas fa-chevron-left"></i>
+                                    Go Back to Records
+                                </a>
+                                <a href="/case-close/<%= caseData.caseNo %>" class="nav hidden">
+                                    <i class="fas fa-check"></i>
+                                    Case Close
+                                </a>
+                                <div class="height0 gap10 width0">
+                                    <a href="" class="nav"><i class="fas fa-edit"></i>Modify</a>
+                                    <a href="" class="nav"><i class="fas fa-trash"></i>Case Close</a>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="height22 justifyBetween alignStart abstractBG padding20 white borderRadius15 relative col">
+                                <p class="size24 str500"><%= caseData.type %></p>
+                                <a href="" class="nav absolute top15 right10 border0"><i class="fas fa-clock"></i>Pending</a>
+                                <div class="height0 gap10">
+                                    <div class="height0 col alignStart">
+                                        <p class="size12"> Case No.</p>
+                                        <p class="size16 str500"><%= caseData.caseNo %></p>
+                                    </div>
+                                    <div class="height0 col alignEnd">
+                                        <p class="size12"> Date File</p>
+                                        <p class="size16 str500">
+                                            <%= new Date(caseData.createdAt).toLocaleDateString('en-US', { 
+                                                month: 'short', day: '2-digit', year: 'numeric' 
+                                            }) %> &bull; 
+                                            <%= new Date(caseData.createdAt).toLocaleTimeString('en-US', { 
+                                                hour: '2-digit', minute: '2-digit', hour12: true 
+                                            }).replace(/^0/, '') %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="height0 padding10 borderRadius10 col alignStart">
+                                <p class="size18 str400">Complainant</p>
+                                <table id="userInfo">
+                                <% if (complainants.length > 0) { %>
+                                    <% complainants.forEach(complainant => { %>
+                                        <p class="size16 str500"></p>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="width45"><%= complainant.name %></td>
+                                                    <td class="width35"><%= complainant.address %></td>
+                                                    <td class="width20"><%= complainant.phone %></td>
+                                                </tr>
+                                            </tbody>
+                                <% }) %>
+                                <% } else { %>
+                                <p>No complainants found.</p>
+                                <% } %>
+                                </table>
+                                <br>
+                                <p class="size18 str400">Complainee</p>
+                                <table id="userInfo">
+                                    <% if (complainees.length > 0) { %>
+                                        <% complainees.forEach(complainee => { %>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="width45"><%= complainee.name %></td>
+                                                        <td class="width35"><%= complainee.address %></td>
+                                                        <td class="width20"><%= complainee.phone %></td>
+                                                    </tr>
+                                                </tbody>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <p>No complainees found.</p>
+                                    <% } %>
+                             </table>
+                            </div>
+                        </div>
+                        <div class="hidden width40 padding40 bgWhite darkShadow borderRadius10 justifyStart alignStart col relative blockX overflow-y1">
+                            <a href="javascript:void()" class="nav absolute right10 top10" id="newBtn">
+                                <i class="fas fa-calendar"></i>
+                                Set New
+                            </a>
+                            <p class="size20 str500">Schedule of Hearing</p>
+                            <br>
+                            <% if (schedules.length > 0) { %>
+                                        <% schedules.forEach(schedule => { %>
+                                            <div class="schedCard height0 marginBottom20 relative">
+                                                <a href="" class="width0 height0 absolute top20 right20 optionBtn" id="optionBtn"><i class="fas fa-ellipsis"></i></a>
+                                                <div class="height0 gap0 absolute top40 right10 width0 bgWhite borderRadius10 col index80 unseen optionCard" id="optionCard">
+                                                    <a href="" class="nav border0"><i class="fas fa-eye"></i>Details</a>
+                                                    <hr>
+                                                    <form action="/delete-sched/<%= schedule._id %>" method="POST" class="vers">
+                                                        <button type="submit" class="nav border0"><i class="fas fa-trash"></i>Remove</button>
+                                                    </form>
+                                                </div>
+                                                <p class="size14 str400"><%= schedule.month %> <%= schedule.day %>, <%= schedule.year %> | <%= schedule.time %></p>
+                                                <br>
+                                                <div class="h40 relative justifyEnd alignCenter">
+                                                    <% if (schedule.chair && schedule.chair.photo) { %>
+                                                        <img src="<%= schedule.chair.photo %>" alt="Chairperson's Photo" class="absolute h40 w40 bottom20 borderRadius500 left0 top0">
+                                                    <% } else { %>
+                                                        <img src="/images/profile.jpg" alt="Default Photo" class="absolute h40 w40 bottom20 borderRadius500 left0 top0">
+                                                    <% } %>
+                                                    <% if (schedule.secretary && schedule.secretary.photo) { %>
+                                                        <img src="<%= schedule.secretary.photo %>" alt="Chairperson's Photo" class="absolute h40 w40 bottom20 borderRadius500 left30 top0">
+                                                    <% } else { %>
+                                                        <img src="/images/profile.jpg" alt="Default Photo" class="absolute h40 w40 bottom20 borderRadius500 left0 top0">
+                                                    <% } %>
+                                                    <% if (schedule.member && schedule.member.photo) { %>
+                                                        <img src="<%= schedule.member.photo %>" alt="Chairperson's Photo" class="absolute h40 w40 bottom20 borderRadius500 left60 top0">
+                                                    <% } else { %>
+                                                        <img src="/images/profile.jpg" alt="Default Photo" class="absolute h40 w40 bottom20 borderRadius500 left0 top0">
+                                                    <% } %>
+                                                    <a href="" class="nav disabled"><i class="fas fa-clock"></i><%= schedule.status %></a>
+                                                </div>
+                                                <div class="height0 col hidden">
+                                                    <p class="size14 str400">
+                                                        <%= schedule.chair ? `${schedule.chair.firstName} ${schedule.chair.lastName} ${schedule.chair.extName || ''}` : 'N/A' %>
+                                                    </p>
+                                                    <p class="size10 str400">Secretary</p>
+                                                    <p class="size14 str400">
+                                                        <%= schedule.secretary ? `${schedule.secretary.firstName} ${schedule.secretary.lastName} ${schedule.secretary.extName || ''}` : 'N/A' %>
+                                                    </p>
+                                                    <p class="size10 str400">Member</p>
+                                                    <p class="size14 str400">
+                                                        <%= schedule.member ? `${schedule.member.firstName} ${schedule.member.lastName} ${schedule.member.extName || ''}` : 'N/A' %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                            <% } else { %>
+                                <p>Unscheduled</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc1">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('clearance')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('clearance')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('clearance')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="clearance" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.08; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section pageMainf">
+                                <div class="section alignStart" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p>
+                                        
+                                        <% if (complainants.length > 0) { %>
+                                            <% complainants.forEach(complainant => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainant.name %></span></p>
+                                        <% }) %>
+                                        <% } else { %>
+                                        <p>No complainants found.</p>
+                                        <% } %>
+                                            
+                                    </div>
+                                    <div class="section col" style="padding: 0; align-items: end;">
+                                        <p class="p10 tnr">Usaping Barangay Blg. <span class="tnr p10 blue"> <%= caseData.caseNo %></span></p>
+                                        <p class="p10 tnr">Ukol sa: <span class="tnr p10 blue" style="font-weight: bold;">  <%= caseData.type %></span></p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">-LABAN KAY-</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p><% if (complainees.length > 0) { %>
+                                            <% complainees.forEach(complainee => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainee.name %></span></p>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <p>No complainees found.</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    P A T A W A G
+                                </p>
+                                <br>
+                                <p class="p10 tnr">KAY:<span class="paragStr blue"><% if (complainees.length > 0) { %>
+                                    <% complainees.forEach(complainee => { %>
+                                        <%= complainee.name %>,
+                                    <% }) %>
+                                <% } else { %>
+                                    <p>No complainees found.</p>
+                                <% } %></span></p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        Sa pamamagitan nito kayo'y tinatawag upang personal na humarap sa akin, sa ika
+                                        <span class="paragStr">19</span>
+                                        ng 
+                                        <span class="paragStr">ENERO</span>,
+                                        <span class="paragStr">2025</span>
+                                         sa ganap na ika-
+                                         <span class="paragStr">9 ng umaga</span>,
+                                         upang sagutin ang isang sumbong na idinulog sa akin, para pamagitanan/pagkasunduin kayo ng tao na nagrereklamo sa iyo ukol sa 
+                                         <span class="paragStr">UTANG</span>.
+                                    </p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        Sa pamamagitan nito kayo'y binabalaan na ang inyong pagtanggi o sadyang di pagharap bilang pagtalima sa patawag na ito ay magbibigay ng karapatan sa mga maysumbong upang tuwiran kayong ipasakdal sa hukuman/tanggapan ng pamahalaan, na doon ay mahahadlangan kayong magharap ng kontra-demanda bunga ng banaggit na sumbong.
+                                    </p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        TUPARIN ITO, at kung hindi'y parurusahan kayo sa salang paglapastangan sa hukuman.
+                                    </p>
+                                    <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr txtStr red" style="width: 45%; justify-content: center;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            
+
+            <div class="block col hidden" id="doc2">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('indigency')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('indigency')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('indigency')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="indigency" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.08; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section pageMainf">
+                                <div class="section alignStart" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p>
+                                        
+                                        <% if (complainants.length > 0) { %>
+                                            <% complainants.forEach(complainant => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainant.name %></span></p>
+                                        <% }) %>
+                                        <% } else { %>
+                                        <p>No complainants found.</p>
+                                        <% } %>
+                                            
+                                    </div>
+                                    <div class="section col" style="padding: 0; align-items: end;">
+                                        <p class="p10 tnr">Usaping Barangay Blg. <span class="tnr p10 blue"> <%= caseData.caseNo %></span></p>
+                                        <p class="p10 tnr">Ukol sa: <span class="tnr p10 blue" style="font-weight: bold;">  <%= caseData.type %></span></p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">-LABAN KAY-</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p><% if (complainees.length > 0) { %>
+                                            <% complainees.forEach(complainee => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainee.name %></span></p>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <p>No complainees found.</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    P A T A W A G
+                                </p>
+                                <br>
+                                <p class="p10 tnr">KAY:<span class="paragStr blue"><% if (complainees.length > 0) { %>
+                                    <% complainees.forEach(complainee => { %>
+                                        <%= complainee.name %>,
+                                    <% }) %>
+                                <% } else { %>
+                                    <p>No complainees found.</p>
+                                <% } %></span></p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        Sa pamamagitan nito kayo'y tinatawag upang personal na humarap sa amin, sa ika
+                                        <span class="paragStr">19</span>
+                                        ng 
+                                        <span class="paragStr">ENERO</span>,
+                                        <span class="paragStr">2025</span>
+                                         sa ganap na ika-
+                                         <span class="paragStr">9 ng umaga</span>,
+                                         upang sagutin ang isang sumbong na idinulog sa akin, para pamagitanan/pagkasunduin kayo ng tao na nagrereklamo sa iyo ukol sa 
+                                         <span class="paragStr">UTANG</span>.
+                                    </p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        Sa pamamagitan nito kayo'y binabalaan na ang inyong pagtanggi o sadyang di pagharap bilang pagtalima sa patawag na ito ay magbibigay ng karapatan sa mga maysumbong upang tuwiran kayong ipasakdal sa hukuman/tanggapan ng pamahalaan, na doon ay mahahadlangan kayong magharap ng kontra-demanda bunga ng banaggit na sumbong.
+                                    </p>
+                                    <p class="p10 parag" style="display: inline;">
+                                        TUPARIN ITO, at kung hindi'y parurusahan kayo sa salang paglapastangan sa hukuman.
+                                    </p>
+                                    <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr txtStr red" style="width: 45%; justify-content: center;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc3">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('resi')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('resi')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('resi')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="resi" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.08; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead" style="position: relative; height: 200px;">
+                            <div class="ctrl" style="width: 150px; height: 150px; justify-content: end; position: absolute; left: 70px; top: 0;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <br><br>
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p14 tnr">&nbsp;TANGGAPAN NG LUPONG TAGAPAMAYAPA&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 150px; height: 150px; justify-content: start; position: absolute; right: 70px; top: 0;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section pageMainf">
+                                <div class="section alignStart" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p>
+                                        
+                                        <% if (complainants.length > 0) { %>
+                                            <% complainants.forEach(complainant => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainant.name %></span></p>
+                                        <% }) %>
+                                        <% } else { %>
+                                        <p>No complainants found.</p>
+                                        <% } %>
+                                            
+                                    </div>
+                                    <div class="section col" style="padding: 0; align-items: end;">
+                                        <p class="p10 tnr">Usaping Barangay Blg. <span class="tnr p10 blue"> <%= caseData.caseNo %></span></p>
+                                        <p class="p10 tnr">Ukol sa: <span class="tnr p10 blue" style="font-weight: bold;">  <%= caseData.type %></span></p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">-LABAN KAY-</p>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="section" style="padding: 0;">
+                                    <div class="section col" style="padding: 0; align-items: start;">
+                                        <p class="p10 tnr">Maysumbong</p><% if (complainees.length > 0) { %>
+                                            <% complainees.forEach(complainee => { %>
+                                                <p class="p10 tnr blue" style="font-weight: bold;"><%= complainee.name %></span></p>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <p>No complainees found.</p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <br>
+                                <p class="p12 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%;">
+                                    KATUNAYAN UPANG MAKADULOG SA HUKUMAN
+                                </p>
+                                <br>
+                                <p class="p10 parag">Ito'y nagpapatunay na ang magkabilang panig sa pagitan ng may sumbong at ipinagsumbong ay sadyang hindi nakapag ayos.</p>
+                                <p class="p10 parag" style="display: inline;">
+                                    Kung kaya't ang kaukulang sumbong ukol sa
+                                    <span class="paragStr"><%= caseData.type %></span>
+                                    ay maari ng idulog sa Hukuman/Tanggapan ng Pamahalaan.
+                                </p>
+                                <br>
+                                <p class="p10 parag">
+                                    Ngayong ika-<span class="paragStr thisDay2" id=""></span> ng <span class="paragStr thisMonth2" id=""></span>,
+                                     taong <span class="paragStr thisYear" id=""></span>.
+                                </p>
+                            
+                            <div class="section col" style="align-items: end; gap: 0;">
+                                <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">FRANCISCO S. VELASQUEZ</p>
+                                <p class="p10 tnr" style="width: 45%; justify-content: center;">Pangkat Kalihim</p>
+                            </div>
+                            <div class="section col" style="align-items: start; gap: 0;">
+                                <p class="p10 tnr" style="width: 45%; justify-content: start;">Pinatotoo ni:</p>
+                                <br>
+                                <p class="p10 tnr txtStr" style="width: 100%; justify-content: start;">ESMERALDAMARGARITA DOMINO</p>
+                                <p class="p10 tnr" style="width: 45%; justify-content: center;">Pangkat Chairman</p>
+                            </div>
+                            <div class="section col" style="align-items: start; gap: 0;">
+                                <p class="p10 tnr" style="width: 45%; justify-content: start;">Sa kaalaman ni:</p>
+                                <br>
+                                <p class="p10 tnr txtStr" style="width: 45%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                <p class="p10 tnr" style="width: 45%; justify-content: center;">Punong Barangay</p>
+                            </div>
+                            </div>
+                        </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="height0">
+        <div class="ctrl">
+            <a href="javascript:void()" class="nav" id="doc1Btn">
+                <i class="fas fa-scroll"></i>
+                Summon from Punong Barangay
+            </a>
+            <a href="" class="nav" id="doc2Btn">
+                <i class="fas fa-scroll"></i>
+                Summon from Lupong Tagapamayapa
+            </a>
+            <a href="" class="nav" id="doc3Btn">
+                <i class="fas fa-file-alt"></i>
+                Cert File Action
+            </a>
+        </div>
+    </div>
+
+            
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect = document.getElementById('purposeSelect');
+                    const purposeRef = document.getElementById('purposeRef');
+            
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect.addEventListener('change', function() {
+                        purposeRef.textContent = purposeSelect.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect2 = document.getElementById('purposeSelect2');
+                    const purposeRef2 = document.getElementById('purposeRef2');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect2.addEventListener('change', function() {
+                        purposeRef2.textContent = purposeSelect2.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect3 = document.getElementById('purposeSelect3');
+                    const purposeRef3 = document.getElementById('purposeRef3');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect3.addEventListener('change', function() {
+                        purposeRef3.textContent = purposeSelect3.value;
+                    });
+                });
+            </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect4 = document.getElementById('purposeSelect4');
+                    const purposeRef4 = document.getElementById('purposeRef4');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect4.addEventListener('change', function() {
+                        purposeRef4.textContent = purposeSelect4.value;
+                    });
+                });
+            </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Get the dropdown and the span element
+                                const purposeSelect5 = document.getElementById('purposeSelect5');
+                                const purposeRef5 = document.getElementById('purposeRef5');
+            
+                                // Update the span with the selected value whenever the selection changes
+                                purposeSelect5.addEventListener('change', function() {
+                                    purposeRef5.textContent = purposeSelect5.value;
+                                });
+                            });
+                        </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+    
+            <script>// Array of IDs for buttons and their corresponding divs
+                const buttons = ['doc1Btn', 'doc2Btn', 'doc3Btn'];
+                const divs = ['doc1', 'doc2', 'doc3'];
+                const trayCard = document.getElementById('trayCard');
+                
+                // Store original button content and styles
+                const originalContent = {};
+                buttons.forEach((buttonId) => {
+                    const button = document.getElementById(buttonId);
+                    originalContent[buttonId] = button.innerHTML;
+                });
+                
+                // Loop through all buttons and assign click event listeners
+                buttons.forEach((buttonId, index) => {
+                    const button = document.getElementById(buttonId);
+                    const correspondingDiv = document.getElementById(divs[index]);
+                
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                
+                        const isActive = button.classList.contains('active');
+                
+                        // Reset all buttons and divs
+                        divs.forEach((divId) => document.getElementById(divId).classList.add('hidden'));
+                        buttons.forEach((btnId) => {
+                            const btn = document.getElementById(btnId);
+                            btn.innerHTML = originalContent[btnId];
+                            btn.classList.remove('active');
+                            btn.style.backgroundColor = '';
+                            btn.style.color = '';
+                        });
+                
+                        if (!isActive) {
+                            // Show the corresponding div and change button state
+                            trayCard.classList.add('hidden');
+                            correspondingDiv.classList.remove('hidden');
+                            button.innerHTML = '<i class="fas fa-times"></i> ' + button.textContent.trim();
+                            button.classList.add('active');
+                            button.style.backgroundColor = '#1d3b2f';
+                            button.style.color = 'white';
+                        } else {
+                            // Hide the corresponding div and reset button state
+                            correspondingDiv.classList.add('hidden');
+                            trayCard.classList.remove('hidden');
+                            button.innerHTML = originalContent[buttonId];
+                            button.classList.remove('active');
+                            button.style.backgroundColor = '';
+                            button.style.color = '';
+                        }
+                    });
+                });
+                
+
+              </script>
+              
+<script>
+const zoomStep = 0.1; // Zoom increment step
+const maxZoom = 1.2; // Maximum zoom level
+const minZoom = 0.5; // Minimum zoom level
+
+// Object to store scales for each element
+let scales = {};
+
+function zoomIn(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] < maxZoom) {
+        scales[elementId] += zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function zoomOut(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] > minZoom) {
+        scales[elementId] -= zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function resetZoom(elementId) {
+    scales[elementId] = 1; // Reset the scale
+    updateZoom(elementId);
+}
+
+function updateZoom(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.transform = `scale(${scales[elementId]})`;
+        element.style.transformOrigin = "top center";
+    }
+}
+
+
+</script>
+
+<script>
+document.getElementById('certContent').addEventListener('input', function() {
+    document.getElementById('certContentM').textContent = this.value; 
+});
+
+</script>
+
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+        var newCard = document.getElementById('newCard');
+        if (newCard.classList.contains('unseen')) {
+            newCard.classList.remove('unseen');
+            newCard.classList.add('seen');
+        }
+    });
+
+    document.getElementById('closeBtn').addEventListener('click', function() {
+        var newCard = document.getElementById('newCard');
+        if (newCard.classList.contains('seen')) {
+            newCard.classList.remove('seen');
+            newCard.classList.add('unseen');
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var optionButtons = document.querySelectorAll(".optionBtn"); // Get all option buttons
+        var optionCards = document.querySelectorAll(".optionCard");  // Get all option cards
+
+        optionButtons.forEach((button) => {
+            var optionCard = button.nextElementSibling; // Assuming the card is right after the button
+            var icon = button.querySelector("i");
+
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                var isVisible = optionCard.classList.contains("seen");
+
+                // Close all other optionCards before opening the clicked one
+                optionCards.forEach((card) => {
+                    card.classList.remove("seen");
+                    card.classList.add("unseen");
+                });
+
+                optionButtons.forEach((btn) => {
+                    btn.querySelector("i").style.transform = "rotate(0deg)";
+                });
+
+                if (isVisible) {
+                    optionCard.classList.remove("seen");
+                    optionCard.classList.add("unseen");
+                    icon.style.transform = "rotate(0deg)";
+                } else {
+                    optionCard.classList.remove("unseen");
+                    optionCard.classList.add("seen");
+                    icon.style.transform = "rotate(90deg)";
+                }
+            });
+        });
+
+        // Close when clicking outside any optionCard
+        document.addEventListener("click", function (event) {
+            optionCards.forEach((card) => {
+                if (!card.contains(event.target)) {
+                    card.classList.remove("seen");
+                    card.classList.add("unseen");
+                }
+            });
+
+            optionButtons.forEach((btn) => {
+                btn.querySelector("i").style.transform = "rotate(0deg)";
+            });
+        });
+
+        // Prevent closing when clicking inside an optionCard
+        optionCards.forEach((card) => {
+            card.addEventListener("click", function (event) {
+                event.stopPropagation();
+            });
+        });
+    });
+</script>

@@ -1,0 +1,341 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .userPhoto {
+                height: 100px;
+                width: 100px;
+                outline: 1px solid lightgray;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            .inputTd {
+                padding: 0 10px;
+                border: none;
+                box-shadow: none;
+            }
+            .inputTd input, .inputTd select {
+                border: none;
+            }
+            .inputTd input:focus, .inputTd select:focus {
+                outline: none;
+            }
+        </style>
+    </head>
+
+        <div class="main height0" style="justify-content: start;">
+            <form action="/update-resident/<%= resident._id %>" method="POST" class="vers block" id="trayCard" style="position: relative; height: 100%; padding-block: 0">
+                <a href="/rsdView/<%= resident._id %>" class="nav transparent white index20" style="position: absolute; left: 40px; top: 60px;">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </a>
+                <div class="card col tray" style="padding: 20px; height: auto;">
+                    <div class="height0 abstractBG padding20 col index0 borderRadius20">
+                        <div class="section">
+                            <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="User Photo" class="userPhoto">
+                        </div>
+                        <br>
+                        <div class="head" style="height: 50px; padding: 0;">
+                            <div class="ctrl" style="padding: 0; width: 70%;">
+                                <div class="field" style="align-items: center;">
+                                    <input value="<%= resident.firstName %>" type="text" style="font-size: 20px; min-width: 0; text-align: center;" name="firstName">
+                                </div>
+                                <div class="field" style="align-items: center;">
+                                    <input value="<%= resident.middleName %>" type="text" style="font-size: 20px; min-width: 0; text-align: center;" name="middleName">
+                                </div>
+                                <div class="field" style=" align-items: center;">
+                                    <input value="<%= resident.lastName %>" type="text" style="font-size: 20px; min-width: 0; text-align: center;" name="lastName">
+                                </div>
+                                <div class="field medium" style="align-items: center;">
+                                    <input value="<%= resident.extName %>" type="text" style="font-size: 20px; min-width: 0; text-align: center;" name="extName">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section" style="align-items: start; padding: 0;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td>Position</td>
+                                    <td class="inputTd">
+                                        <select name="position">
+                                            <option value="Resident" <%= resident.position === 'Resident' ? 'selected' : '' %>>Resident</option>
+                                            <option value="Punong Barangay" <%= resident.position === 'Punong Barangay' ? 'selected' : '' %>>Punong Barangay</option>
+                                            <option value="Barangay Kagawad" <%= resident.position === 'Barangay Kagawad' ? 'selected' : '' %>>Barangay Kagawad</option>
+                                            <option value="Barangay Secretary" <%= resident.position === 'Barangay Secretary' ? 'selected' : '' %>>Barangay Secretary</option>
+                                            <option value="Barangay Treasurer" <%= resident.position === 'Barangay Treasurer' ? 'selected' : '' %>>Barangay Treasurer</option>
+                                            <option value="Sk Chairman/Chairwoman" <%= resident.position === 'Sk Chairman/Chairwoman' ? 'selected' : '' %>>Sk Chairman/Chairwoman</option>
+                                            <option value="Barangay BHW" <%= resident.position === 'Barangay BHW' ? 'selected' : '' %>>Barangay BHW</option>
+                                            <option value="Barangay BIC" <%= resident.position === 'Barangay BIC' ? 'selected' : '' %>>Barangay BIC</option>
+                                            <option value="Barangay BNS" <%= resident.position === 'Barangay BNS' ? 'selected' : '' %>>Barangay BNS</option>
+                                            <option value="Barangay BPO" <%= resident.position === 'Barangay BPO' ? 'selected' : '' %>>Barangay BPO</option>
+                                            <option value="Barangay Clerk" <%= resident.position === 'Barangay Clerk' ? 'selected' : '' %>>Barangay Clerk</option>
+                                            <option value="Barangay DCW" <%= resident.position === 'Barangay DCW' ? 'selected' : '' %>>Barangay DCW</option>
+                                            <option value="Barangay Driver" <%= resident.position === 'Barangay Driver' ? 'selected' : '' %>>Barangay Driver</option>
+                                            <option value="Barangay Electrician" <%= resident.position === 'Barangay Electrician' ? 'selected' : '' %>>Barangay Electrician</option>
+                                            <option value="Barangay Justice" <%= resident.position === 'Barangay Justice' ? 'selected' : '' %>>Barangay Justice</option>
+                                            <option value="Barangay Tanod" <%= resident.position === 'Barangay Tanod' ? 'selected' : '' %>>Barangay Tanod</option>
+                                            <option value="Barangay Tanod-Chief" <%= resident.position === 'Barangay Tanod-Chief' ? 'selected' : '' %>>Barangay Tanod-Chief</option>
+                                            <option value="Barangay Tanod-Deputy" <%= resident.position === 'Barangay Tanod-Deputy' ? 'selected' : '' %>>Barangay Tanod-Deputy</option>
+                                            <option value="Barangay Worker" <%= resident.position === 'Barangay Worker' ? 'selected' : '' %>>Barangay Worker</option>
+                                            <option value="BARC Chairman" <%= resident.position === 'BARC Chairman' ? 'selected' : '' %>>BARC Chairman</option>
+                                            <option value="Environment Officer" <%= resident.position === 'Environment Officer' ? 'selected' : '' %>>Environment Officer</option>
+                                            <option value="Safety Officer" <%= resident.position === 'Safety Officer' ? 'selected' : '' %>>Safety Officer</option>
+                                            <option value="Vawc Desk Officer" <%= resident.position === 'Vawc Desk Officer' ? 'selected' : '' %>>Vawc Desk Officer</option>
+                                        </select>                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Household</td>
+                                    <td class="inputTd">
+                                        <input value="<%= resident.houseNo %>" name="houseNo">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Purok</td>
+                                    <td class="inputTd">
+                                        <select name="purok">
+                                            <option value="Dike Street" <%= resident.purok === 'Dike Street' ? 'selected' : '' %>>Dike Street</option>
+                                            <option value="Bagong Daan Street" <%= resident.purok === 'Bagong Daan Street' ? 'selected' : '' %>>Bagong Daan Street</option>
+                                            <option value="Cantarilla Street" <%= resident.purok === 'Cantarilla Street' ? 'selected' : '' %>>Cantarilla Street</option>
+                                            <option value="Maharlika Highway" <%= resident.purok === 'Maharlika Highway' ? 'selected' : '' %>>Maharlika Highway</option>
+                                            <option value="Perigola Street" <%= resident.purok === 'Perigola Street' ? 'selected' : '' %>>Perigola Street</option>
+                                            <option value="Shortcut Street" <%= resident.purok === 'Shortcut Street' ? 'selected' : '' %>>Shortcut Street</option>
+                                        </select>                                        
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Birthday</td>
+                                    <td class="row padding0 border0">
+                                        <input type="text" value="<%= resident.bMonth %>" class="width25 borderPrimary" style="border: 1px solid lightgray;" name="bMonth">
+                                        <input type="text" value="<%= resident.bDay %>" class="width25 borderPrimary" style="border: 1px solid lightgray;" name="bDay">
+                                        <input type="text" value="<%= resident.bYear %>" class="width50 borderPrimary" style="border: 1px solid lightgray;" name="bYear">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Birth Place</td>
+                                    <td class="inputTd"><select name="birthPlace" required>
+                                        <% let cities = ["Alaminos", "Angeles", "Antipolo", "Bacolod", "Bacoor", "Bago", "Baguio", "Bais", "Balanga", "Batac", "Batangas City", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bogo", "Borongan", "Butuan", "Cabadbaran", "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calaca", "Calamba", "Calapan", "Calbayog", "Caloocan", "Candon", "Canlaon", "Carcar", "Carmona", "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan", "Danao", "Dapitan", "Dasmariñas", "Davao City", "Digos", "Dipolog", "Dumaguete", "El Salvador", "Escalante", "Gapan", "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan", "Iloilo City", "Imus", "Iriga", "Isabela", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", "Lamitan", "Laoag", "Lapu-Lapu", "Las Piñas", "Legazpi", "Ligao", "Lipa", "Lucena", "Maasin", "Mabalacat", "Makati", "Malabon", "Malaybalay", "Malolos", "Mandaluyong", "Mandaue", "Manila", "Marawi", "Marikina", "Masbate City", "Mati", "Meycauayan", "Muñoz", "Muntinlupa", "Naga", "Navotas", "Olongapo", "Ormoc", "Oroquieta", "Ozamiz", "Pagadian", "Palayan", "Panabo", "Parañaque", "Pasay", "Pasig", "Passi", "Puerto Princesa", "Quezon City", "Roxas", "Sagay", "Samal", "San Carlos", "San Fernando", "San Jose", "San Jose del Monte", "San Pablo", "San Pedro", "Santa Rosa", "Santo Tomas", "Santiago", "Silay", "Sipalay", "Sorsogon City", "Surigao City", "Tabaco", "Tabuk", "Tacloban", "Tacurong", "Tagaytay", "Tagbilaran", "Taguig", "Tagum", "Talisay", "Tanauan", "Tandag", "Tangub", "Tanjay", "Tarlac City", "Tayabas", "Toledo", "Trece Martires", "Tuguegarao", "Urdaneta", "Valencia", "Valenzuela", "Victorias", "Vigan", "Zamboanga City"]; %>
+                                    
+                                        <% cities.forEach(function(city) { %>
+                                            <option value="<%= city %>" <%= resident.birthPlace === city ? 'selected' : '' %>><%= city %></option>
+                                        <% }); %>
+                                    </select>
+                                    
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Gender</td>
+                                    <td class="inputTd">
+                                        <select name="gender">
+                                            <option value="Male" <%= resident.gender === 'Male' ? 'selected' : '' %>>Male</option>
+                                            <option value="Female" <%= resident.gender === 'Female' ? 'selected' : '' %>>Female</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Civil Status</td>
+                                    <td class="inputTd">
+                                        <select name="civilStatus">
+                                            <option value="Single" <%= resident.civilStatus === 'Single' ? 'selected' : '' %>>Single</option>
+                                            <option value="Married" <%= resident.civilStatus === 'Married' ? 'selected' : '' %>>Married</option>
+                                            <option value="Widow" <%= resident.civilStatus === 'Widow' ? 'selected' : '' %>>Widow</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr hidden>
+                                    <td style="width: 30%;">Priority</td>
+                                    <td class="inputTd">
+                                        <select id="priority" onchange="togglePriorityRow()" name="priority">
+                                            <option value="">Select Group</option>
+                                            <option value="PWD" <%= resident.priority === 'PWD' ? 'selected' : '' %>>PWD</option>
+                                            <option value="Senior Citizen" <%= resident.priority === 'Senior Citizen' ? 'selected' : '' %>>Senior Citizen</option>
+                                            <option value="Solo Parent" <%= resident.priority === 'Solo Parent' ? 'selected' : '' %>>Solo Parent</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="priorityRow" style="display: none;">
+                                    <td>Disability</td>
+                                    <td class="inputTd">
+                                        <select name="priorityType">
+                                            <option value="">Select Category</option>
+                                            <option value="Hearing Disability" <%= resident.priorityType === 'Hearing Disability' ? 'selected' : '' %>>Hearing Disability</option>
+                                            <option value="Intellectual Disability" <%= resident.priorityType === 'Intellectual Disability' ? 'selected' : '' %>>Intellectual Disability</option>
+                                            <option value="Learning Disability" <%= resident.priorityType === 'Learning Disability' ? 'selected' : '' %>>Learning Disability</option>
+                                            <option value="Multiple Disabilities" <%= resident.priorityType === 'Multiple Disabilities' ? 'selected' : '' %>>Multiple Disabilities</option>
+                                            <option value="Physical Disability" <%= resident.priorityType === 'Physical Disability' ? 'selected' : '' %>>Physical Disability</option>
+                                            <option value="Psychosocial Disability" <%= resident.priorityType === 'Psychosocial Disability' ? 'selected' : '' %>>Psychosocial Disability</option>
+                                            <option value="Speech and Language Disability" <%= resident.priorityType === 'Speech and Language Disability' ? 'selected' : '' %>>Speech and Language Disability</option>
+                                            <option value="Visual Disability" <%= resident.priorityType === 'Visual Disability' ? 'selected' : '' %>>Visual Disability</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <script>
+                                    function togglePriorityRow() {
+                                        var priority = document.getElementById("priority").value;
+                                        var priorityRow = document.getElementById("priorityRow");
+                                
+                                        if (priority === "PWD") {
+                                            priorityRow.style.display = "table-row";
+                                        } else {
+                                            priorityRow.style.display = "none";
+                                        }
+                                    }
+                                
+                                    // Call function on page load to apply initial state
+                                    window.onload = function () {
+                                        togglePriorityRow();
+                                    };
+                                </script>
+                            </tbody>
+                        </table>
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Family Role</td>
+                                    <td class="inputTd">
+                                        <select id="familyRole" onchange="toggleFamilyHead()" name="role">
+                                            <option value="Head" <%= resident.role === 'Head' ? 'selected' : '' %>>Head</option>
+                                            <option value="Member" <%= resident.role === 'Member' ? 'selected' : '' %>>Member</option>
+                                        </select>                                        
+                                    </td>
+                                </tr>
+                                <tr id="familyHeadRow" style="display: none;">
+                                    <td>Your Family Head</td>
+                                    <td class="inputTd">
+                                        <select name="headId">
+                                            <option value="">Select Name</option>
+                                            <% heads.forEach(head => { %>
+                                                <option value="<%= head._id %>" <%= resident.headId === head._id ? 'selected' : '' %>>
+                                                    <%= head.firstName %> <%= head.lastName %> <%= head.extName ? head.extName : '' %>
+                                                </option>
+                                            <% }) %>
+                                        </select>
+                                                                             
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Precinct</td>
+                                    <td class="inputTd">
+                                        <input type="text" name="precinct" value="<%= resident.precinct %>">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Contact</td>
+                                    <td class="inputTd">
+                                        <input type="text" inputmode="numeric" class="phone" name="phone" value="<%= resident.phone %>">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td class="inputTd">
+                                        <input type="email" name="email" value="<%= resident.email %>">
+                                    </td>
+                                </tr>
+                                <tr hidden>
+                                    <td>CTC No.</td>
+                                    <td class="inputTd">
+                                        <input type="text" name="ctcNo" value="<%= resident.ctcNo %>">
+                                    </td>
+                                </tr>
+                                <tr hidden>
+                                    <td>Issued Date</td>
+                                    <td class="inputTd">
+                                        <input type="text" name="ctcDate" value="<%= resident.ctcDate %>">
+                                    </td>
+                                </tr hidden>
+                                <tr hidden>
+                                    <td>Issued At</td>
+                                    <td class="inputTd">
+                                        <input type="text" name="ctcLoc" value="<%= resident.ctcLoc %>">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <button type="submit" class="nav index20" style="position: absolute; right: 40px; top: 60px;">
+                    <i class="fa fa-check-circle"></i>
+                    Update
+                </button>
+                </form>     
+        </div>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+    <script>
+    function toggleFamilyHead() {
+        var role = document.getElementById("familyRole").value;
+        var familyHeadRow = document.getElementById("familyHeadRow");
+
+        if (role === "Member") {
+            familyHeadRow.style.display = "table-row"; // Show row
+        } else {
+            familyHeadRow.style.display = "none"; // Hide row
+        }
+    }
+</script>
+<script>
+function toggleFamilyHead2() {
+    var priority = document.getElementById("priority").value;
+    var priorityRow = document.getElementById("priorityRow");
+
+    if (priority === "PWD") {
+        priorityRow.style.display = "table-row"; // Show row
+    } else {
+        priorityRow.style.display = "none"; // Hide row
+    }
+}
+</script>

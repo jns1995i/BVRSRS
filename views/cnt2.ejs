@@ -1,0 +1,433 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .sidef {
+                display: none;
+            }
+            .card.keyPlain {
+                position: relative;
+                align-items: center;
+                padding: 20px;
+                height: 130px;
+                width: 400px;
+                justify-content: center;
+                gap: 5px;
+            }
+            
+.card.keyPlain:nth-child(1) { background-color: var(--shade1); }
+.card.keyPlain:nth-child(2) { background-color: var(--shade5); }
+.card.keyPlain:nth-child(3) { background-color: var(--shade8); }
+.card.keyPlain:nth-child(4) { background-color: var(--shade5); }
+.card.keyPlain:nth-child(5) { background-color: var(--shade1); }
+.card.keyPlain:nth-child(6) { background-color: var(--shade5); }
+.card.keyPlain:nth-child(7) { background-color: var(--shade8); }
+
+            .graphIcon {
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                color: var(--shade1);
+                border: none;
+            }
+            .modifyIcon {
+                color: var(--shade1);
+                padding: 5px;
+                width: auto;
+                max-width: none;
+                border-radius: 8px;
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.5vw;
+                font-weight: 500;
+                color: white;
+            }
+            .keyL {
+                font-size: 1.2vw;
+                font-weight: 400;
+                line-height: 1.5vw;
+                color: white;
+            }
+            .tbl {
+                height: 28vw;
+                gap: 10px;
+            }
+            .card.keyLarge {
+                justify-content: start;
+                align-items: start;
+                padding: 1.5vw;
+                flex-direction: column;
+                box-shadow: none;
+            }
+            .gapX {
+                gap: 20px;
+            }
+            iframe {
+                width: 100%;
+                height: 320px;
+                background-color: white;
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                border: none;
+                padding: 10px;
+            }
+            .softX {
+                box-shadow: var(--softShadow);
+                height: auto;
+            }
+            .pie {
+                height: 250px;
+                width: 250px;
+                padding: 0;
+            }
+            .pieFrame {
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                border-radius: none;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                overflow-y: hidden;
+                overflow-x: hidden;
+            }
+            table {
+                box-shadow: none;
+            }
+            td {
+                font-size: 14px;
+                font-weight: 500;
+            }
+            .mainf {
+                border-radius: 0;
+            }
+            .card.key.grandTotal {
+                background-color: var(--shade6);
+            }
+            .mainf {
+                position: relative;
+            }
+            .editHtl {
+                position: absolute;
+                z-index: 50;
+                height: auto;
+                width: 25%;
+                flex-direction: column;
+                padding: 0;
+                background-color: rgba(255, 255, 255, 0.142);
+                display: none;
+            }
+        </style>
+    </head>
+
+        <div class="head">
+            <div class="ctrl left">
+                <a href="/hom" class="nav">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    Go Back To Home
+                </a>
+            </div>
+            <div class="ctrl">
+                <p class="title">Emergency Hotlines</p>
+            </div>
+            <div class="ctrl right">
+                <div class="searchBar">
+                    <input type="search" id="univ"><i class="fas fa-search"></i>
+                </div>
+                <a href="/prf" class="nav cnav borderPrimary borderRadius500 padding0 hidden">
+                    <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" 
+                    alt="" 
+                    class="borderRadius500 height100" 
+                    onerror="this.onerror=null; this.src='/images/profile.jpg';">
+                </a>
+            </div>
+        </div>
+     
+
+
+        <div class="main borderRadius10">
+
+
+                <% hotlineData.forEach(function(hotline) { %>
+                    <div id="editFormContainer<%= hotline._id %>" class="abstractBG borderRadius20 unseen">
+                        <form action="/update-hotline/<%= hotline._id %>" method="POST">
+                            <h3>Edit Emergency Hotline</h3>
+            
+                            <!-- Office -->
+                            <label for="office<%= hotline._id %>">Office</label>
+                            <input type="text" id="office<%= hotline._id %>" name="office" value="<%= hotline.office %>" required>
+            
+                            <!-- Phone Numbers -->
+                            <label for="phone1<%= hotline._id %>">Phone 1</label>
+                            <input type="text" id="phone1<%= hotline._id %>" name="phone1" value="<%= hotline.phone1 %>" required>
+            
+                            <label for="phone2<%= hotline._id %>">Phone 2</label>
+                            <input type="text" id="phone2<%= hotline._id %>" name="phone2" value="<%= hotline.phone2 %>">
+            
+                            <label for="phone3<%= hotline._id %>">Phone 3</label>
+                            <input type="text" id="phone3<%= hotline._id %>" name="phone3" value="<%= hotline.phone3 %>">
+            
+                            <!-- Email -->
+                            <label for="email<%= hotline._id %>">Email</label>
+                            <input type="email" id="email<%= hotline._id %>" name="email" value="<%= hotline.email %>">
+            
+                            <!-- Website -->
+                            <label for="web<%= hotline._id %>">Website</label>
+                            <input type="text" id="web<%= hotline._id %>" name="web" value="<%= hotline.web %>">
+            
+                            <!-- Submit Button -->
+                            <button type="submit">Update Hotline</button>
+            
+                            <!-- Cancel Button to Close Form -->
+                            <button type="button" onclick="closeEditForm('<%= hotline._id %>')">Cancel</button>
+                        </form>
+                    </div>
+                <% }); %>
+                <script>
+                    function editHotline(id, office, phone1, phone2, phone3, email, web) {
+                        // Populate the form fields with the hotline data
+                        document.getElementById("office" + id).value = office;
+                        document.getElementById("phone1" + id).value = phone1;
+                        document.getElementById("phone2" + id).value = phone2;
+                        document.getElementById("phone3" + id).value = phone3;
+                        document.getElementById("email" + id).value = email;
+                        document.getElementById("web" + id).value = web;
+                
+                        // Show the form by adding 'seen' and removing 'unseen'
+                        document.getElementById("editFormContainer" + id).classList.remove('unseen');
+                        document.getElementById("editFormContainer" + id).classList.add('seen');
+                    }
+                
+                    // Function to close the edit form
+                    function closeEditForm(id) {
+                        // Hide the form by adding 'unseen' and removing 'seen'
+                        document.getElementById("editFormContainer" + id).classList.remove('seen');
+                        document.getElementById("editFormContainer" + id).classList.add('unseen');
+                    }
+                </script>
+                        
+    <div class="height0 padding20 gap20">
+        <% hotlineData.forEach(function(hotline) { %>
+            <% if (["City Health Office", "PNP Cabanatuan", "BFP Cabanatuan", "CDRRMO"].includes(hotline.office)) { %>
+                <div class="card keyPlain white abstractBG" style="width: 100% !important;">
+                    <p class="size20 str500 marginBottom10"><%= hotline.office %></p>
+                    <p class="size14 str400"><%= hotline.phone1 %></p>
+                    <p class="size14 str400"><%= hotline.phone2 %></p>
+                </div>
+            <% } %>
+        <% }); %>
+    </div>
+    
+    <div class="section tableCard bgSoft borderRadius10">
+        <p class="p14" id="noRecords" style="display: none;">No Records</p>
+    <table id="dirTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Office/Agency</th>
+                <th onclick="sortTable(1)">Contact No.</th>
+                <th onclick="sortTable(2)">Website/Facebook</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% hotlineData.forEach(function(hotline) { %>
+                <tr>
+                    <td class="str600"><%= hotline.office %></td>
+                    <td><%= hotline.phone1 %><br><%= hotline.phone2 %><br><%= hotline.phone3 %></td>
+                    <td><%= hotline.web %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+<script>
+    function confirmArchive(hotlineId) {
+        // Ask for confirmation before archiving the hotline
+        const confirmation = confirm("Are you sure you want to archive this hotline?");
+        
+        if (confirmation) {
+            // If the user confirmed, redirect to the archive route
+            window.location.href = '/archive-htl/' + hotlineId;
+        } else {
+            // If the user canceled, do nothing
+            return;
+        }
+    }
+</script>
+
+<div class="sub">
+    <div class="ctrl left">
+        <span id="totalRecords" class="totalRecords green"></span>
+    </div>
+    <div class="ctrl right">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+    </div>
+     
+    <script>
+        const newHtl = document.getElementById('newHtl');
+        const toggleButtonH = document.getElementById('toggleButtonH');
+        
+        toggleButtonH.addEventListener('click', (e) => {
+            e.preventDefault();
+        
+            // Toggle between unseen and seen states
+            if (newHtl.classList.contains('unseen')) {
+                newHtl.classList.remove('unseen');
+                newHtl.classList.add('seen');
+                toggleButtonH.innerHTML = '<i class="fa fa-times"></i> Close Form';
+            } else {
+                newHtl.classList.remove('seen');
+                newHtl.classList.add('unseen');
+                toggleButtonH.innerHTML = '<i class="fa fa-plus"></i> New Contact';
+            }
+        });
+    </script>
+    
+
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+
+        if (searchInput.value.trim()) return;
+
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+
+        
+        </div>

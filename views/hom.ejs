@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRAR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+        .horizon {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 20px;
+            padding: 15px 0;
+            justify-content: start;
+            scroll-snap-type: x mandatory;
+            border: 1px solid rgba(255, 255, 255, 0);
+            border-radius: 10px;
+        }
+        .horCard {
+            flex: 0 0 auto;
+            padding: 20px;
+            width: 23%;
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease-in-out, opacity 0.8s ease-in-out, padding 0.4s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .details.show {
+            max-height: fit-content;
+            opacity: 1;
+            padding: 10px 0;
+        }
+
+        .newsCard {
+            transition: all 0.8s ease-in-out;
+        }
+        #assignDepCard {
+            max-width: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: 100;
+        }
+        #assignDepCard.active {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            position: absolute;
+            z-index: 100;
+        }
+        .unseen {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        .seen2 {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0;
+            transition: max-height 0.1s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        textarea {
+            background-color: white;
+        }
+        .headf {
+            border: none;
+        }
+        #statLabel {
+            position: absolute;
+            right: 10px;
+            top: 20px;
+            background-color: transparent;
+            padding: 5px;
+            border: 0.5px solid rgba(128, 128, 128, 0.3);
+            display: none;
+        }
+        #TRX {
+            border-radius: 10px;
+            padding: 10px;
+        }
+        #rCard:hover {
+            transform: scale(1.02);
+            transition: transform 0.6s ease-in-out;
+            box-shadow: 0 4px 6px 0 rgba(128, 128, 128, 0.595);
+        }
+        #lastVideo:hover, #rightVideo:hover, #leftVideo:hover {
+            transform: scale(1.02);
+            transition: transform 0.6s ease-in-out;
+            box-shadow: 0 4px 6px 0 rgba(128, 128, 128, 0.595);
+        }
+        #prfBtn:hover {
+            transform: scale(1.08);
+            margin-right: 4px;
+            transition: transform 0.6s ease-in-out, margin 0.3s ease-in-out;
+            box-shadow: 0 2px 4px 0 rgba(128, 128, 128, 0.601);
+            border-radius: 50%;
+        }
+@keyframes flashWarning {
+  0%, 39% { opacity: 1; }   /* visible first half */
+  70%, 100% { opacity: 0; } /* hidden second half */
+}
+#warning {
+  animation: flashWarning 8s infinite;
+  transition: opacity 0.5s ease-in-out;
+}
+
+@media screen and (max-width: 1025px) {
+    .mobile {
+        display: none;
+    }
+    .responsive {
+        display: none;
+    }
+    body {
+        padding: 0;
+    }
+    #MainFrame {
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 5px;
+        height: 90%;
+        display: block;
+    }
+    #VideoFrame {
+        position: initial;
+        width: 100%;
+        height: auto !important;
+        flex-direction: row !important;
+        box-shadow: none;
+    }
+    #VideoFrame2 {
+        flex-direction: row;
+        gap: 8px ;
+    }
+    #leftVideo {
+        width: 50% !important;
+        display: none;
+    }
+    #rightVideo, #lastVideo {
+        width: 50% !important;
+        padding: 15px;
+    }
+    .annCrd {
+        width: 100% !important;
+    }
+    #annFrame {
+        padding-inline: 5% !important;
+        height: auto !important;
+        overflow-y: hidden;
+    }
+    #headFrame {
+        flex-direction: column-reverse !important;
+        height: auto !important;
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+    #navFrame {
+        display: none;
+    }
+    #navFrame2 {
+        display: flex;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto !important;
+        z-index: 600;
+    background: 
+        radial-gradient(circle at 10% 5%, var(--shade15), transparent 25%),  /* Light Gray */
+        radial-gradient(circle at 80% 95%,  var(--green2), transparent 30%),  /* Very Light Blue */
+        radial-gradient(circle at 50% 50%,  var(--green3), transparent 80%); /* White */
+    background-blend-mode: lighten;
+    backdrop-filter: blur(10px);
+    background-color: var(--shade10);
+        justify-content: space-between;
+        padding: 10px;
+        color: white !important;
+    }
+    #navFrame2 p {
+        color: white;
+    }
+    #titleText {
+        font-size: 18px;
+    }
+    .EmerText {
+        display: flex;
+    }
+    #greetings {
+        justify-content: center;
+    }
+}
+    </style>
+<body class="block bgWhite relative">
+    <div class="overflow-y1 absolute top0 left0 padding20 responsive" id="assignDepCard" style="overflow-y: auto !important; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="padding10 width50 bgWhite block overflow-y1 borderRadius15 relative" style="border: 10px solid rgb(255, 255, 255);">
+                    <a href="" class="nav cnav absolute right10 top10 index50"><i class="fas fa-times"></i></a>
+                                
+                    <div class="height0 paddingInline10 justifyStart"><p class="size28 str500 colorPrimary">Request Form</p></div>
+                <form action="/reqDocument" method="POST" enctype="application/x-www-form-urlencoded" class="height0 padding10 darkShadow borderRadius20 relative">
+
+                    <div class="fieldsetContainer height0 padding5 width0 col" id="fieldsetContainer">
+                        <fieldset class="marginBottom20 abstractBG border0 darkShadow padding5">
+                            <div class="justifyBetween marginBottom5" id="removeBtnContainer2">
+                                <p class="size20 str400 white width0 padding5"><i class="fas fa-file-alt size16"></i> Document</p>
+                                <button type="button" class="remove-btn nav fnav width0 border0 size12 dnav">Remove</button>
+                            </div>
+                            
+                            <div class="row gap10 bgWhite borderRadius10 padding10">
+                                <div class="field width40">
+                                    <label>Type</label>
+                                    <div class="selectBar">
+                                        <select name="type[]" required class="docType">
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="Barangay Clearance">Barangay Clearance</option>
+                                            <option value="Barangay Indigency">Barangay Indigency</option>
+                                            <option value="Good Moral">Good Moral</option>
+                                            <option value="Certificate of Residency">Certificate of Residency</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width40">
+                                    <label>Purpose</label>
+                                    <div class="selectBar">
+                                        <select name="purpose[]" required>
+                                            <option value="ANY LEGAL">ANY LEGAL</option>
+                                            <option value="BURIAL ASSISTANCE">BURIAL ASSISTANCE</option>
+                                            <option value="EDUCATIONAL ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                            <option value="FINANCIAL ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                            <option value="MEDICAL ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                            <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                            <option value="BOARD EXAM">BOARD EXAM</option>
+                                            <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                            <option value="LCR">LCR</option>
+                                            <option value="LEGALIZATION">LEGALIZATION</option>
+                                            <option value="LOAN">LOAN</option>
+                                            <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                            <option value="PHILHEALTH">PHILHEALTH</option>
+                                            <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                            <option value="PRIME WATER">PRIME WATER</option>
+                                            <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                            <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                            <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                            <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width20">
+                                    <label>No. Copies</label>
+                                    <div class="selectBar">
+                                        <select name="qty[]" required>
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart hidden" id="purposeCard">
+                                <label for="">Remarks: Indicate here the content (Optional)</label>
+                                <textarea placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarks[]"></textarea>
+                            </div>                        
+                        </fieldset>
+
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const addBtn = document.getElementById("addBtn");
+                        const fieldsetContainer = document.getElementById("fieldsetContainer");
+                        const messageDiv = document.getElementById("formMessage");
+                        const limitMessageDiv = document.getElementById("limitM");
+
+                        const defaultPurposes = [
+                            "ANY LEGAL","BURIAL ASSISTANCE","EDUCATIONAL ASSISTANCE","FINANCIAL ASSISTANCE",
+                            "MEDICAL ASSISTANCE","BANK TRANSACTION","BOARD EXAM","CELCOR/ELECTRIC METER",
+                            "LCR","LEGALIZATION","LOAN","LOCAL EMPLOYMENT","PHILHEALTH","POLICE CLEARANCE",
+                            "PRIME WATER","SCHOOL REQUIREMENT","SENIOR CITIZEN","SOLO PARENT PWD","TRAVEL ABROAD"
+                        ];
+
+                        const indigencyPurposes = [
+                            "ANY LEGAL","BURIAL ASSISTANCE","EDUCATIONAL ASSISTANCE","FINANCIAL ASSISTANCE",
+                            "MEDICAL ASSISTANCE","PHILHEALTH","SCHOOL REQUIREMENT"
+                        ];
+
+                        // ------------------------------
+                        // Function to update purpose options per fieldset
+                        function updatePurposeOptions(fieldset) {
+                            const docTypeSelect = fieldset.querySelector(".docType");
+                            const purposeSelect = fieldset.querySelector("select[name='purpose[]']");
+                            if (!docTypeSelect || !purposeSelect) return;
+
+                            const selectedType = docTypeSelect.value;
+                            purposeSelect.innerHTML = ""; // Clear existing options
+
+                            let purposes = defaultPurposes;
+                            if (selectedType === "Good Moral" || selectedType === "Certification") {
+                                purposes = ["ANY LEGAL"];
+                            } else if (selectedType === "Barangay Indigency") {
+                                purposes = indigencyPurposes;
+                            }
+
+                            // Default "Select" option
+                            const defaultOption = document.createElement("option");
+                            defaultOption.value = "";
+                            defaultOption.textContent = "Select";
+                            defaultOption.disabled = true;
+                            defaultOption.selected = true;
+                            purposeSelect.appendChild(defaultOption);
+
+                            purposes.forEach(purpose => {
+                                const option = document.createElement("option");
+                                option.value = purpose;
+                                option.textContent = purpose;
+                                purposeSelect.appendChild(option);
+                            });
+                        }
+
+                        // ------------------------------
+                        // Show/hide purposeCard and ensure remarks visibility
+                        function togglePurposeCard(selectElement) {
+                            const fieldset = selectElement.closest("fieldset");
+                            const purposeCard = fieldset.querySelector(".purposeCard");
+                            const remarksField = fieldset.querySelector(".remarks");
+
+                            if (selectElement.value === "Certification") {
+                                purposeCard?.classList.remove("unseen");
+                                purposeCard?.classList.add("seen2");
+                            } else {
+                                purposeCard?.classList.remove("seen2");
+                                purposeCard?.classList.add("unseen");
+                            }
+
+                            if (remarksField) {
+                                remarksField.parentElement.classList.remove("unseen");
+                            }
+                        }
+
+                        // ------------------------------
+                        // Validate required fields in a fieldset
+                        function isFieldsetValid(fieldset) {
+                            const requiredFields = fieldset.querySelectorAll("select[required], input[required], textarea[required]");
+                            return Array.from(requiredFields).every(field => field.value.trim() !== "");
+                        }
+
+                        // Enable/disable Add button depending on last fieldset
+                        function checkLastFieldsetBeforeAdding() {
+                            const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+                            const lastFieldset = fieldsets[fieldsets.length - 1];
+
+                            if (isFieldsetValid(lastFieldset)) {
+                                addBtn.removeAttribute("disabled");
+                                messageDiv.style.display = "none";
+                            } else {
+                                addBtn.setAttribute("disabled", "true");
+                            }
+                        }
+
+                        // Check fieldset limit
+                        function checkFieldsetCount() {
+                            const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+
+                            if (fieldsets.length >= 5) {
+                                addBtn.style.display = "none";
+                                limitMessageDiv?.classList.remove("hidden");
+                            } else {
+                                addBtn.style.display = "inline-block";
+                                limitMessageDiv?.classList.add("hidden");
+                            }
+                        }
+
+                        // Attach event listeners to a fieldset (existing or cloned)
+                        function attachFieldsetListeners(fieldset) {
+                            const docTypeSelect = fieldset.querySelector(".docType");
+                            if (docTypeSelect) {
+                                docTypeSelect.addEventListener("change", function () {
+                                    togglePurposeCard(this);
+                                    updatePurposeOptions(fieldset);
+                                });
+                                updatePurposeOptions(fieldset); // initialize purposes on load
+                            }
+
+                            const removeBtn = fieldset.querySelector(".remove-btn");
+                            if (removeBtn) {
+                                removeBtn.style.display = "flex";
+                                removeBtn.addEventListener("click", function () {
+                                    fieldset.remove();
+                                    checkFieldsetCount();
+                                    checkLastFieldsetBeforeAdding();
+                                });
+                            }
+
+                            // Ensure remarks fields are visible
+                            fieldset.querySelectorAll(".remarks").forEach(el => el.parentElement.classList.remove("unseen"));
+                        }
+
+                        // ------------------------------
+                        // Initialize existing fieldsets
+                        document.querySelectorAll("#fieldsetContainer fieldset").forEach(attachFieldsetListeners);
+
+                        // ------------------------------
+                        // Add new fieldset
+                        addBtn.addEventListener("click", function (e) {
+                            e.preventDefault();
+
+                            const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+                            const lastFieldset = fieldsets[fieldsets.length - 1];
+
+                            // Hide previous message
+                            messageDiv.style.display = "none";
+
+                            if (!isFieldsetValid(lastFieldset)) {
+                                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle marginLeft5"></i> &nbsp; Please fill in all required fields before adding a new document!`;
+                                messageDiv.style.display = "flex";
+                                messageDiv.style.padding = "10px";
+                                messageDiv.style.marginBottom = "10px";
+                                messageDiv.style.border = "0.5px solid red";
+                                return;
+                            }
+
+                            // Clone first fieldset as template
+                            const firstFieldset = document.querySelector("#fieldsetContainer fieldset");
+                            if (!firstFieldset) return;
+
+                            const newFieldset = firstFieldset.cloneNode(true);
+
+                            // Clear cloned inputs
+                            newFieldset.querySelectorAll("select, input, textarea").forEach(el => {
+                                if (el.tagName === "SELECT") el.selectedIndex = 0;
+                                else el.value = "";
+                            });
+
+                            // Ensure remarks field visible
+                            const remarksField = newFieldset.querySelector(".remarks");
+                            if (remarksField) remarksField.parentElement.classList.remove("unseen");
+
+                            attachFieldsetListeners(newFieldset); // Attach all listeners
+                            fieldsetContainer.appendChild(newFieldset);
+
+                            checkFieldsetCount();
+                            checkLastFieldsetBeforeAdding();
+                        });
+
+                        // Hide remove button for first fieldset
+                        const firstRemoveBtn = document.querySelector("#fieldsetContainer fieldset .remove-btn");
+                        if (firstRemoveBtn) firstRemoveBtn.style.display = "none";
+
+                        // Monitor input changes
+                        fieldsetContainer.addEventListener("input", checkLastFieldsetBeforeAdding);
+
+                        // Initial check
+                        checkFieldsetCount();
+                        checkLastFieldsetBeforeAdding();
+                    });
+                    </script>
+
+                                                    
+                                    
+                    </div>
+
+                    <div id="formMessage" class="form-message height0 size12 colorPrimary justifyCenter borderRadius10" style="background-color: rgb(255, 228, 228); color: rgb(80, 0, 0);"></div>
+
+                    <div id="limitM" class="limitM height0 size12 colorPrimary justifyCenter borderRadius10 borderPrimary marginBottom5" style="background-color: rgba(246, 255, 247, 0.87);">
+                        <div class="height0 padding10 size14 str500"> You can only request not more than a five (5) items</div>
+                    </div>
+                        
+                    <div class="paddingInline5 height0">
+                        <div class="height0 justifyBetween padding10 borderRadius10 borderPrimary">
+                            <p class="size14 str500">Need More Document?</p>
+                            <a href="#" class="nav pnav tnav" id="addBtn"><i class="fas fa-plus inline"></i> Add Additional Document</a>
+                        </div>
+                    </div>
+                            
+                    <div class="height0 col alignStart hidden" id="">
+                        <label for="">Remarks (Optional)</label>
+                        <textarea class="height0 overflow-y1" placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarkMain"></textarea>
+                    </div> 
+                    <br>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I confirm that I am still a resident of Barangay Valdefuente</p>
+                    </div>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I hereby agree to the <a href="javascript:void()" class="inline height0 width0 green str500" id="tcBtn">terms and conditions</a></p>
+                    </div>
+<script>
+document.getElementById('tcBtn').addEventListener('click', () => {
+    const tcDiv = document.getElementById('tc');
+    tcDiv.classList.toggle('hidden');
+});
+</script>
+                <div class="h150 padding20 col borderPrimary borderRadius10 bgWhite block overflow-y1 marginTop10 hidden" id="tc">
+                    <p class="size14 str600 textCenter">Terms and Conditions for Document Request</p>
+                    <br>
+                    <p class="size14 textJustify">
+                        By submitting a document request through this system, you agree to the following terms and conditions:
+                        <br><br>
+                        1. Eligibility
+                        <br>
+                        You must be a registered resident of Barangay Valdefuente to request documents.
+                        All information provided must be accurate and up to date.
+                        Residents with pending case involvement are not eligible to request Barangay Clearance and Barangay Indigency.
+                        <br><br>
+                        2. Document Request Process
+                        <br>
+                        Only the document type, purpose, and number of copies are required when submitting a request.
+                        All requests are subject to approval by the Barangay Secretary and Punong Barangay.
+                        Requests that do not meet the barangay’s requirements may be denied.
+                        Residents can request up to five (5) documents per transaction, regardless of their purpose, with a limit of three (3) copies per document.
+                        <br><br>
+                        3. Request Approval & Status
+                        <br>
+                        All submitted requests will be initially marked as "Pending."
+                        Requests will be reviewed and processed, then either approved or denied based on eligibility and barangay policies.
+                        Applicants will be notified once the request has been approved, denied, or requires additional information.
+                        <br><br>
+                        4. No Payment Required
+                        <br>
+                        There are no fees for requesting documents.
+                        This system does not involve any payment processing.
+                        <br><br>
+                        5. Data Privacy
+                        <br>
+                        Personal information provided in this system will be used only for processing document requests.
+                        The barangay will not share any personal data with third parties unless required by law.
+                        <br>
+                        6. Changes to Terms
+                        These terms and conditions may be updated at any time.
+                        Continued use of the system after updates implies your acceptance of the revised terms.
+                        <br><br>
+                        7. Agreement
+                        <br>
+                        By checking the box and submitting your request, you confirm that you have read, understood, and agreed to the terms and conditions outlined above.
+                    </p>
+                </div>
+                    <br>
+                    <div class="noteCard textCenter bgSoft">
+                        TAKE NOTE: Please review all the details carefully before submitting your request. Ensure that all selections and information are correct, as changes may not be allowed after submission.
+                    </div>
+
+                    <div class="field height0 marginTop15 width100 alignEnd">
+                        <button type="submit" class="nav tnav pnav"><i class="fas fa-check-circle"></i>Submit</button>
+                    </div>
+                </form>
+            </div>
+    </div>
+    <div class="height10" id="headFrame">
+        <div class=" justifyStart paddingInline20 gap10 responsive">
+            <a href="/hom" class="userPhoto transition h50 bgWhite padding0 borderRadius500"><img src="/images/logo.jpg" alt="" class="height60 borderRadius500"></a>
+            <p class="size24 str400 upperCase colorPrimary">BVRSRS</p>
+        </div>
+                <span class="flex justifyStart alignCenter gap0 snav paddingInline20 paddingBlock0 borderRadius10 width90 responsive">
+                    <i class="fas fa-search" style="font-size: 12px;"></i>
+                    <input type="search" id="" class="border0 width100 univ" placeholder="Search announcement here ..">
+                </span>
+        <div class="">
+            <div class="width100 height100 justifyEnd gap10" id="navFrame">
+                <div class="height0 col width0 alignEnd">
+                    <p class="size16 str500 colorPrimary">Welcome <%= user.firstName %>!</p>
+                    <p class="size10 str400">Manage your account here</p>
+                </div>
+                <a href="/prf" class="height0 width0" id="prfBtn">
+                    <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" 
+                    alt="" 
+                    class="borderRadius500 h50 borderPrimary" 
+                    onerror="this.onerror=null; this.src='/images/profile.jpg';">
+                </a>
+                <a href="/" class="nav he hidden"><i class="fas fa-sign-out"></i>Logout</a>
+            </div>
+            <div class="width100 height100 gap5 hidden" id="navFrame2">
+                <div class="height0 gap5 justifyStart">
+                    <div class="justifyStart gap10">
+                        <a href="/hom" class="userPhoto transition h40 w40 bgWhite padding0 borderRadius500"><img src="/images/logo.jpg" alt="" class="borderRadius500"></a>
+                        <p class="size24 str400 upperCase colorPrimary">BVRSRS</p>
+                    </div>
+                </div>
+                <div class="height0 justifyEnd gap10">
+                    <a href="/prf" class="nav cnav headf" id="">
+                        <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" 
+                        alt="" 
+                        class="borderRadius500" 
+                        onerror="this.onerror=null; this.src='/images/profile.jpg';">
+                    </a>
+                    <a href="/" class="nav headf cnav hidden"><i class="fas fa-sign-out"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="height90 gap20 relative alignStart" id="MainFrame">
+        <div class="height0 bgSoft padding10 justifyBetween hidden EmerText">
+            <% if (requests.length > 0) { %>
+                <a href="/reqAll" class="nav">See All Transactions <i class="fas fa-chevron-right"></i></a>
+            <% } else { %>
+                <p class="size14 str400">You don’t have any active requests.</p>
+            <% } %>
+            <a href="/terms" class="nav pnav"><i class="fas fa-plus"></i> Request New</a>
+        </div>
+        <div class="height0 width25 col gap0 left15 top15 absolute borderRadius15" id="VideoFrame">
+                <div class="height0 col justifyStart gap20 borderRadius15 padding10 searchHide" id="VideoFrame2">
+                    <div class="width100 bgWhite borderRadius15 col padding20 darkShadow relative colorPrimary textCenter" id="lastVideo">
+                            <a href="" class="nav cnav disabled marginBottom15 responsive absolute left10 bottom0 green" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-exclamation-circle"></i></a>
+                        <p class="size14 str500 responsive">Learn more about</p>
+                        <p class="size20 str500 green responsive">BARANGAY VALDEFUENTE</p>
+                        <p class="size12 str500 green hidden EmerText marginBottom5">Learn All About</p>
+                        <p class="size12 str500 marginBottom10 responsive">History, Administration & Other information</p>
+                            <a href="/his" class="nav pnav abstractBG responsive" id="">Discover Now<i class="fas fa-chevron-right"></i></a>
+                            <a href="/his" class="nav pnav abstractBG hidden EmerText size12" id="">Brgy Valdefuente<i class="fas fa-chevron-right size12"></i></a>
+                    </div>
+                    <div class="width100 borderRadius15 abstractBG col alignStart padding20 darkShadow relative gap10" id="rightVideo">
+                        <div class="height0 gap0 col alignstart justifyStart">
+                            <a href="" class="nav cnav disabled marginBottom15 responsive absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-phone"></i></a>
+                            <p class=" str400 white textCenter hidden EmerText size10">For Essential Contacts &</p>
+                            <p class="size14 str400 white textCenter responsive">For Essential Contacts &</p>
+                            <p class="size20 str500 white textCenter responsive" id="">Emergency Hotlines</p>
+                        </div>
+                        <div class="height0 justifyCenter">
+                            <a href="/cnt" class="nav responsive str600">View Directory <i class="fas fa-chevron-right"></i></a>
+                            <a href="/cnt" class="nav hidden EmerText size10" id=""><i class="fas fa-phone size10"></i> Emergency Hotline</a>
+                        </div>
+                    </div>
+                    <div class="height0 width100 col gap10 bgWhite padding10 borderRadius10" id="leftVideo">
+                        <p class="size16 str500">Watch Video for Tutorial</p>
+                        <video autoplay muted controls loop class="width100 borderRadius10 borderPrimary height100 padding5">
+                            <source src="/images/mv.mp4" type="video/mp4">
+                            <source src="/images/mv.webm" type="video/webm">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+        </div>
+        <div class="width100 bgSoft borderRadius10 block overflow-y1 paddingBlock20" style="padding-inline: 27%;" id="annFrame">
+            <div class="col height0 width100 justifyStart alignStart padding25 witch abstractBG borderRadius10 white responsive searchHide">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-bell"></i></a>
+                <p class="size32 str400">Announcements</p>
+                <p class="size14 str400">Your source for Barangay News and Events</p>
+            </div>
+            <div class="col height0 width100 justifyStart alignCenter padding25 witch abstractBG borderRadius10 white hidden EmerText searchHide">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right0 bottom0 border0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-bell"></i></a>
+                <p class="size32 str400">Announcements</p>
+                <p class="size12 str400">Your source for Barangay News and Events</p>
+            </div>
+            <div class="height0 marginTop15 hidden EmerText">
+                <span class="flex justifyStart alignCenter gap0 snav paddingInline20 paddingBlock0 borderRadius10 width90">
+                    <i class="fas fa-search" style="font-size: 12px;"></i>
+                    <input type="search" id="" class="border0 width100 univ" placeholder="Search announcement here ..">
+                </span>
+            </div>
+            <br>
+            <div id="notFound" class="size20 height0 width0 padding30 borderRadius10 str500  shadowNone hidden bgSoft col">
+                <div class="h85 w88 relative borderRadius500 borderBlack">
+                    <i class="fas fa-frown size60 gray h65 w65 absolute right10 bottom10"  style="transform: rotate(-10deg);"></i>
+                    <i class="fas fa-frown size28 black h35 w35 absolute left20 bottom5" style="transform: rotate(-10deg);"></i>
+                </div>
+                Sorry, No record Found!
+            </div>
+            <% const formatDate = (date) => {
+                const currentDate = new Date();
+                const diffInTime = currentDate.getTime() - date.getTime();
+                const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24)); // Difference in days
+            
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                const formattedDate = date.toLocaleString('en-US', options); // Only date part
+                const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true }; // Only time part
+                const formattedTime = date.toLocaleString('en-US', timeOptions);  // Only time part
+            
+                if (diffInDays === 0) {
+                    return `Today • ${formattedDate} - ${formattedTime}`; // Dash separator for today
+                } else if (diffInDays === 1) {
+                    return `Yesterday • ${formattedDate} - ${formattedTime}`; // Dash separator for yesterday
+                } else {
+                    const dayName = date.toLocaleString('en-US', { weekday: 'long' });
+                    return `${dayName} • ${formattedDate} - ${formattedTime}`; // Dash separator for other days
+                }
+            } %>
+    
+            <% announcements.forEach(announcement => { %>
+                <div class="card height0 col alignStart gap0 marginBottom30 newsCard darkShadow padding0 annCrd" id="newsCard" id="announcement-<%= announcement.id %>">
+                    
+                    <div class="height0 paddingInline20 col alignStart">
+                        <br>
+                        <a href="" class="height0 border0 showBtn">
+                            <p class="size26 str500 width100 borderRadius5 colorPrimary" id="titleText"><%= announcement.title %></p>
+                            <i class="fas fa-chevron-down"></i>
+                        </a>
+                        <p class="size10 str400 marginBottom5">Posted <%= formatDate(new Date(announcement.createdAt)) %></p>
+                        <hr class="marginBottom5">
+                        
+                        <p class="size12 str500 details black" id="details"><%= announcement.description %></p>
+                    </div>
+                    <% if (announcement.image) { %>
+                        <% if (announcement.image.endsWith('.mp4') || announcement.image.endsWith('.webm') || announcement.image.endsWith('.ogg')) { %>
+                            <video class="width100 borderRadius0">
+                                <source src="<%= announcement.image %>" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        <% } else { %>
+                            <img src="<%= announcement.image %>" 
+                                alt="User Photo" 
+                                class="width100 height0 borderRadius0" 
+                                onerror="this.onerror=null; this.src='/images/ann2.jpg';">
+                        <% } %>
+                    <% } else { %>
+                        <img src="/images/ann2.jpg" 
+                            alt="Default Announcement" 
+                            class="width100 height0 borderRadius5 marginTop5">
+                    <% } %>
+                    
+                </div>
+            <% }) %>
+        </div>
+        <div class="width26 col gap0 absolute right15 top0 padding10 justifyStart responsive searchHide">
+            <div class="height100 col justifyStart borderRadius10 padding20 alignStart gap10 bgWhite ">
+                <div class="height0 justifyBetween gap5 paddingInline10">
+                    <p class="size24 str500 colorPrimary width0">   Recents</p>
+                    <div class="height0 width0 gap5 justifyBetween">
+                        <a href="javascript:void()" class="nav headf border0 pnav" id="assignBtn"><i class="fas fa-plus"></i>Request New</a>
+                    </div>
+                </div>
+                <div class="height0 col justifyStart alignStart gap15 borderRadius15 padding10">
+                    <% if (requests.length > 0) { %>
+                        <% requests.slice(0, 3).forEach(request => { %>
+
+                                                                <% 
+                                    const createdDate = new Date(request.createdAt);
+                                    const today = new Date();
+                                    const yesterday = new Date();
+                                    yesterday.setDate(today.getDate() - 1);
+
+                                    const isToday = createdDate.toDateString() === today.toDateString();
+                                    const isYesterday = createdDate.toDateString() === yesterday.toDateString();
+
+                                    const monthDay = createdDate.toLocaleString('en-US', { month: 'long', day: 'numeric' });
+
+                                    let formattedDate;
+                                    if (isToday) {
+                                        formattedDate = `Today - ${monthDay}`;
+                                    } else if (isYesterday) {
+                                        formattedDate = `Yesterday - ${monthDay}`;
+                                    } else {
+                                        const weekday = createdDate.toLocaleString('en-US', { weekday: 'long' });
+                                        formattedDate = `${weekday} - ${monthDay}`;
+                                    }
+                                    %>
+                                    <a href="/reqView/<%= request._id %>" class="height0 padding0 width100 widthMin100 borderRadius10" id="rCard">
+                                        
+                                        <div class="card padding15 relative borderGray justifyStart alignStart col height0">
+                                            <div class="height0 padding5 abstractBG size12 width30 absolute left0 top12
+                                            <% if ( request.status == "Pending") { %>
+                                            witch white
+                                            <% } else if ( request.status == "Claimed") { %>
+                                            bgTint7 colorPrimary str600
+                                            <% } else if ( request.status == "Declined") { %>
+                                            bgRed white abstractBG
+                                            <% } else if ( request.status == "Cancelled") { %>
+                                            bgSoft
+                                            <% } else { %>
+                                            bgShade1 white
+                                            <% } %>
+                                            " style="border-top-right-radius: 15px; border-bottom-right-radius: 3px;"><%= request.status %></div>
+                                            <div class="height0 padding5 size12 width0 absolute top12" style="border-top-right-radius: 15px; border-bottom-right-radius: 3px; left: 32%;"><%= formattedDate %></div>
+                                            <p class="size16 str500 marginTop30">TR# <%= request.tr %></p>
+                                            
+                                                <%
+                                                // Step 1: Merge documents with the same type and count occurrences
+                                                let mergedDocuments = {};
+                                            
+                                                request.documents.forEach(doc => {
+                                                    if (mergedDocuments[doc.type]) {
+                                                        mergedDocuments[doc.type]++;
+                                                    } else {
+                                                        mergedDocuments[doc.type] = 1;
+                                                    }
+                                                });
+                                            
+                                                // Step 2: Convert to an array for easy iteration
+                                                let mergedArray = Object.keys(mergedDocuments).map(type => ({
+                                                    type: type,
+                                                    count: mergedDocuments[type]
+                                                }));
+                                            
+                                                // Step 3: Define how many items to show before "+X more"
+                                                let visibleItems = 2;
+                                                let hiddenCount = mergedArray.length - visibleItems; // Count remaining hidden items
+                                            %>
+                                            <% if (mergedArray.length > visibleItems) { %>
+                                                <% for (let i = 0; i < visibleItems; i++) { %>
+                                                    <p class="size10 str400"><%= mergedArray[i].count %> <%= mergedArray[i].type %>, </p>
+                                                <% } %>
+                                                <% if (hiddenCount > 0) { %> 
+                                                    <p class="size10 str400 green">+<%= hiddenCount %> more items</p>
+                                                <% } %>
+                                            <% } else { %>
+                                                <% mergedArray.forEach(document => { %>
+                                                    <p class="size10 str400"><%= document.count %> <%= document.type %>, </p>
+                                                <% }) %>
+                                            <% } %>
+
+                                        </div>
+                                    </a>
+
+                          
+                        <% }) %>
+                    <% } else { %>
+                        <hr>
+                        <p class="size14 str400 textCenter">No Recent or Active Requests as of Now</p>
+                    <% } %> 
+                    <% if (requests.length > 0) { %>
+                    <div class="height0 justifyEnd gap5 paddingInline10">
+                            <a href="/reqAll" class="nav border0 bgWhite">See All Transactions <i class="fas fa-chevron-right"></i></a>
+                    </div>   
+                    <% } %>                
+                </div>
+            </div>
+        </div>
+        <div class="height0 width0 padding10 borderRadius10 bgWhite darkShadow absolute left15 bottom5 size12 str500 green responsive hidden" id="">
+            <i class="fas fa-bell inline"></i> &nbsp; Keep your Contact Information Updated
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".showBtn").forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default <a> behavior
+    
+                let newsCard = this.closest(".newsCard"); // Get parent newsCard
+                let details = newsCard.querySelector(".details"); // Get details inside the card
+                let icon = this.querySelector("i"); // Get icon inside the button
+    
+                details.classList.toggle("show"); // Toggle visibility
+                
+                // Toggle icon class
+                if (details.classList.contains("show")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+    });
+    
+    </script>
+    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const univInputs = document.querySelectorAll(".univ");
+    const newsCards = document.querySelectorAll(".newsCard");
+    const notFoundMessage = document.getElementById("notFound");
+    const searchHideDivs = document.querySelectorAll(".searchHide");
+
+    function handleFilter(event) {
+        const filter = event.target.value.toLowerCase();
+        let found = false;
+
+        if (filter === "") {
+            // Reset all cards to their default display
+            newsCards.forEach(card => card.style.display = "");
+            notFoundMessage.style.display = "none";
+            searchHideDivs.forEach(div => div.style.display = "");
+            return;
+        }
+
+        // Hide .serachHide while searching
+        searchHideDivs.forEach(div => div.style.display = "none");
+
+        // Filter cards
+        newsCards.forEach(card => {
+            if (card.textContent.toLowerCase().includes(filter)) {
+                card.style.display = "";
+                found = true;
+            } else {
+                card.style.display = "none";
+            }
+        });
+
+        notFoundMessage.style.display = found ? "none" : "flex";
+    }
+
+    univInputs.forEach(univInput => {
+        univInput.addEventListener("input", handleFilter);
+    });
+});
+</script>
+
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(?<!\S)(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|net|org|gov|edu|ph)\b)(?!\S)/g, '<a href="http://$1" target="_blank" class="inline blue str500">$1</a>');
+});
+</script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(^|\s)(#\w+)/g, '$1<span class="green str500">$2</span>');
+});
+</script>
+<script>
+document.getElementById("assignBtn").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent default link behavior
+    
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Toggle 'active' class
+    assignCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (assignCard.classList.contains("active")) {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    } else {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    }
+});
+
+// Hide #assignDepCard when #closeNav is clicked
+document.getElementById("closeNav").addEventListener("click", function() {
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Remove 'active' class
+    assignCard.classList.remove("active");
+
+    // Reset button text & icon
+    assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .main {
+                padding-inline: 20%;
+            }
+            .annCard {
+                height: auto;
+                min-height: 300px;
+                border-radius: 0.5vw;
+                flex-direction: column;
+                justify-content: start;
+                align-items: start;
+                gap: 10px;
+                padding: 10px;
+                position: relative;
+                margin-bottom: 24px;
+                width: 100%;
+            }
+            .annCard .section {
+                justify-content: start;
+                padding: 5px;
+            }
+            .annDate {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                width: auto;
+                height: auto;
+                margin-bottom: 10px;
+                font-size: 1vw;
+            }
+            .annPhoto {
+                width: auto;
+                height: 340px;
+            }
+            .annPhoto img {
+                width: 100%;
+                height: 100%;
+                border-radius: 0.5vw;
+            }
+            textarea {
+                width: 100%;
+            }
+        </style>
+    </head>
+
+        <div class="head">
+            <div class="ctrl left">
+                <a href="../views/ann.html" class="nav">
+                    <i class="fa-solid fa-chevron-left"></i>
+                    Previous
+                </a>
+            </div>
+            <div class="ctrl">
+                <p class="title">Modify Announcement</p>
+            </div>
+            <div class="ctrl right">
+            </div>
+        </div>
+
+
+        <div class="main">
+
+            <form class="annCard">
+                <div class="row">
+                    <div class="field medium">
+                        <input type="text" placeholder="Title">
+                    </div>
+                    <div class="field medium">
+                        <input type="date" placeholder="Date">
+                    </div>
+                </div>
+                <div class="section mainCN">
+                        <textarea name="" id="" placeholder="Description"></textarea>
+                </div>
+                <div class="section annPhoto">
+                    <img src="../public/images/annphoto2.jpg" alt="" class="">
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <input type="file">
+                    </div>
+                    <div class="field btn" style="width: 35%; justify-content: end; align-items: end;">
+                        <button class="nav pnav" type="submit" style="width: 100%;">
+                            <i class="fa-solid fa-check-circle"></i>
+                            Update
+                        </button>
+                    </div>
+                </div>
+                <div class="head right gap10">
+                </div>
+            </form>
+
+        </div>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>

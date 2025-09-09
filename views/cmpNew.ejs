@@ -1,0 +1,516 @@
+<% layout('layout') %>
+<head>
+    <style>
+        button {
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 1.4rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 0.5px solid lightgray;
+            cursor: pointer;
+            background-color: var(--tint10);
+            transition: all 0.6s ease-in-out;
+            height: auto;
+            width: auto;
+            font-size: 0.8vw;
+            font-family: 'poppins', sans-serif;
+            color: #083a3c;
+        }
+        button:hover {
+            transform: scale(1);
+        }
+        .pnav:hover, .pnav {
+            color: white;
+            background-color: rgb(0, 105, 0) !important;
+        }
+        .f {
+            height: auto;
+            flex-direction: column;
+            align-items: start;
+            gap: 5px;
+        }
+        .search-results button {
+            border: none
+        }
+        .person-item {
+            gap: 10px;
+            border: 0.5px solid rgb(1, 84, 0);
+            border-radius: 10px;
+            padding: 8px 10px;
+            width: fit-content;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 2px lightgray;
+            background-color: rgb(243, 248, 243);
+        }
+        .person-item div {
+            width: fit-content;
+            font-weight: 600 !important;
+        }
+        .person-item .remove-btn {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<div class="bgSoft padding30 borderRadius10 blockX overflow-y1 relative">
+    <a href="/cmp" class="nav absolute left10 top10"><i class="fas fa-chevron-left"></i>Go Back</a>
+    <div class="col height0 padding10">
+    
+        <form action="/cases" method="POST" id="caseForm" class="padding40 borderRadius20 height0">
+            <div class="height0 justifyStart">
+                <p class="size30 str500 colorPrimary">ADD RECORD</p>
+            </div>
+            <div class="height0 gap5 borderRadius10 col borderPrimary padding20 alignStart">
+                    <p class="size20 str500">Step 1 - Case No.</p>
+                    <label class="">Make sure to input the correct case no.</label>
+                <div class="gap10 justifyStart">
+                    <input type="text" name="caseNo" id="caseNoInput" class="width50" placeholder="e.g. 03-2025-001" required>
+                    <div id="exist" class="hidden width0 marginLeft5" style="color: red;"></div>
+                </div>
+                
+            </div>
+                
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get references to the input and the message div
+        const caseNoInput = document.getElementById("caseNoInput"); // Changed to id for direct access
+        const existMessage = document.getElementById("exist");
+
+        // Function to check if the case number exists
+        async function checkCaseNumberExistence() {
+            const caseNo = caseNoInput.value.trim();
+
+            // Hide the message if the input is empty
+            if (!caseNo) {
+                existMessage.classList.add("hidden");
+                return;
+            }
+
+            try {
+                // Call the new server endpoint
+                const response = await fetch(`/check-case-number?caseNo=${encodeURIComponent(caseNo)}`);
+                const data = await response.json();
+
+                if (data.exists) {
+                    existMessage.textContent = "Case Number Already Exists!";
+                    existMessage.classList.remove("hidden"); // Show the message
+                } else {
+                    existMessage.classList.add("hidden"); // Hide the message
+                }
+            } catch (error) {
+                console.error("Error checking case number:", error);
+                // Optionally show a generic error message to the user
+                // existMessage.textContent = "Error checking case number. Please try again.";
+                // existMessage.classList.remove("hidden");
+            }
+        }
+
+        // Add event listener to the caseNo input for 'input' event (fires on every keystroke)
+        caseNoInput.addEventListener("input", checkCaseNumberExistence);
+        
+        // Optional: Also check on page load if the input might have a pre-filled value
+        // checkCaseNumberExistence(); 
+    });
+</script>
+            <br>
+            <div class="height0 gap10 borderRadius10 col borderPrimary padding20">
+                <div class="f">
+                    <p class="size20 str500">Step 2 - Case(s)</p>
+                    <label for="">Select and add a type of case the complainant filed</label>
+                    <div class="height0 justifyStart gap10 wrap">
+                        <div class="selectBar widthMax80">
+                            <select id="caseTypeSelect" name="caseTypeSelect">
+                                <option value="">Select Case Type</option>
+                                <option value="Alarms and Scandals">Alarms and Scandals</option>
+                                <option value="Boundary Disputes">Boundary Disputes</option>
+                                <option value="Child Custody or Support (initial discussion only)">Child Custody or Support (initial discussion only)</option>
+                                <option value="Collection of Money (e.g., unpaid debts)">Collection of Money (e.g., unpaid debts)</option>
+                                <option value="Contract Disputes">Contract Disputes</option>
+                                <option value="Damage to Property">Damage to Property</option>
+                                <option value="Defamation on Social Media (if minor)">Defamation on Social Media (if minor)</option>
+                                <option value="Family Disputes (non-violent marital issues)">Family Disputes (non-violent marital issues)</option>
+                                <option value="Failure to Deliver Goods or Services">Failure to Deliver Goods or Services</option>
+                                <option value="Harassment">Harassment</option>
+                                <option value="Intriguing Against Honor">Intriguing Against Honor</option>
+                                <option value="Land Disputes">Land Disputes</option>
+                                <option value="Lease Agreement Violations">Lease Agreement Violations</option>
+                                <option value="Light Threats">Light Threats</option>
+                                <option value="Malicious Mischief">Malicious Mischief</option>
+                                <option value="Marital Disputes (non-violent)">Marital Disputes (non-violent)</option>
+                                <option value="Noise Complaints">Noise Complaints</option>
+                                <option value="Non-payment of Rent">Non-payment of Rent</option>
+                                <option value="Oral Defamation (Slander)">Oral Defamation (Slander)</option>
+                                <option value="Petty Fights or Quarrels">Petty Fights or Quarrels</option>
+                                <option value="Public Disturbances">Public Disturbances</option>
+                                <option value="Slander by Deed">Slander by Deed</option>
+                                <option value="Slight Physical Injuries">Slight Physical Injuries</option>
+                                <option value="Social Media Harassment (minor cases)">Social Media Harassment (minor cases)</option>
+                                <option value="Theft">Theft</option>
+                                <option value="Trespassing">Trespassing</option>
+                                <option value="Unjust Vexation">Unjust Vexation</option>
+                                <option value="Verbal Arguments Between Neighbors">Verbal Arguments Between Neighbors</option>
+                                <option value="Violation of Barangay Ordinances (e.g., curfew, sanitation)">Violation of Barangay Ordinances (e.g., curfew, sanitation)</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <input type="text" id="otherCaseInput" name="otherCaseInput" placeholder="Enter Case Type" class="hidden width80 hMin45">
+                        <button type="button" class="pnav borderRadius10 width15" onclick="addCaseType()">
+                            <i class="fas fa-plus"></i> &nbsp; Add
+                        </button>
+                    </div>
+                </div>
+                    <div id="casesList" class="person-list justifyStart gap10 paddingBottom5 wrap">
+                    </div>
+                <input type="hidden" id="caseTypesData" name="caseTypes">
+            </div>
+            <br>
+ <script>
+  // Function to generate a light random color
+  function getRandomLightColor() {
+    const r = Math.floor(200 + Math.random() * 55);
+    const g = Math.floor(200 + Math.random() * 55);
+    const b = Math.floor(200 + Math.random() * 55);
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  // Apply to all elements with class 'person-item'
+  document.querySelectorAll('.person-item').forEach(item => {
+    item.style.backgroundColor = getRandomLightColor();
+  });
+</script>
+            <div class="height0 gap5 borderRadius10 col borderPrimary padding20">
+                <div class="col alignStart">
+                    <p class="size20 str500">Step 3 - Complainant</p>
+                    <label for="">Add one or more complainant.</label>  
+                </div>
+                <hr>
+                <div class="height0 justifyStart gap10 paddingBlock5">
+                    <p class="size16 str500">Search a Resident</p> <input type="text" id="complainantSearch" name="complainantSearch" placeholder="Search complainant..." autocomplete="off" class="width40"> or 
+                    <button class="nav tnav borderGray" type="button" onclick="toggleManualComplainant()">Add Non-Resident</button>
+                </div>
+                
+                <div id="complainantResults" class="search-results bgSoft height0 gap10 padding10 borderRadius10 hidden" style="flex-wrap: wrap;"></div>
+                <div id="manualComplainant" class="hidden bgSoft padding15 col borderRadius10">
+                    <input class="marginBottom5" type="text" id="cFirstName" name="cFirstName" placeholder="First Name">
+                    <input class="marginBottom5" type="text" id="cMiddleName" name="cMiddleName" placeholder="Middle Name">
+                    <input class="marginBottom5" type="text" id="cLastName" name="cLastName" placeholder="Last Name">
+                    <input class="marginBottom5" type="text" id="cExtName" name="cExtName" placeholder="Ext Name">
+                    <button class="pnav" type="button" onclick="addManualComplainant()">Add to List</button>
+                </div>
+                <div id="complainantList" class="person-list justifyStart  gap10 paddingBottom5 wrap"></div>
+                <input type="hidden" id="complainantsData" name="complainants">
+            </div>
+            <br>    
+            <div class="height0 gap10 borderRadius10 col borderPrimary padding20">
+                <div class="f">
+                    <p class="size20 str500">Step 4 - Respondent</p>
+                    <label for="">Select and add a type of case the complainant filed</label>
+                    
+                </div>
+                <hr>
+                <div class="height0 justifyStart gap10 paddingBlock5">
+                    <p class="size16 str500">Search a Resident</p> <input type="text" id="respondentSearch" name="respondentSearch" placeholder="Search Respondent" autocomplete="off" class="width40"> or 
+                    <button class="nav tnav borderGray" type="button" onclick="toggleManualRespondent()">Add Non-Resident</button>
+                </div>
+                <div id="respondentResults" class="search-results bgSoft height0 gap10 padding10 borderRadius10 hidden"></div>
+                
+                <div id="manualRespondent" class="hidden bgSoft padding10 gap10 col borderRadius10">
+                    <input class="marginBottom5" type="text" id="rFirstName" name="rFirstName" placeholder="First Name">
+                    <input class="marginBottom5" type="text" id="rMiddleName" name="rMiddleName" placeholder="Middle Name">
+                    <input class="marginBottom5" type="text" id="rLastName" name="rLastName" placeholder="Last Name">
+                    <input class="marginBottom5" type="text" id="rExtName" name="rExtName" placeholder="Ext Name">
+                    <button class="pnav" type="button" onclick="addManualRespondent()">Add To List</button>
+                </div>
+                <div id="respondentList" class="person-list justifyStart  gap10 paddingBottom5 wrap"></div>
+                <input type="hidden" id="respondentsData" name="respondents">
+            </div>
+            <br>
+            <div class="height0 justifyEnd">
+                <button type="submit" class="nav pnav">Submit Case</button>
+            </div>
+        </form> 
+    </div>
+</div>
+    
+    <script>
+        let caseTypes = [];
+        let complainants = [];
+        let respondents = [];
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("Script Loaded ✅");
+
+            // Initialize form validation
+            document.getElementById('caseForm').addEventListener('submit', function(e) {
+                // Update hidden fields with JSON data
+                document.getElementById('complainantsData').value = JSON.stringify(complainants);
+                document.getElementById('respondentsData').value = JSON.stringify(respondents);
+                document.getElementById('caseTypesData').value = JSON.stringify(caseTypes);
+                
+                // Validate form
+                if (!validateForm(e)) {
+                    e.preventDefault();
+                }
+            });
+    
+            document.getElementById("caseTypeSelect").addEventListener("change", function () {
+                document.getElementById("otherCaseInput").style.display = this.value === "Others" ? "block" : "none";
+            });
+    
+            // Search functionality
+            document.getElementById("complainantSearch").addEventListener("input", function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    document.getElementById("complainantResults").classList.remove("hidden");
+                    searchResident("complainantSearch", "complainantResults", complainants, "complainantList");
+                } else {
+                    document.getElementById("complainantResults").classList.add("hidden");
+                }
+            });
+    
+            document.getElementById("respondentSearch").addEventListener("input", function() {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    document.getElementById("respondentResults").classList.remove("hidden");
+                    searchResident("respondentSearch", "respondentResults", respondents, "respondentList");
+                } else {
+                    document.getElementById("respondentResults").classList.add("hidden");
+                }
+            });
+        });
+    
+        // Form validation
+        function validateForm(e) {
+            // Validate case number
+            if (!document.getElementById('caseNo').value.trim()) {
+                alert('Case number is required');
+                return false;
+            }
+
+            // Validate at least one complainant
+            if (complainants.length === 0) {
+                alert('At least one complainant is required');
+                return false;
+            }
+
+            // Validate at least one respondent
+            if (respondents.length === 0) {
+                alert('At least one respondent is required');
+                return false;
+            }
+
+            // Validate case types
+            if (caseTypes.length === 0) {
+                alert('At least one case type is required');
+                return false;
+            }
+
+            return true;
+        }
+
+        // Add Case Type
+        function addCaseType() {
+            let caseSelect = document.getElementById("caseTypeSelect");
+            let otherCaseInput = document.getElementById("otherCaseInput");
+            let casesList = document.getElementById("casesList");
+    
+            let caseType = caseSelect.value === "Others" ? otherCaseInput.value.trim() : caseSelect.value;
+    
+            if (caseType && !caseTypes.includes(caseType)) {
+                caseTypes.push(caseType);
+                
+                let div = document.createElement("div");
+                div.className = "person-item";
+                div.textContent = caseType;
+                
+                let removeBtn = document.createElement("button");
+                removeBtn.className = "remove-btn";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.onclick = function() {
+                    casesList.removeChild(div);
+                    caseTypes = caseTypes.filter(ct => ct !== caseType);
+                };
+                
+                div.appendChild(removeBtn);
+                casesList.appendChild(div);
+    
+                if (caseSelect.value === "Others") {
+                    otherCaseInput.value = "";
+                    otherCaseInput.style.display = "none";
+                    caseSelect.value = "";
+                }
+            }
+        }
+    
+        // Toggle Non-Resident Input
+        function toggleManualComplainant() {
+            let manualDiv = document.getElementById("manualComplainant");
+            manualDiv.style.display = manualDiv.style.display === "none" ? "block" : "none";
+            document.getElementById("complainantResults").classList.add("hidden");
+        }
+    
+        function toggleManualRespondent() {
+            let manualDiv = document.getElementById("manualRespondent");
+            manualDiv.style.display = manualDiv.style.display === "none" ? "block" : "none";
+            document.getElementById("respondentResults").classList.add("hidden");
+        }
+    
+        // Search Residents from MongoDB
+        async function searchResident(inputId, resultsId, list, type) {
+            let searchQuery = document.getElementById(inputId).value.trim();
+            if (searchQuery.length < 2) return;
+        
+            try {
+                let response = await fetch(`/search-resident?q=${encodeURIComponent(searchQuery)}`);
+                let data = await response.json();
+        
+                let resultsDiv = document.getElementById(resultsId);
+                resultsDiv.innerHTML = "";
+        
+                if (data.length === 0) {
+                    resultsDiv.innerHTML = "<div>No results found</div>";
+                    return;
+                }
+        
+                data.forEach(resident => {
+                    let button = document.createElement("button");
+                    button.textContent = `${resident.firstName} ${resident.lastName}`;
+                    button.type = 'button';
+                    button.setAttribute("data-id", resident._id);
+                    button.onclick = function () {
+                        addResident(resident, list, type);
+                        document.getElementById(inputId).value = "";
+                        resultsDiv.classList.add("hidden");
+                    };
+                    resultsDiv.appendChild(button);
+                });
+
+            } catch (error) {
+                console.error("Error fetching residents:", error);
+            }
+        }
+    
+        function addResident(resident, list, type) {
+            if (!list.some(r => r._id.toString() === resident._id.toString())) {
+                list.push(resident);
+        
+                let listDiv = document.getElementById(type);
+                let container = document.createElement("div");
+                container.className = "person-item boldText";
+                container.style.fontWeight = "bold";
+                
+                // Display info
+                let div = document.createElement("div");
+                div.textContent = `${resident.firstName} ${resident.lastName}`;
+                
+                // Remove button
+                let removeBtn = document.createElement("button");
+                removeBtn.className = "remove-btn";
+                removeBtn.innerHTML = "&times;";
+                removeBtn.onclick = function() {
+                    listDiv.removeChild(container);
+                    let index = list.findIndex(r => r._id.toString() === resident._id.toString());
+                    if (index !== -1) list.splice(index, 1);
+                };
+                
+                container.appendChild(div);
+                container.appendChild(removeBtn);
+                listDiv.appendChild(container);
+            }
+        }
+
+        // Add Non-Resident Complainant/Respondent
+        function addManualComplainant() {
+            let fName = document.getElementById("cFirstName").value.trim();
+            let lName = document.getElementById("cLastName").value.trim();
+            let mName = document.getElementById("cMiddleName").value.trim();
+            let eName = document.getElementById("cExtName").value.trim();
+    
+            if (!fName || !lName) {
+                alert("First & Last Name required!");
+                return;
+            }
+    
+            let complainant = { 
+                _id: 'manual-' + Date.now(),
+                firstName: fName, 
+                middleName: mName, 
+                lastName: lName, 
+                extName: eName,
+                isManual: true
+            };
+            
+            complainants.push(complainant);
+    
+            let container = document.createElement("div");
+            container.className = "person-item str500";
+            container.textContent = `${fName} ${mName} ${lName} ${eName}`.replace(/\s+/g, ' ').trim();
+            
+            let removeBtn = document.createElement("button");
+            removeBtn.className = "remove-btn";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = function() {
+                document.getElementById("complainantList").removeChild(container);
+                complainants = complainants.filter(c => c._id !== complainant._id);
+            };
+            
+            container.appendChild(removeBtn);
+            document.getElementById("complainantList").appendChild(container);
+            
+            // Clear fields and hide form
+            document.getElementById("cFirstName").value = "";
+            document.getElementById("cMiddleName").value = "";
+            document.getElementById("cLastName").value = "";
+            document.getElementById("cExtName").value = "";
+            document.getElementById("manualComplainant").style.display = "none";
+        }
+    
+        function addManualRespondent() {
+            let fName = document.getElementById("rFirstName").value.trim();
+            let lName = document.getElementById("rLastName").value.trim();
+            let mName = document.getElementById("rMiddleName").value.trim();
+            let eName = document.getElementById("rExtName").value.trim();
+    
+            if (!fName || !lName) {
+                alert("First & Last Name required!");
+                return;
+            }
+    
+            let respondent = { 
+                _id: 'manual-' + Date.now(),
+                firstName: fName, 
+                middleName: mName, 
+                lastName: lName, 
+                extName: eName,
+                isManual: true
+            };
+            
+            respondents.push(respondent);
+    
+            let container = document.createElement("div");
+            container.className = "person-item";
+            container.textContent = `${fName} ${mName} ${lName} ${eName}`.replace(/\s+/g, ' ').trim();
+            
+            let removeBtn = document.createElement("button");
+            removeBtn.className = "remove-btn";
+            removeBtn.innerHTML = "&times;";
+            removeBtn.onclick = function() {
+                document.getElementById("respondentList").removeChild(container);
+                respondents = respondents.filter(r => r._id !== respondent._id);
+            };
+            
+            container.appendChild(removeBtn);
+            document.getElementById("respondentList").appendChild(container);
+            
+            // Clear fields and hide form
+            document.getElementById("rFirstName").value = "";
+            document.getElementById("rMiddleName").value = "";
+            document.getElementById("rLastName").value = "";
+            document.getElementById("rExtName").value = "";
+            document.getElementById("manualRespondent").style.display = "none";
+        }
+    </script>

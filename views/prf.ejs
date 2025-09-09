@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRSRS</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+        .horizon {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 20px;
+        padding: 15px 0;
+        justify-content: start;
+        scroll-snap-type: x mandatory;
+        border: 1px solid rgba(255, 255, 255, 0);
+        border-radius: 10px;
+        }
+        .horCard {
+            flex: 0 0 auto;
+            padding: 20px;
+            width: 23%;
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease-in-out, opacity 0.8s ease-in-out, padding 0.4s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .details.show {
+            max-height: fit-content;
+            opacity: 1;
+            padding: 10px 0;
+        }
+
+        .newsCard {
+            transition: all 0.8s ease-in-out;
+        }
+        #assignDepCard, #assignPhotoCard, #passCard, #povertyCard {
+            max-width: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #assignDepCard.active, #assignPhotoCard.active, #passCard.active, #povertyCard.active {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            padding: 0;
+            position: absolute;
+            z-index: 500;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .unseen {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+        }
+        .seen {
+            max-height: 300px;
+            opacity: 1;
+            padding: 0;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+        }
+        textarea {
+            background-color: white;
+        }
+        label {
+            margin-top: 20px;
+        }
+        .headf {
+            border: none;
+        }
+        .cnavX {
+                padding: 0;
+                height: 30px;
+                width: 31px;
+                min-width: 0;
+                border-radius: 50%;
+                i {
+                    font-size: 14px;
+                    height: 100%;
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+            }
+            #userInfo td.str400 {
+                width: 25%;
+            }
+            #centerTable td, #centerTable tr, #centerTable th {
+                text-align: center;
+            }
+
+        
+@media screen and (max-width: 1025px) {
+    .mobile {
+        display: none;
+    }
+    .responsive {
+        display: none;
+    }
+    body {
+        padding: 0;
+    }
+    .EmerText {
+        display: flex;
+    }
+    #mainBody {
+        padding: 0 !important;
+    }
+    #mainCardM {
+        width: 100% !important;
+    }
+    .abstractBG {
+        align-items: center;
+    }
+        #assignDepCard.active, #assignPhotoCard.active, #passCard.active, #povertyCard.active {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            padding: 0;
+            position: absolute;
+            z-index: 500;
+            top: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    .modalCard form {
+        width: 100%;
+    }
+    #sidePanel, #sidePanel2 {
+        position: relative;
+        width: 100%;
+        top: 0;
+        left: 0;
+        margin-block: 15px;
+        background-color: rgb(237, 237, 237);
+        border: 0.5px solid gray;
+        box-shadow: none;
+    }
+    #perCard {
+        position: relative;
+        width: 100%;
+        top: 0;
+        left: 0;
+        margin-block: 15px;
+        border: 0.5px solid rgb(208, 208, 208);
+        box-shadow: none;
+    }
+}
+    </style>
+<body class="block bgWhite">
+
+
+    <div class="height100 block alignStart overflow-y1 hidden" id="rstCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard">
+            <form action="/myPasswordRST" method="POST" id="changePassForm" class="flex bgWhite borderRadius10 col height0 padding30 gap15 width35 darkShadow relative">
+                <p class="size18 str500 green">Create New Password</p>
+
+                <div class="height0 col alignStart padding10 borderRadius10 borderPrimary">
+                    <p class="size12">Take Note! Password must contain the following:</p>
+                    <p class="size12">&bull; Atleast 1 Special Character</p>
+                    <p class="size12">&bull; Atleast 1 Upper Case Letter</p>
+                    <p class="size12">&bull; Combination of Letter and Numbers</p>
+                    <p class="size12">&bull; Minimum of 8 characters</p>
+                </div>
+                <!-- Current password (hidden) -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="currentPassword" class="marginTop0 hidden">Current Password</label>
+                        <div class="width0 success1 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Verified</div>
+                    </div>
+                    <input type="password" class="hidden" id="currentPassword" name="currentPassword" value="<%= user.password %>" required>
+                    <div class="error1 red size12 justifyStart height0" style="display:none;">Wrong Password!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match current -->
+
+                <!-- New password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="newPassword" class="marginTop0">Create Password </label>                        
+                        <div class="width0 success3 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Strong Password</div>
+                        <div class="width0 success4 colorPrimary size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Good but Too Short</div>
+                    </div>
+                    <input type="password" id="newPassword" name="password" required>
+                    <div class="error3 red size12 justifyStart height0" style="display:none;">
+                        Weak Password!
+                    </div>
+                </div>
+
+                <!-- Error if password is weak -->
+
+                <!-- Confirm new password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="confirmPassword" class="marginTop0">Confirm Password</label>
+                        <div class="width0 success2 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Passwords Matched</div>
+                    </div>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <div class="error2 red size12 justifyStart height0" style="display:none;">Passwords do not match!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match new password -->
+
+                <!-- Show/hide -->
+                <div class="height0 justifyStart">
+                    <label class="showPass size12 marginTop0" style="cursor:pointer;" onclick="togglePasswords()"><i class="fas fa-eye"></i> Show Password</label>
+                </div>
+
+                <div class="textCenter size12 red str500 warning padding10 borderPrimary borderRadius10" style="display: none;">
+                    Please ensure all inputs are valid!
+                </div>
+                <!-- Submit -->
+                <div class="height0 justifyEnd faded2" id="submitBtn">
+                    <button type="submit" class="nav fnav width0 bgGreen white border0">Update</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+(function() {
+    const rstCard = document.getElementById("rstCard");
+    if (!rstCard) return; // safety check
+
+    const newPass = rstCard.querySelector("#newPassword");
+    const confirmPass = rstCard.querySelector("#confirmPassword");
+    const form = rstCard.querySelector("#changePassForm");
+    const warningDiv = rstCard.querySelector(".warning");
+
+    const error2 = rstCard.querySelector(".error2");   // mismatch
+    const error3 = rstCard.querySelector(".error3");   // weak
+    const success2 = rstCard.querySelector(".success2"); // match ok
+    const success3 = rstCard.querySelector(".success3"); // strong
+    const success4 = rstCard.querySelector(".success4"); // good
+    const showToggle = rstCard.querySelector(".showPass");
+    const submitBtnDiv = rstCard.querySelector("#submitBtn");
+
+    let debounceTimer;
+
+    function isStrong(password) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+    }
+
+    function isGood(password) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{4,}$/.test(password);
+    }
+
+    function checkFormValidity() {
+        const newVal = newPass.value.trim();
+        const confVal = confirmPass.value.trim();
+        const passwordsMatch = newVal !== "" && newVal === confVal;
+        const passwordIsStrong = isStrong(newVal);
+
+        if (passwordsMatch && passwordIsStrong) {
+            submitBtnDiv.classList.remove("faded2");
+            warningDiv.style.display = "none";
+        } else {
+            submitBtnDiv.classList.add("faded2");
+        }
+    }
+
+    function validatePasswords() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const newVal = newPass.value.trim();
+            const confVal = confirmPass.value.trim();
+
+            // mismatch check
+            if (newVal && confVal) {
+                if (newVal !== confVal) {
+                    error2.style.display = "flex";
+                    success2.style.display = "none";
+                } else {
+                    error2.style.display = "none";
+                    success2.style.display = "inline";
+                }
+            } else {
+                error2.style.display = "none";
+                success2.style.display = "none";
+            }
+
+            // strength check
+            if (newVal) {
+                if (!isGood(newVal)) {
+                    error3.style.display = "flex";
+                    success3.style.display = "none";
+                    success4.style.display = "none";
+                } else if (!isStrong(newVal)) {
+                    error3.style.display = "none";
+                    success3.style.display = "none";
+                    success4.style.display = "inline";
+                } else {
+                    error3.style.display = "none";
+                    success3.style.display = "inline";
+                    success4.style.display = "none";
+                }
+            } else {
+                error3.style.display = "none";
+                success3.style.display = "none";
+                success4.style.display = "none";
+            }
+
+            checkFormValidity();
+        }, 500);
+    }
+
+    newPass.addEventListener("input", validatePasswords);
+    confirmPass.addEventListener("input", validatePasswords);
+
+    form.addEventListener("submit", (e) => {
+        warningDiv.style.display = "none";
+        const newVal = newPass.value.trim();
+        const confVal = confirmPass.value.trim();
+
+        const passwordsMatch = newVal !== "" && newVal === confVal;
+        const passwordIsStrong = isStrong(newVal);
+
+        if (!(passwordsMatch && passwordIsStrong)) {
+            e.preventDefault();
+            warningDiv.style.display = "flex";
+        } else {
+            const confirmReset = confirm("Are you sure you want to reset your password?");
+            if (!confirmReset) e.preventDefault();
+        }
+    });
+
+    showToggle.addEventListener("click", () => {
+        const isHidden = newPass.type === "password";
+        [newPass, confirmPass].forEach(input => {
+            input.type = isHidden ? "text" : "password";
+        });
+
+        showToggle.innerHTML = isHidden
+            ? '<i class="fas fa-eye-slash"></i> Hide Password'
+            : '<i class="fas fa-eye"></i> Show Password';
+    });
+})();
+</script>
+
+
+    <div class="height100 block alignStart overflow-y1" id="assignDepCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard">
+            <form action="/myUpdate" method="POST" class="flex bgWhite borderRadius10 col height0 padding30 gap10 width25 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size24 str500 colorPrimary textCenter">Contact Information</p>                
+                <div class="height0 padding20 bgSoft textCenter borderRadius10">
+                    <p class="size12">For major corrections of other information, please visit the Barangay Hall.</p>
+                </div>
+                    <height0 class="gap5 col">
+                        <label for="">Email</label>
+                        <input type="text" class="bgWhite" value="<%= user.email %>" name="email">
+                    </height0>
+                    <height0 class="gap5 col">
+                        <label for="">Contact No</label>
+                        <input type="text" class="bgWhite" value="<%= user.phone %>" name="phone">
+                    </height0>
+                <div class="height0 justifyEnd"><button type="submit" class="nav fnav width0 bgGreen white border0">Update</button></div>
+
+            </form>
+        </div>
+    </div>
+    <div class="height100 block alignStart overflow-y1" id="povertyCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard">
+            <form action="/myUpdate" method="POST" class="flex bgWhite borderRadius10 col height0 padding30 gap10 width50 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size24 str500 colorPrimary textCenter">Poverty Threshold Guide</p>
+                <table cellpadding="8" cellspacing="0" id="centerTable">
+                    <thead>
+                        <tr>
+                            <th>Family Size</th>
+                            <th>Indigent<br>(Below)</th>
+                            <th>Low Income<br>(Range)</th>
+                            <th>Non-Indigent<br>(Above)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 - 2</td>
+                            <td>₱7,499 and below</td>
+                            <td>₱7,500 - ₱10,000</td>
+                            <td>Above ₱10,000</td>
+                        </tr>
+                        <tr>
+                            <td>3 - 4</td>
+                            <td>₱9,999 and below</td>
+                            <td>₱10,000 - ₱13,000</td>
+                            <td>Above ₱13,000</td>
+                        </tr>
+                        <tr>
+                            <td>5 - 6</td>
+                            <td>₱12,499 and below</td>
+                            <td>₱12,500 - ₱15,000</td>
+                            <td>Above ₱15,000</td>
+                        </tr>
+                        <tr>
+                            <td>7 - 8</td>
+                            <td>₱14,999 and below</td>
+                            <td>₱15,000 - ₱18,000</td>
+                            <td>Above ₱18,000</td>
+                        </tr>
+                        <tr>
+                            <td>9 and above</td>
+                            <td>₱16,999 and below</td>
+                            <td>₱17,000 - ₱20,000</td>
+                            <td>Above ₱20,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="height0 borderPrimary borderRadius10 padding20">
+                    <p class="size14 str400 textJustify">
+                        A poverty threshold is the minimum income required to meet basic needs, defined in the Philippines by the Philippine Statistics Authority (PSA) and National Economic and Development Authority (NEDA) based on food, health, education, and housing needs. For 2023, the monthly poverty threshold for a family of five in the Philippines was set at PHP13,873. 
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="height100 block alignStart overflow-y1" id="passCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard">
+            <form action="/myPassword" method="POST" id="changePassForm" class="flex bgWhite borderRadius10 col height0 padding30 gap15 width35 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size18 str500 green">Reset Password</p>
+
+                <div class="height0 col alignStart padding10 borderRadius10 borderPrimary">
+                    <p class="size12">Take Note! Password must contain the following:</p>
+                    <p class="size12">&bull; Atleast 1 Special Character</p>
+                    <p class="size12">&bull; Atleast 1 Upper Case Letter</p>
+                    <p class="size12">&bull; Combination of Letter and Numbers</p>
+                    <p class="size12">&bull; Minimum of 8 characters</p>
+                </div>
+                <hr>
+
+                <!-- Current password (hidden) -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="currentPassword" class="marginTop0">Current Password</label>
+                        <div class="width0 success1 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Verified</div>
+                    </div>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                    <div class="error1 red size12 justifyStart height0" style="display:none;">Wrong Password!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match current -->
+
+                <!-- New password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="newPassword" class="marginTop0">Create Password </label>                        
+                        <div class="width0 success3 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Strong Password</div>
+                        <div class="width0 success4 colorPrimary size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Good but Too Short</div>
+                    </div>
+                    <input type="password" id="newPassword" name="password" required>
+                    <div class="error3 red size12 justifyStart height0" style="display:none;">
+                        Weak Password!
+                    </div>
+                </div>
+
+                <!-- Error if password is weak -->
+
+                <!-- Confirm new password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="confirmPassword" class="marginTop0">Confirm Password</label>
+                        <div class="width0 success2 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Passwords Matched</div>
+                    </div>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <div class="error2 red size12 justifyStart height0" style="display:none;">Passwords do not match!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match new password -->
+
+                <!-- Show/hide -->
+                <div class="height0 justifyStart">
+                    <label class="showPass size12 marginTop0" style="cursor:pointer;" onclick="togglePasswords()"><i class="fas fa-eye"></i> Show Password</label>
+                </div>
+
+                <div class="textCenter size12 red str500 warning padding10 borderPrimary borderRadius10" style="display: none;">
+                    Please ensure all inputs are valid!
+                </div>
+                <!-- Submit -->
+                <div class="height0 justifyEnd faded2" id="submitBtn">
+                    <button type="submit" class="nav fnav width0 bgGreen white border0">Update</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+<script>
+const currentPassword = document.querySelector("#passCard #currentPassword");
+const newPass = document.querySelector("#passCard #newPassword");
+const confirmPass = document.querySelector("#passCard #confirmPassword");
+const form = document.querySelector("#passCard #changePassForm");
+const warningDiv = document.querySelector("#passCard .warning");
+
+const error1 = document.querySelector("#passCard .error1");
+const error2 = document.querySelector("#passCard .error2");
+const error3 = document.querySelector("#passCard .error3");
+
+const success1 = document.querySelector("#passCard .success1");
+const success2 = document.querySelector("#passCard .success2");
+const success3 = document.querySelector("#passCard .success3");
+const success4 = document.querySelector("#passCard .success4");
+
+const showToggle = document.querySelector("#passCard .showPass");
+const submitBtnDiv = document.querySelector("#passCard #submitBtn");
+
+let debounceTimerNewConfirm;
+let debounceTimerCurrent; // New debounce timer for current password validation
+let isCurrentPasswordValid = false; // New state variable
+
+function isStrong(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+}
+
+function isGood(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{4,}$/.test(password);
+}
+
+// ✅ Checks if all conditions are met before showing submit button
+function checkFormValidity() {
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+    
+    // Passwords must match, be strong, and the current password must be valid
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    if (passwordsMatch && passwordIsStrong && isCurrentPasswordValid) {
+        submitBtnDiv.classList.remove("faded2");
+        warningDiv.style.display = "none";
+    } else {
+        submitBtnDiv.classList.add("faded2");
+    }
+}
+
+// ✅ Function to validate current password with the server
+async function validateCurrentPassword() {
+    const curVal = currentPassword.value.trim();
+    if (!curVal) {
+        // Clear states if the input is empty
+        success1.style.display = "none";
+        error1.style.display = "none";
+        isCurrentPasswordValid = false;
+        checkFormValidity();
+        return;
+    }
+
+    try {
+        const response = await fetch("/verify-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ currentPassword: curVal }),
+        });
+
+        const data = await response.json();
+        isCurrentPasswordValid = data.valid;
+
+        if (isCurrentPasswordValid) {
+            success1.style.display = "inline";
+            error1.style.display = "none";
+        } else {
+            success1.style.display = "none";
+            error1.style.display = "flex";
+        }
+    } catch (err) {
+        console.error("Failed to verify password:", err);
+        isCurrentPasswordValid = false;
+        success1.style.display = "none";
+        error1.style.display = "flex";
+    }
+    
+    checkFormValidity();
+}
+
+form.addEventListener("submit", (e) => {
+    warningDiv.style.display = "none";
+
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    if (!(passwordsMatch && passwordIsStrong && isCurrentPasswordValid)) {
+        e.preventDefault();
+        warningDiv.style.display = "flex";
+    } else {
+        const confirmReset = confirm("Are you sure you want to reset your password?");
+        if (!confirmReset) {
+            e.preventDefault();
+        }
+    }
+});
+
+// ✅ Debounced new/confirm password validation (no changes needed here)
+function validateNewPasswords() {
+    clearTimeout(debounceTimerNewConfirm);
+    debounceTimerNewConfirm = setTimeout(() => {
+        const newVal = newPass.value.trim();
+        const confVal = confirmPass.value.trim();
+
+        // Error 2: New and confirm password mismatch
+        if (newVal && confVal) {
+            if (newVal !== confVal) {
+                error2.style.display = "flex";
+                success2.style.display = "none";
+            } else {
+                error2.style.display = "none";
+                success2.style.display = "inline";
+            }
+        } else {
+            error2.style.display = "none";
+            success2.style.display = "none";
+        }
+
+        // Error 3: Weak password
+        if (newVal) {
+            if (!isGood(newVal)) {
+                error3.style.display = "flex";
+                success3.style.display = "none";
+                success4.style.display = "none";
+            } else if (!isStrong(newVal)) {
+                error3.style.display = "none";
+                success3.style.display = "none";
+                success4.style.display = "inline";
+            } else {
+                error3.style.display = "none";
+                success3.style.display = "inline";
+                success4.style.display = "none";
+            }
+        } else {
+            error3.style.display = "none";
+            success3.style.display = "none";
+            success4.style.display = "none";
+        }
+
+        checkFormValidity();
+    }, 500);
+}
+
+newPass.addEventListener("input", validateNewPasswords);
+confirmPass.addEventListener("input", validateNewPasswords);
+currentPassword.addEventListener("input", () => {
+    clearTimeout(debounceTimerCurrent);
+    debounceTimerCurrent = setTimeout(validateCurrentPassword, 500);
+});
+
+
+// ✅ Show/Hide toggle
+showToggle.addEventListener("click", () => {
+    const isHidden = newPass.type === "password";
+
+    [newPass, confirmPass, currentPassword].forEach(input => {
+        input.type = isHidden ? "text" : "password";
+    });
+
+    showToggle.innerHTML = isHidden
+        ? '<i class="fas fa-eye-slash"></i> Hide Password'
+        : '<i class="fas fa-eye"></i> Show Password';
+});
+</script>
+
+
+
+
+
+    <div class="height100 block alignStart overflow-y1" id="assignPhotoCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard gap0">
+            <form id="cropForm" class="flex bgSoft borderRadius10 col height0 padding20 gap10 width30 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size18 str500 green">Change Photo</p>
+
+                <div class="gap5 col alignStart height0 justifyStart bgWhite padding10 borderPrimary borderRadius10">
+                    <label class="marginBlock0">Upload your photo here</label>
+                    <input type="file" id="photoInput" accept="image/*">
+                </div>
+
+                <!-- Cropper preview area -->
+                <div style="width: 100%; max-height: 300px; overflow: hidden;">
+                    <img id="photoPreview" style="max-width: 100%; display: none; border-radius: 10px;" />
+                </div>
+
+                <!-- Hidden input for base64 cropped image -->
+                <input type="hidden" name="croppedImage" id="croppedImageInput">
+
+                <div class="height0 justifyEnd">
+                    <button type="submit" class="nav fnav width0 bgGreen white border0">Save</button>
+                </div>
+            </form>
+
+            <script>
+  let cropper;
+  const photoInput = document.getElementById('photoInput');
+  const photoPreview = document.getElementById('photoPreview');
+  const croppedImageInput = document.getElementById('croppedImageInput');
+  const cropForm = document.getElementById('cropForm');
+
+  photoInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      photoPreview.src = event.target.result;
+      photoPreview.style.display = 'block';
+
+      if (cropper) cropper.destroy();
+
+      cropper = new Cropper(photoPreview, {
+        aspectRatio: 1, // 1:1 crop
+        viewMode: 1,
+        responsive: true,
+        autoCropArea: 1,
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  cropForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (!cropper) {
+      alert("Please upload and crop your photo first.");
+      return;
+    }
+
+    const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+    const base64 = canvas.toDataURL("image/jpeg");
+
+    croppedImageInput.value = base64;
+
+    // Submit using fetch
+    fetch("/upload-my-photo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ image: base64 })
+    }).then(res => {
+      if (res.ok) {
+        window.location.href = "/prf";
+      } else {
+        alert("Upload failed.");
+      }
+    });
+  });
+</script>
+
+
+            <script>
+                const input = document.getElementById("photoInput");
+                const preview = document.getElementById("photoPreview");
+
+                input.addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                            preview.style.display = "flex";
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        preview.src = "#";
+                        preview.style.display = "none";
+                    }
+                });
+            </script>
+
+        </div>
+    </div>
+    <div class="height95 gap20 bgSoft padding20 borderRadius10 alignStart overflow-y1 relative" id="mainBody">
+        <a href="/hom" class="nav absolute left20 top20 responsive"><i class="fas fa-chevron-left"></i> Go Back to Home</a>
+        <div class="bgWhite borderRadius10 padding20 col justifyStart width45 height0 gap10" id="mainCardM">
+            
+            <div class="height0 alignStart col white gap5 padding20 abstractBG borderRadius10 relative">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right15 bottom5" style="opacity: 0.1; transform: scale(3);"><i class="fas fa-lock"></i></a>
+                <a href="/hom" class="nav cnav hidden EmerText marginBottom10 absolute top10 left10"><i class="fas fa-chevron-left"></i></a>
+                <a href="/" class="nav cnav hidden EmerText marginBottom10 absolute top10 right10"><i class="fas fa-share-from-square"></i></a>
+                <a href="/" class="nav responsive marginBottom10 absolute top15 right15"><i class="fas fa-share-from-square"></i>Logout</a>
+                <div class="height0 relative h90 w90" id="profilePhoto">
+                    <a href="javascript:void()" class="nav cnavX index10 white transparent" id="assignPhoto" style="border: 0.5px solid white; position: absolute; right: 0; bottom: 0;">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <img src="<%= user.photo || '/images/profile.jpg' %>" alt="" class="borderRadius500 borderPrimary height100 width100">
+                </div>
+                <p class="size22 str400"><%= user.firstName %> <%= user.middleName %> <%= user.lastName %> <%= user.extName %></p>
+            </div>
+            
+            <div class="bgWhite darkShadow borderRadius10 height0 padding20 size12 textCenter col absolute left20 top80 width25" id="sidePanel">
+                <p>
+                    To ensure smooth communication and access to services, always keep your details up to date. You can update your photo, password, personal email and contact number only.
+                    <br><br>
+                    <span class="flex gap10 justifyCenter">
+                        <a href="javascript:void()" class="nav tnav pnav" id="assignBtn"><i class="fas fa-edit"></i>Contact Info</a>
+                        <a href="javascript:void()" class="nav tnav dnav" id="passBtn"><i class="fas fa-key"></i> Password</a>
+                    </span>
+                    <center>
+                    </center>
+                    <br>
+                    If there's a mispelled or incorrect information, please visit the Barangay Hall for In-Person Interview and Re-Assessment. Might as well bring any supporting document.
+                </p>
+                <br>
+                <div class="height0 padding20 abstractBG borderRadius10 textCenter size20 white">
+                    Your updated information helps us serve you better!
+                </div>
+                <br>
+                <div class="height0 borderRadius10 padding20 size12 col gap0 relative">
+                <a href="" class="nav cnav disabled marginBottom15 absolute left10 bottom0" style="opacity: 0.1; transform: scale(2.5);"><i class="fas fa-hand-holding-heart"></i></a>
+                    <p class="absolute right10 top10 padding0">
+                        <a href="javascript:void()" class="nav cnavX" id="povertyBtn"><i class="fas fa-question-circle"></i></a>
+                    </p>
+                    <p class="size16 str400 lineHeight1">You are a Member of</p>
+                    <p class="size20 str500 green"><%= family ? family.poverty : 'N/A' %> Family</p>
+                    <p class="size12 str500">Your Family Income per month is 
+                        <%= family ? '₱' + parseFloat(family.familyIncome).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A' %>
+                    </p>
+                </div>
+            </div>
+            <div class="hidden bgWhite darkShadow borderRadius10 height0 padding0 size12 col absolute left20 bottom20 width25 gap0" id="sidePanel2">
+            </div>
+
+            <div class="height0 padding10 bgSoft gap10 borderRadius10 alignStart" id="hshCard">
+                <div class="height0 bgWhite borderRadius10 col padding20 justifyStart alignStart relative width60">
+                    <p class="size20 str500">Household Information</p>
+                    <hr><br>
+                    <label for="" class="margin0 marginTop5">Household No. & Purok</label>
+                    <p class="size14 str500"><%= household ? household.houseNo : 'N/A' %> <%= household ? household.purok : 'N/A' %></p>
+                    <label for="" class="margin0 marginTop5">House Type</label>
+                    <p class="size14 str500 marginBottom15"><%= household ? household.houseType : 'N/A'  %></p>
+                     <label for="" class="margin0 marginTop5">Wall Material</label>
+                    <p class="size14 str500 marginBottom15"><%= household ? household.wallMaterial : 'N/A'  %></p>
+                    <label for="" class="margin0 marginTop5">Roof Material</label>
+                    <p class="size14 str500 marginBottom15"><%= household ? household.roofMaterial : 'N/A'  %></p>
+                    <label for="" class="margin0 marginTop5">Flooring Material</label>
+                    <p class="size14 str500"><%= household ? household.flooringMaterial : 'N/A'  %></p>
+                </div>
+                <div class="height0 gap10 col width40">
+                    <div class="height0 bgWhite borderRadius10 col padding20 justifyStart alignStart relative gap5">
+                        <i class="fas fa-toilet size16 absolute right10 top10  bgSoft padding10 borderRadius500"></i>
+                        <label for="" class="margin0">Toilet Type</label>
+                        <p class="size14 str500"><%= household ? household.toiletType : 'N/A'  %></p>
+                    </div>
+                    <div class="height0 bgWhite borderRadius10 col padding20 justifyEnd alignStart relative gap5">
+                        <i class="fas fa-door-open size16 absolute right10 top10 bgSoft padding10 borderRadius500"></i>
+                        <label for="" class="margin0">Rooms</label>
+                        <p class="size14 str500">Total of <%= household ? household.numRooms : 'N/A'  %></p>
+                    </div>
+                    <div class="height0 bgWhite borderRadius10 col padding20 justifyEnd alignStart relative gap5">
+                        <i class="fas fa-lightbulb size16 absolute right10 top10 yellow h34 w35 bgSoft padding10 borderRadius500"></i>
+                        <label for="" class="margin0">Lighting</label>
+                        <p class="size14 str500"><%= household ? household.electricity : 'N/A'  %></p>
+                    </div>
+                    <div class="height0 bgWhite borderRadius10 col padding20 justifyEnd alignStart relative gap5">
+                        <i class="fas fa-droplet size16 absolute right10 top10  blue h34 w35  bgSoft padding10 borderRadius500"></i>
+                        <label for="" class="margin0">Water</label>
+                        <p class="size14 str500"><%= household ? household.waterSource : 'N/A'  %></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="height0 col alignStart padding20  absolute right20 top20 width25 bgWhite borderRadius10" id="perCard">
+                <p class="size20 str500">Personal Information</p>
+                <table id="userInfo" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                    <% if ( user.position != 'Resident') { %>
+                        <tr>
+                            <td class="str400">Position</td>
+                            <td class="str500"><%= user.position %></td>
+                        </tr>
+                    <% } %>
+                    <tr>
+                        <td class="str400">Gender</td>
+                        <td class="str500"><%= user.gender %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Civil Status</td>
+                        <td class="str500"><%= user.civilStatus %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Birthday</td>
+                        <td class="str500">
+                            <% const monthNames = [
+                                "January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"
+                            ]; %>
+                            <%= monthNames[user.bMonth - 1] %> <%= user.bDay %>, <%= user.bYear %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Birth Place</td>
+                        <td class="str500"><%= user.birthPlace %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Phone</td>
+                        <td class="str500"><%= user.phone %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Email</td>
+                        <td class="str500"><%= user.email %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Precinct</td>
+                        <td class="str500"><%= user.precinct %></td>
+                    </tr>
+                    <% if ( user.soloParent == 'on') { %>
+                        <tr>
+                            <td class="str400">Solo Parent</td>
+                            <td class="str500"><%= user.soloParent ? 'Yes' : 'No' %></td>
+                        </tr>
+                        <% } %>
+                    <% if (user.gender == 'Female') { %>
+                        <tr>
+                            <td class="str400">Pregnant</td>
+                            <td class="str500"><%= user.pregnant ? 'Yes' : 'No' %></td>
+                        </tr>
+                    <% } %>
+                    <tr>
+                        <td class="str400">PWD</td>
+                        <td class="str500"><%= user.pwd ? 'Yes' : 'No' %></td>
+                    </tr>
+                    <% if (user.pwd == 'on') { %>
+                        <tr>
+                            <td class="str400">Disability Type</td>
+                            <td class="str500"><%= user.pwdType || 'N/A' %></td>
+                        </tr>
+                    <% } %>
+                    <tr>
+                        <td class="str400">Employment</td>
+                        <td class="str500"><%= user.employmentStatus %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Source of Income</td>
+                        <td class="str500"><%= user.work %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Monthly Income</td>
+                        <td class="str500"><%= user.monthlyIncome %></td>
+                    </tr>
+                    <tr>
+                        <td class="str400">Family Role</td>
+                        <td class="str500"><%= user.role %></td>
+                    </tr>
+                </table>
+
+            </div>
+
+                        
+  
+        </div>
+
+
+
+        <div class="bgWhite borderRadius10 padding20 col justifyStart width35 height0 gap20 hidden">
+            <div class="height0 gap10 justifyEvenly">
+                <a href="javascript:void()" class="nav tnav" id=""><i class="fas fa-key"></i>Reset Password</a>
+            </div>
+            <div class="bgSoft borderRadius10 height0 padding20 size12 textCenter hidden">
+                <p></p>
+                <p class="">
+                    If there’s a mispelled or incorrect information,<br>you can ask for RE-INTERVIEW 🔗 <a href="" class="inline str600"> REQUEST HERE</a>
+                    
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".showBtn").forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default <a> behavior
+    
+                let newsCard = this.closest(".newsCard"); // Get parent newsCard
+                let details = newsCard.querySelector(".details"); // Get details inside the card
+                let icon = this.querySelector("i"); // Get icon inside the button
+    
+                details.classList.toggle("show"); // Toggle visibility
+                
+                // Toggle icon class
+                if (details.classList.contains("show")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+    });
+    
+    </script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(?<!\S)(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|net|org|gov|edu|ph)\b)(?!\S)/g, '<a href="http://$1" target="_blank" class="inline blue str500">$1</a>');
+});
+</script>
+<script>
+document.getElementById("assignBtn").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default link behavior
+
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Toggle 'active' class
+    assignCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (assignCard.classList.contains("active")) {
+        assignBtn.innerHTML = '<i class="fas fa-edit"></i> Update Info';
+    } else {
+        assignBtn.innerHTML = '<i class="fas fa-edit"></i> Update Info';
+    }
+});
+
+// Add logic to handle closing when closeBtn is clicked
+document.getElementById("closeBtn").addEventListener("click", function () {
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Remove 'active' class
+    assignCard.classList.remove("active");
+
+    // Reset button text & icon
+    assignBtn.innerHTML = '<i class="fas fa-edit"></i> Update Info';
+});
+
+</script>
+
+<script>
+document.getElementById("assignPhoto").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default link behavior
+
+    let assignPhotoCard = document.getElementById("assignPhotoCard");
+    let assignPhoto = document.getElementById("assignPhoto");
+
+    // Toggle 'active' class
+    assignPhotoCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (assignPhotoCard.classList.contains("active")) {
+        assignPhoto.innerHTML = '<i class="fas fa-pen"></i>';
+    } else {
+        assignPhoto.innerHTML = '<i class="fas fa-pen"></i>';
+    }
+});
+
+// Add logic to handle closing when closeBtn is clicked
+document.getElementById("closeBtn").addEventListener("click", function () {
+    let assignPhotoCard = document.getElementById("assignPhotoCard");
+    let assignPhoto = document.getElementById("assignPhoto");
+
+    // Remove 'active' class
+    assignPhotoCard.classList.remove("active");
+
+    // Reset button text & icon
+    assignPhoto.innerHTML = '<i class="fas fa-pen"></i>';
+});
+
+</script>
+
+<script>
+document.getElementById("passBtn").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default link behavior
+
+    let passCard = document.getElementById("passCard");
+    let passBtn = document.getElementById("passBtn");
+
+    // Toggle 'active' class
+    passCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (passCard.classList.contains("active")) {
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+    } else {
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+    }
+});
+
+// Add logic to handle closing when closeBtn is clicked
+document.getElementById("closeBtn").addEventListener("click", function () {
+    let passCard = document.getElementById("passCard");
+    let passBtn = document.getElementById("passBtn");
+
+    // Remove 'active' class
+    passCard.classList.remove("active");
+
+    // Reset button text & icon
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+});
+
+</script>
+<script>
+document.getElementById("povertyBtn").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default link behavior
+
+    let povertyCard = document.getElementById("povertyCard");
+    let povertyBtn = document.getElementById("povertyBtn");
+
+    // Toggle 'active' class
+    povertyCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (povertyCard.classList.contains("active")) {
+    povertyBtn.innerHTML = '<i class="fas fa-question-circle"></i>';
+    } else {
+    povertyBtn.innerHTML = '<i class="fas fa-question-circle"></i>';
+    }
+});
+
+// Add logic to handle closing when closeBtn is clicked
+document.getElementById("closeBtn").addEventListener("click", function () {
+    let povertyCard = document.getElementById("povertyCard");
+    let povertyBtn = document.getElementById("povertyBtn");
+
+    // Remove 'active' class
+    povertyCard.classList.remove("active");
+
+    // Reset button text & icon
+    povertyBtn.innerHTML = '<i class="fas fa-question-circle"></i>';
+});
+</script>
+
+<script>
+    // Inject from server to client
+    const user = {
+        reset: <%= user.reset %>  // if using EJS
+    };
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if (user.reset === 1) {   // loose equality works for both number and string
+        const rstCard = document.getElementById("rstCard");
+        if (rstCard) {
+            rstCard.classList.remove("hidden");
+        }
+    }
+});
+</script>
+
+
+</body>
+</html>

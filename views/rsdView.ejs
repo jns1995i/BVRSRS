@@ -1,0 +1,1506 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+                display: flex;
+            }
+            .resetPassCard, .newAccCard, .suspendCard, .suspendCard2,  .archiveCard,  .archiveCard2 {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                z-index: 505;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .resetCard, .newCard, .suspend, .archive, .archive2, .suspend2 {
+                width: 500px;
+                height: 450px;
+                background-color: white;
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+                background-color: var(--lightgray);
+            }
+            .block.s {
+                width: 15%;
+                height: auto;
+                flex-direction: column;
+                justify-content: start;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 50px 150px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: start;
+                justify-items: start;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                position: absolute;
+                bottom: 0;
+                right: 38px;
+                z-index: 50;
+                flex-direction: column-reverse;
+                height: 100%;
+                gap: 10px;
+                width: 15%;
+                align-items: center;
+                justify-content: space-between;
+                padding-block: 20px;
+            }
+            .docHead .ctrl {
+                height: auto;
+                padding: 0;
+                width: 100%;
+                flex-direction: column;
+            }
+            .docHead .ctrl.right {
+                flex-direction: row;
+            }
+            .docHead .ctrl.left .nav {
+                width: 100%
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 60px;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            .userPhoto {
+                height: 120px;
+                width: 120px;
+                outline: 1px solid lightgray;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: none;
+            }
+            .headCtrl {
+                padding: 5px;
+            }
+            .headCtrl .ctrl {
+                width: 97.5%;
+                border-radius: 0.5vw;
+            }
+            .certContent {
+                position: absolute;
+                z-index: 50;
+                left: 10px;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: auto;
+                padding: 15px;
+                width: 18%;
+            }
+            .certTA, .certTA:hover, .certTA:focus {
+                height: calc(38 * 1em);
+            }
+            .seen {
+                padding: 30px;
+                height: 200px;
+                max-height: 200px;
+            }
+            #newCard.seen {
+                padding: 40px;
+                max-height: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 20px;
+            }
+.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+.certContent {
+    height: calc(8 * 1em);
+    width: 98%;
+}
+.certContentM {
+    white-space: pre-wrap; /* Preserves new lines and spaces */
+}
+@media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .maindocPage {
+                    background-image: url('your-background-image.png') !important;
+                    background-size: cover !important;
+                }
+                span {
+                    font-size: 14pt !important;
+                }
+                sup, sub {
+                    font-size: inherit !important;
+                }
+            }
+            .cnav {
+                transform: scale(0.95);
+            }
+
+              #famBtn i {
+    transition: transform 0.3s ease;
+  }
+
+  /* when card is visible, rotate the icon */
+  #famBtn i.rotate {
+    transform: rotate(180deg);
+  }
+        </style>
+    </head>
+
+    <div class="resetPassCard" id="resetPassCard" style="display: none;">
+        <div class="resetCard col">
+            <p class="P40"><i class="fas fa-warning" style="font-size: 60px;"></i></p>
+            <p class="p40">WARNING!</p>
+            <p class="p16 str500">This action cannot be undone!</p>
+            <br>
+            <p class="p10 str400">The user will receive a new password.</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmReset" data-id="<%= resident._id %>">Reset Password</a>
+                <a href="#" class="nav fnav" id="closeResetCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="suspendCard" id="suspendCard" style="display: none;">
+        <div class="suspend col padding30">
+            <p class="P40"><i class="fas fa-lock" style="font-size: 60px;"></i></p>
+            <p class="p40">OH NO!</p>
+            <p class="p16 str500 textCenter">Are you sure you want to suspend this user?</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmSuspend" data-id="<%= resident._id %>">Suspend</a>
+                <a href="#" class="nav fnav" id="closeSuspendCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="suspendCard2" id="suspendCard2" style="display: none;">
+        <div class="suspend2 col padding30">
+            <p class="P40"><i class="fas fa-unlock" style="font-size: 60px;"></i></p>
+            <p class="size36 hidden">Awesome!</p>
+            <p class="p14 str500 textCenter">You are about to <br> unsuspend this user ..</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmSuspend2" data-id="<%= resident._id %>">Unsuspend</a>
+                <a href="#" class="nav fnav" id="closeSuspendCard2">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="archiveCard" id="archiveCard" style="display: none;">
+        <div class="archive col padding30">
+            <p class="P40"><i class="fas fa-archive" style="font-size: 60px;"></i></p>
+            <p class="p40">OH NO!</p>
+            <p class="p16 str500 textCenter">Are you sure you want to archive this user?</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmArchive" data-id="<%= resident._id %>">Archive</a>
+                <a href="#" class="nav fnav" id="closeArchiveCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="archiveCard2" id="archiveCard2" style="display: none;">
+        <div class="archive col padding30">
+            <p class="P40"><i class="fas fa-check-circle" style="font-size: 60px;"></i></p>
+            <p class="size36 hidden">Awesome!</p>
+            <p class="p14 str500 textCenter">You are about to <br> restore this user ..</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmArchive2" data-id="<%= resident._id %>">Restore</a>
+                <a href="#" class="nav fnav" id="closeArchiveCard2">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="unseen padding30" id="newCard">
+        <form action="/upload-photo/<%= resident._id %>" method="POST" enctype="multipart/form-data" class="width30 padding30 gap20">
+            <p class="size14 str500 textCenter">Uploading Photo</p>
+            <input type="file" name="photo" required />
+            <div class="height0 gap10">
+                <a class="nav fnav" type="submit" id="closeBtn">Cancel</a>
+                <button class="nav pnav fnav" type="submit">Upload Photo</button>
+            </div>
+        </form> 
+    </div>
+
+        <div class="main height100">
+
+            <div class="block col" id="trayCard" style="position: relative; padding: 0; background-color: white;">
+
+                <div class="card col tray height0" style="padding: 10px; border-radius: 10px;">
+                    <div class="height0 paddingTop15 relative gap15 alignStart justifyBetween paddingRight5"> 
+
+                        <div class="height0 width55 absolute left0 top0 index50">
+                            <div class="section relative">
+                                <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="User Photo" class="userPhoto">
+                                <a href="javascript:void()" class="nav cnav index10 colorPrimary" id="newBtn" style="position: absolute; right: 40%; bottom: 10px; transform: scale(0.9);">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                            </div> 
+                        </div>
+
+                        <div class="height0 gap10 col width55">
+                            <div class="height0 gap10 justifyBetween paddingInline5" style="z-index: 200;">
+                                <div class="height0 gap10 paddingInline5 width0">
+                                    <% if ( back === "rsd") { %>
+                                    <a href="/rsd" class="nav index10">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Previous
+                                    </a>
+                                    <% } else if ( back === "rsdArc") { %>
+                                    <a href="/arcRsd" class="nav index10">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Previous
+                                    </a>
+                                    <% } else { %>
+                                    <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav index10">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Previous
+                                    </a>
+                                    <% } %>
+                                    
+                                </div>
+                                <p class="size18 str500"><%= resident.position || "" %> <i class="bi bi-patch-check-fill inline green"></i></p>
+                            </div>
+
+                            <div class="height0 col padding15 index0 borderRadius20 relative <% if (resident.suspend === 1 || resident.archive === 1 || resident.archive === "1") { %> grayscale abstractBG <% } else { %> witch abstractBG <% } %>"> 
+                                <a href="" class="nav cnav disabled marginBottom15 responsive absolute right20 bottom10 green" style="opacity: 0.1; transform: scale(3.5);"><i class="fas fa-user"></i></a>  
+                                <div class="head userH marginTop55">
+                                    <div class="ctrl">
+                                        <p class="size28 str400 white"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></p>
+                                    </div>
+                                </div>
+                                <div class="height0 padding5 wrap gap10">
+                                    <% if (resident.precinct === "Registered Voter") { %>
+                                    <div class="height0 padding10 borderRadius10 borderWhite white width0">Registered Voter</div>
+                                    <% } else { %>
+                                    <div class="height0 padding10 borderRadius10 borderWhite white width0">Non-Voter</div>
+                                    <% } %>
+
+                                    <% if (resident.pregnant === "on") { %>
+                                    <div class="height0 padding10 borderRadius10 borderWhite white width0">Pregnant</div>
+                                    <% } else { %>
+                                    <% } %>
+                                    
+                                    <% if (resident.soloParent === "on") { %>
+                                    <div class="height0 padding10 borderRadius10 borderWhite white width0">Solo Parent</div>
+                                    <% } else { %>
+                                    <% } %>
+
+                                    <% if (resident.pwd === "on") { %>
+                                    <div class="height0 padding10 borderRadius10 borderWhite white width0">Person with Disability: <%= resident.pwdType || 'Unknown Type'%></div>
+                                    <% } else { %>
+                                    <% } %>
+                                </div>
+                                
+                            </div>  
+                            <br>       
+                            <div class="height0 padding15 bgTint8 gap15 borderRadius15 alignStart" id="hshCard">
+                                <div class="height0 bgWhite borderRadius15 col padding25 justifyStart alignStart relative width60">
+                                    <p class="size24 colorPrimary str500">Household</p>
+                                    <hr><br>
+                                    <label for="" class="margin0 marginTop5">Household No. & Purok</label>
+                                    <p class="size14 str500 marginBottom15"><%= householdData ? householdData.houseNo : "-" %> <%= householdData ? householdData.purok : '-' %></p>
+                                    <label for="" class="margin0 marginTop5">House Type</label>
+                                    <p class="size14 str500 marginBottom15"><%= householdData ? householdData.houseType : '-'  %></p>
+                                    <label for="" class="margin0 marginTop5">Wall Material</label>
+                                    <p class="size14 str500 marginBottom15"><%= householdData ? householdData.wallMaterial : '-'  %></p>
+                                    <label for="" class="margin0 marginTop5">Roof Material</label>
+                                    <p class="size14 str500 marginBottom15"><%= householdData ? householdData.roofMaterial : '-'  %></p>
+                                    <label for="" class="margin0 marginTop5">Flooring Material</label>
+                                    <p class="size14 str500"><%= householdData ? householdData.flooringMaterial : '-'  %></p>
+                                </div>
+                                <div class="height0 gap15 col width40">
+                                    <div class="height0 bgWhite borderRadius15 col padding20 justifyStart alignStart relative gap5">
+                                        <i class="fas fa-toilet size16 absolute right10 top10 colorPrimary  bgSoft padding10 borderRadius500"></i>
+                                        <label for="" class="margin0">Toilet Type</label>
+                                        <p class="size14 str500"><%= householdData ? householdData.toiletType : '-'  %></p>
+                                    </div>
+                                    <div class="height0 bgWhite borderRadius15 col padding20 justifyEnd alignStart relative gap5">
+                                        <i class="fas fa-door-open size16 absolute right10 top10 green bgSoft padding10 borderRadius500"></i>
+                                        <label for="" class="margin0">Rooms</label>
+                                        <p class="size14 str500">Total of <%= householdData ? householdData.numRooms : '0'  %></p>
+                                    </div>
+                                    <div class="height0 bgWhite borderRadius15 col padding20 justifyEnd alignStart relative gap5">
+                                        <i class="fas fa-lightbulb size16 absolute right10 top10 yellow h34 w35 bgSoft padding10 borderRadius500"></i>
+                                        <label for="" class="margin0">Lighting</label>
+                                        <p class="size14 str500"><%= householdData ? householdData.electricity : '-'  %></p>
+                                    </div>
+                                    <div class="height0 bgWhite borderRadius15 col padding20 justifyEnd alignStart relative gap5">
+                                        <i class="fas fa-droplet size16 absolute right10 top10  blue h34 w35  bgSoft padding10 borderRadius500"></i>
+                                        <label for="" class="margin0">Water</label>
+                                        <p class="size14 str500"><%= householdData ? householdData.waterSource : '-'  %></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="height0 width45 col gap15" style="padding: 5px 5px 10px 20px;">
+                        
+                        <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
+                                <a href="/updateRsd/<%= resident._id %>" class="nav absolute right10 top10"><i class="fas fa-pen"></i>Edit Information</a>
+                            
+                                <% 
+                                    // Parse birthday into a Date object
+                                    const birthDateParts = birthday.split(" ");
+                                    const birthMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(birthDateParts[0]);
+                                    const birthDay = parseInt(birthDateParts[1].replace(",", ""));
+                                    const birthYear = parseInt(birthDateParts[2]);
+
+                                    // Compute age based on birthday
+                                    const today = new Date();
+                                    let computedAge = today.getFullYear() - birthYear;
+
+                                    if (today < new Date(today.getFullYear(), birthMonth, birthDay)) {
+                                        computedAge--;
+                                    }
+                                %>
+                            
+                            
+                            <div class="height0 justifyBetween">
+                                <p class="size24 colorPrimary str500">Personal</p>
+                            </div>
+                            <hr>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Family Role</p>
+                                <p class="size14 str600"><%= resident.role || "" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Address</p>
+                                <p class="size14 str600"><%= householdData ? householdData.houseNo : "-" %> <%= householdData ? householdData.purok : "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Age</p>
+                                <p class="size14 str600"><%= age %> <% if (computedAge >= 60) { %> (Senior) <% } %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Birthday</p>
+                                <p class="size14 str600"><%= birthday %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">BirthPlace</p>
+                                <p class="size14 str600"><%= resident.birthPlace || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Gender</p>
+                                <p class="size14 str600"><%= resident.gender || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Civil Status</p>
+                                <p class="size14 str600"><%= resident.civilStatus %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Contact No</p>
+                                <p class="size14 str600"><%= resident.phone || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Email</p>
+                                <p class="size14 str600"><%= resident.email || "-" %></p>
+                            </div>
+                        </div>
+                        
+                        
+                                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                                <div class="head userH width0 index50 gap10">
+                                        <% if (resident.archive === 0 || resident.archive === "0") { %>  
+                                            <a href="javascript:void()" class="nav" id="openResetCard">
+                                                <i class="fas fa-key"></i> Reset
+                                            </a>
+                                            <% if (resident.suspend === 1) { %>
+                                            <a href="javascript:void(0)" class="nav openSuspendCard2" data-resident-id="<%= resident._id.toString() %>">
+                                                <i class="fas fa-unlock"></i> Unsuspend
+                                            </a>
+                                            <% } else { %>
+                                            <a href="javascript:void(0)" class="nav openSuspendCard" data-resident-id="<%= resident._id.toString() %>">
+                                                <i class="fas fa-lock"></i> Suspend
+                                            </a>
+                                            <% } %>
+                                            <a href="javascript:void(0)" class="nav openArchiveCard" data-resident-id="<%= resident._id.toString() %>">
+                                                <i class="fa fa-trash"></i> Archive
+                                            </a>
+                                        <% } else { %>
+                                        <a href="javascript:void(0)" class="nav openArchiveCard2" data-resident-id="<%= resident._id.toString() %>">
+                                            <i class="fas fa-arrows-rotate"></i> Restore
+                                        </a>
+                                        <% } %>
+                                        <% if (calculateAge(birthday) <= 1.5) { %>
+                                            <p class="">|</p>
+                                            <a href="javascript:void(0)" class="nav" id="immuBtn"><i class="fas fa-syringe"></i>Immunization</a>
+                                        <% } %>
+                                        <% if ( resident.pregnant === 'on') { %>
+                                            <p class="">|</p>
+                                            <a href="javascript:void(0)" class="nav" id="pregBtn"><i class="fas fa-syringe"></i>Vaccination</a>
+                                        <% } %>
+                                </div>
+                                <% } %>
+
+                        <% if (calculateAge(birthday) >= 0) { %>
+                        <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
+
+                            <div class="height0 justifyBetween">
+                                <p class="size24 colorPrimary str500">Employment</p>
+                            </div><hr>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Employment Status</p>
+                                <p class="size14 str600"><%= resident.employmentStatus || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Work or Business</p>
+                                <p class="size14 str600"><%= resident.work || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Monthly Gross Income</p>
+                                <% let income = Number(resident.monthlyIncome) || null; %>
+                                <p class="size14 str600"><%= income ? "₱ " + income.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %></p>
+                            </div>
+
+                        </div>
+                        <% } %>
+
+                        <% 
+                            let filteredMembers = familyMembers
+                                .filter(member => member._id.toString() !== resident._id.toString()) // Exclude the resident
+                                .sort((a, b) => b.age - a.age); // Sort by age, eldest first
+                        %>
+                        <% if (filteredMembers.length > 0) { %>
+                        <div class="height0 col paddingInline5 marginTop20">
+                                <div class="height0 justifyBetween">
+                                        <% if (familyData) { %>
+                                        <div class="height0 padding10 borderRadius10 borderPrimary width0"><p> Member of <%= familyData.poverty || "Unidentified" %> Family</p></div>
+                                        <% } %>
+                                        <a href="" class="nav" id="famBtn"><% filteredMembers.forEach(member => { %>
+                                            <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h20 w20 borderRadius500 borderPrimary"> &nbsp;
+                                        <% }) %> Family Details &nbsp; <i class="fas fa-chevron-down"></i></a>
+                                </div>
+                        </div>
+                        <% } else { %>
+                                <div class="height0 justifyBetween">
+                                        <% if (familyData) { %>
+                                        <div class="height0 padding10 borderRadius10 borderPrimary width0"><p> Member of <%= familyData.poverty || "Unidentified" %> Family</p></div>
+                                        <% } %>
+                                        <% if (householdData) { %>
+                                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav hidden">View Family</a>
+                                        <% } %>
+                                        <p class="size14 str500">No Other Family Members</p>
+                                </div>
+                        <% } %>
+
+                    </div>
+                </div>
+
+                <div class="height0 padding25 bgSoft col borderRadius15 hidden marginTop30" id="famCard">
+                    <div class="height0 justifyBetween">
+                        <div class="height0 col width0 alignStart">
+                            <% if (familyData) { %>
+                            <p class="size20 str500">
+                                <%= familyData.poverty || "Unidentified" %> Family
+                            </p>
+                            <p class="size14 str400">Total of <%= familyData.familyIncome ? "₱ " + familyData.familyIncome.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %> Family Monthly Gross Income</p>
+                            
+                            <% } %>
+                        </div>
+                        <% if (householdData) { %>
+                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav">View Household Details</a>
+                        <% } %>
+                    </div>
+                    <br>                   
+                    <% filteredMembers.forEach(member => { %>
+                        <div class="height0 padding10 borderRadius25 bgWhite gap20 justifyStart">
+                            <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h55 w55 borderRadius500 borderPrimary">
+                            <div class="height0 width25 col alignStart">
+                                <p class="size12 str400">
+                                    <% if (
+                                        (resident.rel === "Father" && member.rel === "Mother") || 
+                                        (resident.rel === "Mother" && member.rel === "Father")
+                                    ) { %>
+                                        Spouse
+                                    <% } else if (resident.rel === "Siblings") { %>
+                                        <% if (member.rel === "Siblings") { %>
+                                            <% if (member.gender === "Male") { %>
+                                                Brother
+                                            <% } else if (member.gender === "Female") { %>
+                                                Sister
+                                            <% } else { %>
+                                                Sibling
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= member.rel %>
+                                        <% } %>
+                                    <% } else { %>
+                                        <% if (member.rel === "Siblings") { %>
+                                            <% if (member.gender === "Male") { %>
+                                                Son
+                                            <% } else if (member.gender === "Female") { %>
+                                                Daughter
+                                            <% } else { %>
+                                                Child
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= member.rel %>
+                                        <% } %>
+                                    <% } %>
+                                    
+                                </p>
+                                <p class="size16 str500"><%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %></p>
+                            </div>
+                            <div class="height0 col width30 alignStart">
+                                <p class="size12 str400"><%= member.age ? member.age + "" : "--" %></p>
+                                <p class="size16 str500"><%= member.employmentStatus ? member.employmentStatus + "" : "--" %></p>
+                            </div>
+                        </div>
+                        
+                        <br>
+            
+                    <% }) %>
+
+                </div>
+
+                    <%
+                    function calculateAge(birthday) {
+                        let birthDate = new Date(birthday);
+                        let today = new Date();
+                        
+                        let ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+                        let ageInYears = ageInMonths / 12; // Convert months to years
+                        
+                        return ageInYears;
+                    }
+                    %>
+<script>
+  const famCard = document.getElementById("famCard");
+  const famBtn = document.getElementById("famBtn");
+  const famIcon = famBtn.querySelector("i");
+
+  famBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const isHidden = famCard.classList.contains("hidden");
+
+    // show card first
+    famCard.classList.toggle("hidden");
+    famIcon.classList.toggle("rotate");
+
+    // if it was hidden and now shown → scroll to it
+    if (isHidden) {
+      famCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+</script>  
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+const immuBtn = document.getElementById("immuBtn");
+const immuClose = document.getElementById("immuClose");
+const immuCard = document.getElementById("immuCard");
+
+immuBtn.addEventListener("click", (e) => {
+e.preventDefault();
+immuCard.classList.remove("hidden");
+});
+
+immuClose.addEventListener("click", (e) => {
+e.preventDefault();
+immuCard.classList.add("hidden");
+});
+});
+</script>
+
+                
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+const immuBtn = document.getElementById("immuBtn");
+const immuClose = document.getElementById("immuClose");
+const immuCard = document.getElementById("immuCard");
+
+immuBtn.addEventListener("click", (e) => {
+e.preventDefault();
+immuCard.classList.remove("hidden");
+});
+
+immuClose.addEventListener("click", (e) => {
+e.preventDefault();
+immuCard.classList.add("hidden");
+});
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Immu
+    const immuBtn = document.getElementById("immuBtn");
+    const immuClose = document.getElementById("immuClose");
+    const immuCard = document.getElementById("immuCard");
+
+    if (immuBtn && immuClose && immuCard) {
+      immuBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        immuCard.classList.remove("hidden");
+      });
+
+      immuClose.addEventListener("click", (e) => {
+        e.preventDefault();
+        immuCard.classList.add("hidden");
+      });
+    }
+
+    // Preg
+    const pregBtn = document.getElementById("pregBtn");
+    const pregClose = document.getElementById("pregClose");
+    const pregCard = document.getElementById("pregCard");
+
+    if (pregBtn && pregClose && pregCard) {
+      pregBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        pregCard.classList.remove("hidden");
+      });
+
+      pregClose.addEventListener("click", (e) => {
+        e.preventDefault();
+        pregCard.classList.add("hidden");
+      });
+    }
+  });
+</script>
+                <% if (calculateAge(birthday) <= 1.5) { %>
+                    <div class="bgSoft padding20 col gap10 borderRadius10 absolute right5 top0 darkShadow height99 hidden" style="z-index: 500;" id="immuCard">
+                        <div class="height0 justifyBetween padding5">
+                          <p class="size22 str500">Child Immunization Schedule</p>
+                          <a href="" class="nav" id="immuClose"><i class="fas fa-times"></i> Close</a>
+                        </div>
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Vaccine</th>
+                                    <th>Disease Prevented</th>
+                                    <th>Number of Doses</th>
+                                    <th>Schedule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% function calculateDate(weeks) { %>
+                                    <%= new Date(new Date(birthday).getTime() + weeks * 7 * 24 * 60 * 60 * 1000)
+                                        .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
+                                    %>
+                                <% } %>                            
+                        
+                                <tr>
+                                    <td>BCG (Bacillus Calmette–Guérin)</td>
+                                    <td>Tuberculosis (TB)</td>
+                                    <td>1 Dose</td>
+                                    <td><%= birthday %> (At birth)</td>
+                                </tr>
+                                <tr>
+                                    <td>Hepatitis B (Hep B)</td>
+                                    <td>Hepatitis B</td>
+                                    <td>1 Dose</td>
+                                    <td><%= birthday %> (Within 24 hours)</td>
+                                </tr>
+                                <tr>
+                                    <td>Pentavalent (DTP-HepB-Hib)</td>
+                                    <td>Diphtheria, Tetanus, Pertussis, Hepatitis B, Hib</td>
+                                    <td>3 Doses</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Oral Polio Vaccine (OPV)</td>
+                                    <td>Poliovirus</td>
+                                    <td>3 Doses + 1 Booster</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>, 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Inactivated Polio Vaccine (IPV)</td>
+                                    <td>Poliovirus</td>
+                                    <td>1 Dose</td>
+                                    <td><%= calculateDate(14) %></td>
+                                </tr>
+                                <tr>
+                                    <td>Pneumococcal Conjugate Vaccine (PCV 13)</td>
+                                    <td>Pneumonia, Meningitis, Ear Infections</td>
+                                    <td>3 Doses + 1 Booster</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>, 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Rotavirus Vaccine (RV)</td>
+                                    <td>Severe Diarrhea (Rotavirus)</td>
+                                    <td>2 or 3 Doses</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %> (for 2-dose) 
+                                        or <%= calculateDate(14) %> (for 3-dose)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Measles, Mumps, and Rubella (MMR) / Measles-Rubella (MR)</td>
+                                    <td>Measles, Mumps, Rubella</td>
+                                    <td>2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(39) %> (9 months), 
+                                        <%= calculateDate(52) %> (12-15 months)
+                                    </td>
+                                </tr>
+                                <tr class="hidden">
+                                    <td>Japanese Encephalitis Vaccine (JE)</td>
+                                    <td>Japanese Encephalitis</td>
+                                    <td>1 Dose + Booster</td>
+                                    <td>
+                                        <%= calculateDate(39) %> (9 months), 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Varicella (Chickenpox) Vaccine</td>
+                                    <td>Chickenpox</td>
+                                    <td>1-2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(52) %> (12-15 months), 
+                                        <%= calculateDate(208) %> (4-6 years, if 2nd dose needed)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Hepatitis A Vaccine</td>
+                                    <td>Hepatitis A</td>
+                                    <td>2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(52) %> (12-23 months), 
+                                        Second Dose: <%= calculateDate(78) %> (6-12 months after)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Influenza Vaccine (Flu Shot)</td>
+                                    <td>Seasonal Flu</td>
+                                    <td>1 Dose (Yearly)</td>
+                                    <td>Starting at <%= calculateDate(26) %> (6 months), then yearly</td>
+                                </tr>
+                                <tr class="hidden">
+                                    <td>COVID-19 Vaccine</td>
+                                    <td>COVID-19</td>
+                                    <td>Depends on Vaccine Type</td>
+                                    <td>Age 5+ (Based on local guidelines)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+
+                    <% if ( resident.pregnant === 'on' ) { %>
+                        <div class="height0 bgSoft padding30 col gap10 borderRadius10  absolute right5 top0 darkShadow height99 hidden justifyStart" id="pregCard" style="z-index: 500;"> 
+                            <div class="height0 justifyBetween padding5">
+                            <p class="size22 str500">Maternal Immunization Schedule</p>
+                            <a href="" class="nav" id="pregClose"><i class="fas fa-times"></i> Close</a>
+                            </div>                
+                            <table width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Vaccine</th>
+                                        <th>Disease Prevented</th>
+                                        <th>Number of Doses</th>
+                                        <th>Recommended Schedule</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Tetanus, Diphtheria, Pertussis (Tdap)</td>
+                                        <td>Tetanus, Diphtheria, Whooping Cough</td>
+                                        <td>1 Dose</td>
+                                        <td>During 27–36 weeks of pregnancy</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Influenza (Flu Shot)</td>
+                                        <td>Seasonal Influenza</td>
+                                        <td>1 Dose (Yearly)</td>
+                                        <td>Anytime during pregnancy (before flu season)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>COVID-19 Vaccine</td>
+                                        <td>COVID-19</td>
+                                        <td>Based on vaccine type</td>
+                                        <td>Anytime during pregnancy (as per guidelines)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hepatitis B (Hep B)</td>
+                                        <td>Hepatitis B</td>
+                                        <td>3 Doses (if needed)</td>
+                                        <td>Anytime if at risk</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pneumococcal Vaccine (PPSV23 or PCV13)</td>
+                                        <td>Pneumonia, Meningitis</td>
+                                        <td>1 Dose (if needed)</td>
+                                        <td>For high-risk conditions</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect = document.getElementById('purposeSelect');
+                    const purposeRef = document.getElementById('purposeRef');
+            
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect.addEventListener('change', function() {
+                        purposeRef.textContent = purposeSelect.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect2 = document.getElementById('purposeSelect2');
+                    const purposeRef2 = document.getElementById('purposeRef2');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect2.addEventListener('change', function() {
+                        purposeRef2.textContent = purposeSelect2.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect3 = document.getElementById('purposeSelect3');
+                    const purposeRef3 = document.getElementById('purposeRef3');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect3.addEventListener('change', function() {
+                        purposeRef3.textContent = purposeSelect3.value;
+                    });
+                });
+            </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect4 = document.getElementById('purposeSelect4');
+                    const purposeRef4 = document.getElementById('purposeRef4');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect4.addEventListener('change', function() {
+                        purposeRef4.textContent = purposeSelect4.value;
+                    });
+                });
+            </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Get the dropdown and the span element
+                                const purposeSelect5 = document.getElementById('purposeSelect5');
+                                const purposeRef5 = document.getElementById('purposeRef5');
+            
+                                // Update the span with the selected value whenever the selection changes
+                                purposeSelect5.addEventListener('change', function() {
+                                    purposeRef5.textContent = purposeSelect5.value;
+                                });
+                            });
+                        </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buttons = ['doc1Btn', 'doc2Btn', 'doc3Btn', 'doc4Btn', 'doc5Btn'];
+        const divs = ['doc1', 'doc2', 'doc3', 'doc4', 'doc5'];
+        const trayCard = document.getElementById('trayCard');
+    
+        if (!trayCard) {
+            console.error("❌ Error: 'trayCard' not found.");
+            return;
+        }
+    
+        const originalContent = {};
+        buttons.forEach((buttonId) => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                originalContent[buttonId] = button.innerHTML;
+            } else {
+                console.error(`❌ Error: Button with ID '${buttonId}' not found.`);
+            }
+        });
+    
+        buttons.forEach((buttonId, index) => {
+            const button = document.getElementById(buttonId);
+            const correspondingDiv = document.getElementById(divs[index]);
+    
+            if (!button || !correspondingDiv) {
+                console.error(`❌ Error: Element missing for button '${buttonId}' or div '${divs[index]}'`);
+                return;
+            }
+    
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log(`✅ Clicked button: ${buttonId}`);
+    
+                const isActive = button.classList.contains('active');
+    
+                // Hide all divs
+                divs.forEach((divId) => {
+                    const div = document.getElementById(divId);
+                    if (div) {
+                        console.log(`🔴 Hiding: ${divId}`);
+                        div.classList.add('hidden');
+                    }
+                });
+    
+                // Reset all buttons
+                buttons.forEach((btnId) => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        btn.innerHTML = originalContent[btnId];
+                        btn.classList.remove('active');
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        btn.style.display = '';
+                    }
+                });
+    
+                if (!isActive) {
+                    trayCard.classList.add('hidden');
+    
+                    console.log(`🟢 Showing: ${divs[index]}`);
+                    correspondingDiv.classList.remove('hidden'); // Ensure class is removed
+    
+                    button.innerHTML = '<i class="fas fa-times"></i> ' + originalContent[buttonId];
+                    button.classList.add('active');
+                    button.style.backgroundColor = '#285436';
+                    button.style.color = 'white';
+    
+                    // Hide other buttons
+                    buttons.forEach((btnId) => {
+                        if (btnId !== buttonId) {
+                            const otherButton = document.getElementById(btnId);
+                            if (otherButton) otherButton.style.display = 'none';
+                        }
+                    });
+                } else {
+                    console.log(`🔄 Resetting: ${divs[index]}`);
+                    correspondingDiv.classList.add('hidden');
+                    trayCard.classList.remove('hidden');
+    
+                    button.innerHTML = originalContent[buttonId];
+                    button.classList.remove('active');
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+    
+                    buttons.forEach((btnId) => {
+                        const btn = document.getElementById(btnId);
+                        if (btn) btn.style.display = '';
+                    });
+                }
+            });
+        });
+    });
+    
+    </script>
+    
+<script>
+    const openResetCard = document.getElementById('openResetCard');
+    const resetPassCard = document.getElementById('resetPassCard');
+    const closeResetCard = document.getElementById('closeResetCard');
+    const confirmReset = document.getElementById('confirmReset');
+
+    // Show confirmation modal
+    openResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'flex';
+    });
+
+    // Hide confirmation modal
+    closeResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'none';
+    });
+
+    // Confirm password reset and send request
+    confirmReset.addEventListener('click', function(e) {
+        e.preventDefault();
+        const residentId = confirmReset.getAttribute('data-id');
+
+        fetch(`/reset-resident/${residentId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Password reset successfully!");
+                resetPassCard.style.display = 'none';
+            } else {
+                alert("Failed to reset password.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const suspendCard = document.getElementById("suspendCard");
+        const closeSuspendCard = document.getElementById("closeSuspendCard");
+        const confirmSuspend = document.getElementById("confirmSuspend");
+    
+        document.querySelectorAll(".openSuspendCard").forEach((button) => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                suspendCard.style.display = "flex";
+    
+                const residentId = this.getAttribute("data-resident-id");
+                confirmSuspend.setAttribute("data-id", residentId);
+            });
+        });
+    
+        closeSuspendCard.addEventListener("click", function (e) {
+            e.preventDefault();
+            suspendCard.style.display = "none";
+        });
+    
+        confirmSuspend.addEventListener("click", async function (e) {
+            e.preventDefault();
+            const residentId = this.getAttribute("data-id");
+    
+            try {
+                const response = await fetch(`/suspend-resident/${residentId}`, { method: "POST" });
+                const data = await response.json();
+    
+                if (data.success) {
+                    alert("User suspended successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to suspend user.");
+                }
+            } catch (error) {
+                alert("Error suspending user.");
+            }
+        });
+    });
+    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const suspendCard2 = document.getElementById("suspendCard2");
+        const closeSuspendCard2 = document.getElementById("closeSuspendCard2");
+        const confirmSuspend2 = document.getElementById("confirmSuspend2");
+    
+        document.querySelectorAll(".openSuspendCard2").forEach((button) => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                suspendCard2.style.display = "flex";
+    
+                const residentId = this.getAttribute("data-resident-id");
+                confirmSuspend2.setAttribute("data-id", residentId);
+            });
+        });
+    
+        closeSuspendCard2.addEventListener("click", function (e) {
+            e.preventDefault();
+            suspendCard2.style.display = "none";
+        });
+    
+        confirmSuspend2.addEventListener("click", async function (e) {
+            e.preventDefault();
+            const residentId = this.getAttribute("data-id");
+    
+            try {
+                const response = await fetch(`/suspend2-resident/${residentId}`, { method: "POST" });
+                const data = await response.json();
+    
+                if (data.success) {
+                    alert("User suspended successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to suspend user.");
+                }
+            } catch (error) {
+                alert("Error suspending user.");
+            }
+        });
+    });
+    </script>
+
+    
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const archiveCard = document.getElementById("archiveCard");
+    const closeArchiveCard = document.getElementById("closeArchiveCard");
+    const confirmArchive = document.getElementById("confirmArchive");
+
+    document.querySelectorAll(".openArchiveCard").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+            archiveCard.style.display = "flex";
+
+            const residentId = this.getAttribute("data-resident-id");
+            confirmArchive.setAttribute("data-id", residentId);
+        });
+    });
+
+    closeArchiveCard.addEventListener("click", function (e) {
+        e.preventDefault();
+        archiveCard.style.display = "none";
+    });
+
+    confirmArchive.addEventListener("click", async function (e) {
+        e.preventDefault();
+        const residentId = this.getAttribute("data-id");
+
+        try {
+            const response = await fetch(`/archive-resident/${residentId}`, { method: "POST" });
+            const data = await response.json();
+
+            if (data.success) {
+                alert("User archived successfully!");
+                location.reload();
+            } else {
+                alert("Failed to archive user.");
+            }
+        } catch (error) {
+            alert("Error archiving user.");
+        }
+    });
+});
+    </script>
+
+        
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const archiveCard2 = document.getElementById("archiveCard2");
+    const closeArchiveCard2 = document.getElementById("closeArchiveCard2");
+    const confirmArchive2 = document.getElementById("confirmArchive2");
+
+    document.querySelectorAll(".openArchiveCard2").forEach((button) => {
+        button.addEventListener("click", function (e) {
+            e.preventDefault();
+            archiveCard2.style.display = "flex";
+
+            const residentId = this.getAttribute("data-resident-id");
+            confirmArchive2.setAttribute("data-id", residentId);
+        });
+    });
+
+    closeArchiveCard2.addEventListener("click", function (e) {
+        e.preventDefault();
+        archiveCard2.style.display = "none";
+    });
+
+    confirmArchive2.addEventListener("click", async function (e) {
+        e.preventDefault();
+        const residentId = this.getAttribute("data-id");
+
+        try {
+            const response = await fetch(`/archive2-resident/${residentId}`, { method: "POST" });
+            const data = await response.json();
+
+            if (data.success) {
+                alert("User restored successfully!");
+                location.reload();
+            } else {
+                alert("Failed to archive user.");
+            }
+        } catch (error) {
+            alert("Error archiving user.");
+        }
+    });
+});
+    </script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let allRows = Array.from(dirTable.getElementsByTagName("tbody")[0].rows);
+    
+    function renderTable() {
+        if (allRows.length === 0) {
+            dirTable.style.display = "none";
+            totalRecordsLabel.innerText = "Pending Cases: No Record Found";
+            paginationContainer.innerHTML = "";
+            return;
+        } else {
+            dirTable.style.display = "table";
+        }
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        for (let row of allRows) {
+            row.style.display = "none";
+        }
+
+        for (let i = start; i < end && i < allRows.length; i++) {
+            allRows[i].style.display = "";
+        }
+
+        totalRecordsLabel.innerText = `Pending Cases: Found ${allRows.length}`;
+        renderPagination(allRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = (i === currentPage) ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    renderTable();
+});
+</script>
+    
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('unseen')) {
+        newCard.classList.remove('unseen');
+        newCard.classList.add('seen');
+    }
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('seen')) {
+        newCard.classList.remove('seen');
+        newCard.classList.add('unseen');
+    }
+});
+
+</script>    
+
+            
+        </div>

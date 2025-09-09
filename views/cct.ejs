@@ -1,0 +1,439 @@
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/images/logo.png">
+    <head>
+        <style>
+            body {
+                flex-direction: column;
+                justify-content: start;
+            }
+            .card.keyPlain {
+                position: relative;
+                align-items: start;
+                padding: 20px;
+                height: 100px;
+                justify-content: space-between;
+            }
+            .graphIcon {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: var(--shade1);
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.4vw;
+                font-weight: 500;
+                color: var(--shade5)
+            }
+            .keyL {
+                font-size: 0.9vw;
+                font-weight: 400;
+                line-height: 1.5vw;
+            }
+            .clrd {
+                color: white;
+                position: relative;
+            }
+            .clrd .keyT {
+                font-size: 24px;
+            }
+            .clrd p {
+                color: white;
+                font-size: 16px;
+            }
+            label {
+                margin-top: 10px;
+            }
+.clrd:nth-child(1) { background-color: var(--shade1); }
+.clrd:nth-child(2) { background-color: var(--shade5); }
+.clrd:nth-child(3) { background-color: var(--shade7); }
+.clrd:nth-child(4) { background-color: var(--shade9); }
+.clrd:nth-child(5) { background-color: var(--shade1); }
+.clrd:nth-child(6) { background-color: var(--shade5); }
+.clrd:nth-child(7) { background-color: var(--shade8); }
+
+        </style>
+    </head>
+
+        <div class="head hidden">
+            <div class="ctrl left">
+                <p class="title">Residents Records</p>
+            </div>
+            <div class="ctrl right">
+                <div class="selectBar hidden">
+                    <select name="" id="">
+                        <option value="">Filter by Purok</option>
+                        <option value="">Dike Street</option>
+                        <option value="">Cantarilla</option>
+                        <option value="">Bagong Daan</option>
+                        <option value="">Shortcut</option>
+                        <option value="">Highway</option>
+                        <option value="">Perigola</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="height0">
+            <div class="ctrl left gap10">
+                <a href="/vvp" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>
+                <p class="title">
+                    Full Records
+                </p>
+            </div>
+            <div class="ctrl right">
+                <div class="searchBar">
+                    <input type="search" id="univ">
+                    <i class="fas fa-search"></i>
+                </div>
+                <a href="/export-residents" class="nav">
+                    <i class="fa-solid fa-download"></i>
+                    Export Excel File
+                </a>
+            </div>
+        </div>
+        <div class="height0">
+            <div class="height0 justifyStart">
+                <form action="/generate-admin" method="POST" class=" height0 width0 paddingBlock5 shadowNone paddingInline5">
+                    <button type="submit" class="nav pnav borderRadius10">Create Admin</button>
+                </form>
+                <form action="/generate-households" method="POST" class=" height0 width0 paddingBlock5 shadowNone paddingInline5">
+                    <button type="submit" class="nav pnav borderRadius10">Create Household</button>
+                </form>
+                <form action="/delete-archived-households" method="POST"  class=" height0 width0 paddingBlock5 shadowNone paddingInline5">
+                    <button type="submit" class="nav dnav borderRadius10">
+                        <i class="fas fa-trash"></i> Dummy Households
+                    </button>
+                </form>
+                <form action="/generate-families-for-households" method="POST" class=" height0 width0 paddingBlock5 shadowNone paddingInline5">
+                    <button type="submit" class="nav pnav borderRadius10">Create Family</button>
+                </form>
+                <form action="/delete-archived-families2" method="POST"  class="hidden height0 width0 paddingBlock5 shadowNone paddingInline5">
+                    <button type="submit" class="nav dnav borderRadius10">
+                        <i class="fas fa-trash"></i> Dummy Families
+                    </button>
+                </form>
+            </div>
+            <div class="height0 justifyEnd">
+            </div>
+        </div>
+        <br>
+
+        <div class="main overflow-y1 bgSoft borderRadius15" style="height: 55% !important;">
+
+
+            <div class="section tableCard">
+                <p class="p14" id="noRecords" style="display: none;">No Records</p>
+                
+                <table id="dirTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" style="width: 15%;">ID</th>
+                            <th onclick="sortTable(1)" style="width: 20%;">Complete Name</th>
+                            <th onclick="sortTable(0)" style="width: 10%;">Username</th>
+                            <th onclick="sortTable(0)" style="width: 10%;">Password</th>
+                            <th onclick="sortTable(0)" style="width: 5%;">Rst</th>
+                            <th onclick="sortTable(0)" style="width: 20%;">Email</th>
+                            <th onclick="sortTable(2)" style="width: 10%;">Home Address</th>
+                            <th onclick="sortTable(4)" style="width: 10%;">Indigency Status</th>
+                            <th onclick="sortTable(0)" style="width: 10%;">Voting Status</th>
+                            <th onclick="sortTable(5)" class="thCtrl">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (residents && residents.length > 0) { %>
+                            <% residents.forEach(resident => { %>
+                                <tr>
+                                    <td><%= resident._id %></td>
+                                    <td>
+                                        <div class="height0 width0 justifyStart gap5">
+                                            <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h25 w25 borderRadius500 borderPrimary"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>
+                                        </div>
+                                    </td>
+                                    <td class="str600"><%= resident.username %></td>
+                                    <td class="str600"><%= resident.password %></td>
+                                    <td class="str600"><%= resident.reset %></td>
+                                    <td><%= resident.email %></td>
+                                    <td><%= resident.houseNo %> <%= resident.purok %></td>
+                                    <td><%= resident.familyPoverty %></td>
+                                    <td><%= resident.precinct %></td>
+                                    <td class="tdCtrl">
+                                        
+                                        <% if (resident.username) { %>
+                                            <a href="/rsdView/<%= resident._id %>" class="nav width80"><%= resident.username %><i class="fas fa-chevron-right"></i></a>
+                                        <% } else { %>
+                                            No Account
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7">No residents found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+                
+
+
+    </div>
+</div>
+<div class="sub height0 row flex">
+    <div class="ctrl left width20">
+        <span id="totalRecords" class="totalRecords"></span>
+    </div>
+    <div class="ctrl right width80">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>            
+
+            
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+    
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+
+function renderPagination(totalRows) {
+    paginationContainer.innerHTML = "";
+
+    if (searchInput.value.trim()) return;
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "« Previous";
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        currentPage--;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // --- New Logic for displaying a limited number of page buttons ---
+
+    // Display all buttons if total pages are 7 or less
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+                renderPagination(totalRows);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    } else { // Display condensed pagination for more than 7 pages
+        const startPages = [1, 2, 3];
+        const endPages = [totalPages - 2, totalPages - 1, totalPages];
+        const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+
+        // Function to create a page button
+        const createPageButton = (page, isEllipsis = false) => {
+            const btn = document.createElement("button");
+            btn.innerHTML = isEllipsis ? "..." : page;
+            btn.disabled = isEllipsis;
+            if (!isEllipsis) {
+                btn.className = page === currentPage ? "active" : "";
+                btn.onclick = () => {
+                    currentPage = page;
+                    renderTable();
+                    renderPagination(totalRows);
+                };
+            }
+            return btn;
+        };
+
+        // Add first pages
+        for (const page of startPages) {
+            if (page <= totalPages) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+        
+        // Add ellipsis if current page is not near the start
+        if (currentPage > 4) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add middle pages (current page and its neighbors)
+        if (currentPage > 3 && currentPage < totalPages - 2) {
+            for (const page of middlePages) {
+                if (page > 0 && page <= totalPages) {
+                    paginationContainer.appendChild(createPageButton(page));
+                }
+            }
+        }
+
+        // Add ellipsis if current page is not near the end
+        if (currentPage < totalPages - 3) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add last pages
+        for (const page of endPages) {
+            if (page > 3) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+    }
+
+    // Next Button
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next »";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        currentPage++;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+
+<script>
+    function toggleFamilyRole() {
+        const familyRole = document.getElementById("familyRole").value;
+        const inputFHead = document.getElementById("inputFHead");
+        const inputIndigent = document.getElementById("inputIndigent");
+
+        // Hide both fields initially
+        inputFHead.classList.add("hidden");
+        inputIndigent.classList.add("hidden");
+
+        // Show the respective field based on selection
+        if (familyRole === "Member") {
+            inputFHead.classList.remove("hidden");
+        } else if (familyRole === "Head") {
+            inputIndigent.classList.remove("hidden");
+        }
+    }
+
+    function toggleDisability() {
+        const priorityCheckbox = document.getElementById("priority");
+        const disabilityField = document.getElementById("disabilityField");
+
+        if (priorityCheckbox.checked) {
+            disabilityField.classList.remove("hidden");
+        } else {
+            disabilityField.classList.add("hidden");
+        }
+    }
+</script>

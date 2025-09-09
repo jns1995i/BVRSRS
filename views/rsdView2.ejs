@@ -1,0 +1,1293 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+                display: flex;
+            }
+            .resetPassCard, .newAccCard, .suspendCard {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                z-index: 50;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .resetCard, .newCard, .suspend {
+                width: 500px;
+                height: 450px;
+                background-color: white;
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+                background-color: var(--lightgray);
+            }
+            .block.s {
+                width: 15%;
+                height: auto;
+                flex-direction: column;
+                justify-content: start;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 50px 150px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: start;
+                justify-items: start;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                position: absolute;
+                bottom: 0;
+                right: 38px;
+                z-index: 50;
+                flex-direction: column-reverse;
+                height: 100%;
+                gap: 10px;
+                width: 15%;
+                align-items: center;
+                justify-content: space-between;
+                padding-block: 20px;
+            }
+            .docHead .ctrl {
+                height: auto;
+                padding: 0;
+                width: 100%;
+                flex-direction: column;
+            }
+            .docHead .ctrl.right {
+                flex-direction: row;
+            }
+            .docHead .ctrl.left .nav {
+                width: 100%
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 60px;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            .userPhoto {
+                height: 100px;
+                width: 100px;
+                outline: 1px solid lightgray;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: none;
+            }
+            .headCtrl {
+                padding: 5px;
+            }
+            .headCtrl .ctrl {
+                width: 97.5%;
+                border-radius: 0.5vw;
+            }
+            .certContent {
+                position: absolute;
+                z-index: 50;
+                left: 10px;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: auto;
+                padding: 15px;
+                width: 18%;
+            }
+            .certTA, .certTA:hover, .certTA:focus {
+                height: calc(38 * 1em);
+            }
+            .seen {
+                padding: 30px;
+                height: 200px;
+                max-height: 200px;
+            }
+.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+.certContent {
+    height: calc(8 * 1em);
+    width: 98%;
+}
+.certContentM {
+    white-space: pre-wrap; /* Preserves new lines and spaces */
+}
+@media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .maindocPage {
+                    background-image: url('your-background-image.png') !important;
+                    background-size: cover !important;
+                }
+                span {
+                    font-size: 14pt !important;
+                }
+                sup, sub {
+                    font-size: inherit !important;
+                }
+            }
+            .cnav {
+                transform: scale(0.95);
+            }
+        </style>
+    </head>
+
+    <div class="resetPassCard" id="resetPassCard" style="display: none;">
+        <div class="resetCard col">
+            <p class="P40"><i class="fas fa-warning" style="font-size: 60px;"></i></p>
+            <p class="p40">WARNING!</p>
+            <p class="p16 str500">This action cannot be undone!</p>
+            <br>
+            <p class="p10 str400">The user will receive a new password.</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmReset" data-id="<%= resident._id %>">Reset Password</a>
+                <a href="#" class="nav fnav" id="closeResetCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="suspendCard" id="suspendCard" style="display: none;">
+        <div class="suspend col padding30">
+            <p class="P40"><i class="fas fa-archive" style="font-size: 60px;"></i></p>
+            <p class="p40">OH NO!</p>
+            <p class="p16 str500 textCenter">Are you sure you want to suspend this user?</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmSuspend" data-id="<%= resident._id %>">Suspend</a>
+                <a href="#" class="nav fnav" id="closeSuspendCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+        <div class="main height100">
+
+            <div class="block col" id="trayCard" style="position: relative; padding: 0; background-color: white;">
+                <div class="card col tray height0" style="padding: 20px; border-radius: 10px;">
+                    <div class="height0 abstractBG col padding20 index0 borderRadius20 relative">
+                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav index10" style="position: absolute; left: 20px; top: 20px;">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </a>
+                        <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                        <div class="head userH absolute right20 top20 width0 index50">
+                            <div class="ctrl">  
+                                <a href="javascript:void()" class="nav cnav" id="openResetCard">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                <a href="javascript:void(0)" class="nav cnav openSuspendCard" data-resident-id="<%= resident._id.toString() %>">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <% } %>
+                        <form action="/upload-photo/<%= resident._id %>" method="POST" enctype="multipart/form-data" class="unseen width40 padding0 gap20" id="newCard">
+                            <p class="size14 str500 textCenter">Uploading Photo</p>
+                            <input type="file" name="photo" required />
+                            <div class="height0 gap10">
+                                <a class="nav fnav" type="submit" id="closeBtn">Cancel</a>
+                                <button class="nav pnav fnav" type="submit">Upload Photo</button>
+                            </div>
+                        </form>
+                        <div class="section relative">
+                            <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="User Photo" class="userPhoto">
+                            <a href="javascript:void()" class="nav cnav index10 colorPrimary" id="newBtn" style="position: absolute; right: 44%; bottom: 10px; transform: scale(0.9);">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                        </div>                
+                        <div class="head userH">
+                            <div class="ctrl">
+                                <p class="p20 str500 white"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></p>
+                            </div>
+                        </div>
+                        <p class="size18 str400 white"><%= resident.position || "" %></p>
+                    </div>
+                    <br>
+                    <div class="height0">
+                        <p class="size20 str500 green gap10 paddingInline5">Personal Information  <a href="/updateRsd/<%= resident._id %>" class="nav cnav"><i class="fas fa-pen"></i></a></p>
+                    </div>
+                    <div class="section" style="align-items: start;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td>Family Role</td>
+                                    <td class="str"><%= resident.role || "" %></td>
+                                </tr>
+                                <tr class="hidden">
+                                    <td>Address</td>
+                                    <td class="str"><%= householdData ? householdData.houseNo : "-" %> <%= householdData ? householdData.purok : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td class="str"><%= age %></td>
+                                </tr>
+                                <% 
+                                    // Parse birthday into a Date object
+                                    const birthDateParts = birthday.split(" ");
+                                    const birthMonth = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"].indexOf(birthDateParts[0]);
+                                    const birthDay = parseInt(birthDateParts[1].replace(",", ""));
+                                    const birthYear = parseInt(birthDateParts[2]);
+
+                                    // Compute age based on birthday
+                                    const today = new Date();
+                                    let computedAge = today.getFullYear() - birthYear;
+
+                                    if (today < new Date(today.getFullYear(), birthMonth, birthDay)) {
+                                        computedAge--;
+                                    }
+                                %>
+
+                                <% if (computedAge >= 60) { %>
+                                    <tr>
+                                        <td>Senior Citizen</td>
+                                        <td class="str">Yes</td>
+                                    </tr>
+                                <% } %>
+
+                                <tr>
+                                    <td>Birthday</td>
+                                    <td class="str"><%= birthday %></td>
+                                </tr>
+                                <tr>
+                                    <td>Birth Place</td>
+                                    <td class="str"><%= resident.birthPlace || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Gender</td>
+                                    <td class="str"><%= resident.gender || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Civil Status</td>
+                                    <td class="str"><%= resident.civilStatus %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td>Contact</td>
+                                    <td class="str"><%= resident.phone || "--" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td class="str"><%= resident.email || "--" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Poverty Status</td>
+                                    <td class="str relative"><%= familyPoverty || "--" %></td>
+                                </tr>                   
+                                <tr>
+                                    <td>Voting Status</td>
+                                    <td class="str"><%= resident.precinct || "--" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Solo Parent</td>
+                                    <td class="str"><%= resident.soloParent === "on" ? "Yes" : resident.soloParent || "--" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Pwd</td>
+                                    <td class="str"><%= resident.pwd === "on" ? "Yes" : resident.pwd || "--" %> <%= resident.pwdType ? `, ${resident.pwdType} Disabilities` : "" %></td>
+                                </tr>
+                                <% if (resident.pregnant === "on") { %>
+                                    <tr>
+                                        <td>Pregnant</td>
+                                        <td class="str">Yes</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <br>
+                    <div class="height0 padding20 col bgSoft borderRadius10">
+                        <p class="size20 str500 green gap10 paddingInline5">Family Members <a href="" class="nav cnav"><i class="fas fa-pen"></i></a></p>
+                                            
+                        <% 
+                        let filteredMembers = familyMembers
+                            .filter(member => member._id.toString() !== resident._id.toString()) // Exclude the resident
+                            .sort((a, b) => b.age - a.age); // Sort by age, eldest first
+                    %>
+
+                    <% if (filteredMembers.length > 0) { %>
+                        <div class="height0 bgSoft wrap padding20 gap15">
+                            <% filteredMembers.forEach(member => { %>
+                            <div class="height0 bgWhite width24 col padding30 borderRadius20">
+                                <p class="size14 str400">
+                                    <% if (
+                                        (resident.rel === "Father" && member.rel === "Mother") || 
+                                        (resident.rel === "Mother" && member.rel === "Father")
+                                    ) { %>
+                                        Spouse
+                                    <% } else if (resident.rel === "Siblings") { %>
+                                        <% if (member.rel === "Siblings") { %>
+                                            <% if (member.gender === "Male") { %>
+                                                Brother
+                                            <% } else if (member.gender === "Female") { %>
+                                                Sister
+                                            <% } else { %>
+                                                Sibling
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= member.rel %>
+                                        <% } %>
+                                    <% } else { %>
+                                        <% if (member.rel === "Siblings") { %>
+                                            <% if (member.gender === "Male") { %>
+                                                Son
+                                            <% } else if (member.gender === "Female") { %>
+                                                Daughter
+                                            <% } else { %>
+                                                Child
+                                            <% } %>
+                                        <% } else { %>
+                                            <%= member.rel %>
+                                        <% } %>
+                                    <% } %>
+                                    
+                                </p>
+                                <br>
+                                <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h80 w80 borderRadius500 borderPrimary">
+                                <p class="size18 str500"><%= member.firstName %></p>
+                                <p class="size12 str500"><%= member.age ? member.age + "" : "--" %></p>
+                                <br>
+                                <a href="/rsdView/<%= member._id %>" class="nav padding5 border0">See Details</a>
+                            </div>
+                            <% }) %>
+                        </div>
+                        <table id="userInfo" class="hidden">
+                            <thead>
+                                <tr>
+                                    <th>Role</th>
+                                    <th>Complete Name</th>
+                                    <th>Age</th>
+                                    <th>Civil Status</th>
+                                    <th class="thCtrl">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% filteredMembers.forEach(member => { %>
+                                    <tr>
+                                        <td><%= member.role %></td>
+                                        <td>
+                                            <%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %>
+                                        </td>
+                                        <td><%= member.age ? member.age + "" : "--" %></td>
+                                        <td><%= member.civilStatus %></td>
+                                        <td class="tdCtrl"><a href="/rsdView/<%= member._id %>" class="nav"><i class="fas fa-eye"></i> Details</a></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    <% } else { %>
+                        <p>No other family members listed.</p>
+                    <% } %>
+                    </div>
+
+                    
+                    <% if (calculateAge(birthday) >= 15) { %>
+                    <br>
+                    <div class="height0">
+                        <p class="size20 str500 green"></p>
+                    </div>
+                    <div class="section" style="align-items: start;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Employment Status</td>
+                                    <td class="str"><%= resident.employmentStatus || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Work or Business</td>
+                                    <td class="str"><%= resident.work || "" %></td>
+                                </tr>
+                                <tr class="">
+                                    <td>Monthly Income</td>
+                                    <td class="str"><%= resident.monthlyIncome || "" %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table id="userInfo">   
+                            <tbody>
+                                    <tr class="hidden">
+                                        <td style="width: 30%;">Monthly Income</td>
+                                        <td class="str"><%= resident.monthlyIncome || "" %></td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+
+
+
+                    <br>
+                    <div class="height0">
+                        <p class="size20 str500 green gap10 paddingInline5">Household Information  <a href="" class="nav cnav"><i class="fas fa-pen"></i></a></p>
+                    </div>
+
+                    <div class="section" style="align-items: start;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Address</td>
+                                    <td class="str"><%= householdData ? householdData.houseNo : "-" %> <%= householdData ? householdData.purok : "-" %>, Valdefuente</td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Ownership</td>
+                                    <td class="str"><%= householdData ? householdData.ownership : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>House Type</td>
+                                    <td class="str"><%= householdData ? householdData.houseType : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Wall Material</td>
+                                    <td class="str"><%= householdData ? householdData.wallMaterial : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Roof Material</td>
+                                    <td class="str"><%= householdData ? householdData.roofMaterial : "-" %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Flooring Material</td>
+                                    <td class="str"><%= householdData ? householdData.flooringMaterial : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Number of Rooms</td>
+                                    <td class="str"><%= householdData ? householdData.numRooms : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Access to Electricity</td>
+                                    <td class="str relative"><%= householdData ? householdData.electricity : "-" %></td>
+                                </tr>                   
+                                <tr>
+                                    <td>Water Supply</td>
+                                    <td class="str"><%= householdData ? householdData.waterSource : "-" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Toilet Type</td>
+                                    <td class="str"><%= householdData ? householdData.toiletType : "-" %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <%
+                    function calculateAge(birthday) {
+                        let birthDate = new Date(birthday);
+                        let today = new Date();
+                        
+                        let ageInMonths = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+                        let ageInYears = ageInMonths / 12; // Convert months to years
+                        
+                        return ageInYears;
+                    }
+                %>
+                
+                <% if (calculateAge(birthday) <= 1.5) { %>
+                    <div class="height0 bgSoft padding20 col gap10 borderRadius10">
+                        <p class="size20 str500 green">Child Immunization Schedule</p>
+                        <table width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Vaccine</th>
+                                    <th>Disease Prevented</th>
+                                    <th>Number of Doses</th>
+                                    <th>Schedule</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% function calculateDate(weeks) { %>
+                                    <%= new Date(new Date(birthday).getTime() + weeks * 7 * 24 * 60 * 60 * 1000)
+                                        .toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
+                                    %>
+                                <% } %>                            
+                        
+                                <tr>
+                                    <td>BCG (Bacillus Calmette–Guérin)</td>
+                                    <td>Tuberculosis (TB)</td>
+                                    <td>1 Dose</td>
+                                    <td><%= birthday %> (At birth)</td>
+                                </tr>
+                                <tr>
+                                    <td>Hepatitis B (Hep B)</td>
+                                    <td>Hepatitis B</td>
+                                    <td>1 Dose</td>
+                                    <td><%= birthday %> (Within 24 hours)</td>
+                                </tr>
+                                <tr>
+                                    <td>Pentavalent (DTP-HepB-Hib)</td>
+                                    <td>Diphtheria, Tetanus, Pertussis, Hepatitis B, Hib</td>
+                                    <td>3 Doses</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Oral Polio Vaccine (OPV)</td>
+                                    <td>Poliovirus</td>
+                                    <td>3 Doses + 1 Booster</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>, 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Inactivated Polio Vaccine (IPV)</td>
+                                    <td>Poliovirus</td>
+                                    <td>1 Dose</td>
+                                    <td><%= calculateDate(14) %></td>
+                                </tr>
+                                <tr>
+                                    <td>Pneumococcal Conjugate Vaccine (PCV 13)</td>
+                                    <td>Pneumonia, Meningitis, Ear Infections</td>
+                                    <td>3 Doses + 1 Booster</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %>, 
+                                        <%= calculateDate(14) %>, 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Rotavirus Vaccine (RV)</td>
+                                    <td>Severe Diarrhea (Rotavirus)</td>
+                                    <td>2 or 3 Doses</td>
+                                    <td>
+                                        <%= calculateDate(6) %>, 
+                                        <%= calculateDate(10) %> (for 2-dose) 
+                                        or <%= calculateDate(14) %> (for 3-dose)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Measles, Mumps, and Rubella (MMR) / Measles-Rubella (MR)</td>
+                                    <td>Measles, Mumps, Rubella</td>
+                                    <td>2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(39) %> (9 months), 
+                                        <%= calculateDate(52) %> (12-15 months)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Japanese Encephalitis Vaccine (JE)</td>
+                                    <td>Japanese Encephalitis</td>
+                                    <td>1 Dose + Booster</td>
+                                    <td>
+                                        <%= calculateDate(39) %> (9 months), 
+                                        Booster: <%= calculateDate(52) %> (1 year)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Varicella (Chickenpox) Vaccine</td>
+                                    <td>Chickenpox</td>
+                                    <td>1-2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(52) %> (12-15 months), 
+                                        <%= calculateDate(208) %> (4-6 years, if 2nd dose needed)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Hepatitis A Vaccine</td>
+                                    <td>Hepatitis A</td>
+                                    <td>2 Doses</td>
+                                    <td>
+                                        <%= calculateDate(52) %> (12-23 months), 
+                                        Second Dose: <%= calculateDate(78) %> (6-12 months after)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Influenza Vaccine (Flu Shot)</td>
+                                    <td>Seasonal Flu</td>
+                                    <td>1 Dose (Yearly)</td>
+                                    <td>Starting at <%= calculateDate(26) %> (6 months), then yearly</td>
+                                </tr>
+                                <tr>
+                                    <td>COVID-19 Vaccine</td>
+                                    <td>COVID-19</td>
+                                    <td>Depends on Vaccine Type</td>
+                                    <td>Age 5+ (Based on local guidelines)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+
+                    <% if ( resident.pregnant === 'on' ) { %>
+                        <div class="height0 bgSoft padding20 col gap10 borderRadius10">
+                            <p class="size20 str500 green">Maternal Immunization Schedule</p>                  
+                            <table width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Vaccine</th>
+                                        <th>Disease Prevented</th>
+                                        <th>Number of Doses</th>
+                                        <th>Recommended Schedule</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Tetanus, Diphtheria, Pertussis (Tdap)</td>
+                                        <td>Tetanus, Diphtheria, Whooping Cough</td>
+                                        <td>1 Dose</td>
+                                        <td>During 27–36 weeks of pregnancy</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Influenza (Flu Shot)</td>
+                                        <td>Seasonal Influenza</td>
+                                        <td>1 Dose (Yearly)</td>
+                                        <td>Anytime during pregnancy (before flu season)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>COVID-19 Vaccine</td>
+                                        <td>COVID-19</td>
+                                        <td>Based on vaccine type</td>
+                                        <td>Anytime during pregnancy (as per guidelines)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hepatitis B (Hep B)</td>
+                                        <td>Hepatitis B</td>
+                                        <td>3 Doses (if needed)</td>
+                                        <td>Anytime if at risk</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pneumococcal Vaccine (PPSV23 or PCV13)</td>
+                                        <td>Pneumonia, Meningitis</td>
+                                        <td>1 Dose (if needed)</td>
+                                        <td>For high-risk conditions</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+
+                    
+                    <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                    
+                        <h3 class="hidden">Cases Involving Resident</h3>
+<% if (cases.length) { %>
+    
+    <% cases.forEach(caseItem => { %>
+        <div class="case-card hidden" style="display: none;">
+            <h4>Case ID: <%= caseItem._id %></h4>
+            <p><strong>Complainants:</strong></p>
+            <ul>
+                <% caseItem.complainants.forEach(person => { %>
+                    <li><%= person.fname %> <%= person.lname %></li>
+                <% }); %>
+            </ul>
+            <p><strong>Respondents:</strong></p>
+            <ul>
+                <% caseItem.respondents.forEach(person => { %>
+                    <li><%= person.fname %> <%= person.lname %></li>
+                <% }); %>
+            </ul>
+        </div>
+    <% }); %>
+<% } else { %>
+    <p class="hidden"  style="display: none;">No cases found.</p>
+<% } %>
+
+
+
+
+                            <div class="section height0 darkShadow borderRadius15 col alignStart padding10 tableCard hidden">
+                            <div class="sub">
+                                <div class="ctrl left">
+                                    <span id="totalRecords" class="totalRecords"></span>
+                                </div>
+                                <div class="ctrl right hidden">
+                                    <p>Display Per Page:</p>
+                                    <div class="selectBar" style="width: 70px;"> 
+                                        <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px;">
+                                            <option value="10">10</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="1000000000000">All</option>
+                                        </select>
+                                    </div>
+                                    <div class="pagination" id="pagination"></div>
+                                </div>
+                            </div>
+                        
+                            <% if (cases.length > 0) { %>
+                                <table id="dirTable">
+                                    <thead>
+                                        <tr>
+                                            <th onclick="sortTable(0)" style="width: 15%;">Case No.</th>
+                                            <th onclick="sortTable(1)">Type</th>
+                                            <th onclick="sortTable(2)" style="width: 30%;">Complainants</th>
+                                            <th onclick="sortTable(3)" style="width: 30%;">Complainees</th>
+                                            <th onclick="sortTable(4)">Date Filed</th>
+                                            <th onclick="sortTable(5)">Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% cases.forEach(caseItem => { %>
+                                            <tr>
+                                                <td><%= caseItem.caseNo %></td>
+                                                <td><%= caseItem.type %></td>
+                                                
+                                                <!-- Complainants -->
+                                                <td>
+                                                    <% if (caseItem.complainants && caseItem.complainants.length > 0) { %>
+                                                        <ul>
+                                                            <% caseItem.complainants.forEach(comp => { %>
+                                                                <li><%= comp %></li> <!-- Removed `.name` since `comp` is already a string -->
+                                                            <% }) %>
+                                                        </ul>
+                                                    <% } else { %>
+                                                        <span>No complainants</span>
+                                                    <% } %>
+                                                </td>
+                        
+                                                <!-- Complainees -->
+                                                <td>
+                                                    <% if (caseItem.complainees && caseItem.complainees.length > 0) { %>
+                                                        <ul>
+                                                            <% caseItem.complainees.forEach(comp => { %>
+                                                                <li><%= comp %></li> <!-- Removed `.name` since `comp` is already a string -->
+                                                            <% }) %>
+                                                        </ul>
+                                                    <% } else { %>
+                                                        <span>No complainees</span>
+                                                    <% } %>
+                                                </td>
+                        
+                                                <td><%= caseItem.createdAt ? caseItem.createdAt.toDateString() : "N/A" %></td>
+                                                <td><%= caseItem.status %></td>
+                                                <td>
+                                                    <a href="/caseView/<%= caseItem._id %>" class="nav borderRadius10">
+                                                        <i class="fas fa-eye"></i> Details
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            <% } else { %>
+                                <p class="hidden">No cases found.</p>
+                            <% } %>
+                        </div>
+                        
+            <% } %>
+                </div>
+            </div>
+
+            
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect = document.getElementById('purposeSelect');
+                    const purposeRef = document.getElementById('purposeRef');
+            
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect.addEventListener('change', function() {
+                        purposeRef.textContent = purposeSelect.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect2 = document.getElementById('purposeSelect2');
+                    const purposeRef2 = document.getElementById('purposeRef2');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect2.addEventListener('change', function() {
+                        purposeRef2.textContent = purposeSelect2.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect3 = document.getElementById('purposeSelect3');
+                    const purposeRef3 = document.getElementById('purposeRef3');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect3.addEventListener('change', function() {
+                        purposeRef3.textContent = purposeSelect3.value;
+                    });
+                });
+            </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect4 = document.getElementById('purposeSelect4');
+                    const purposeRef4 = document.getElementById('purposeRef4');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect4.addEventListener('change', function() {
+                        purposeRef4.textContent = purposeSelect4.value;
+                    });
+                });
+            </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Get the dropdown and the span element
+                                const purposeSelect5 = document.getElementById('purposeSelect5');
+                                const purposeRef5 = document.getElementById('purposeRef5');
+            
+                                // Update the span with the selected value whenever the selection changes
+                                purposeSelect5.addEventListener('change', function() {
+                                    purposeRef5.textContent = purposeSelect5.value;
+                                });
+                            });
+                        </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const buttons = ['doc1Btn', 'doc2Btn', 'doc3Btn', 'doc4Btn', 'doc5Btn'];
+        const divs = ['doc1', 'doc2', 'doc3', 'doc4', 'doc5'];
+        const trayCard = document.getElementById('trayCard');
+    
+        if (!trayCard) {
+            console.error("❌ Error: 'trayCard' not found.");
+            return;
+        }
+    
+        const originalContent = {};
+        buttons.forEach((buttonId) => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                originalContent[buttonId] = button.innerHTML;
+            } else {
+                console.error(`❌ Error: Button with ID '${buttonId}' not found.`);
+            }
+        });
+    
+        buttons.forEach((buttonId, index) => {
+            const button = document.getElementById(buttonId);
+            const correspondingDiv = document.getElementById(divs[index]);
+    
+            if (!button || !correspondingDiv) {
+                console.error(`❌ Error: Element missing for button '${buttonId}' or div '${divs[index]}'`);
+                return;
+            }
+    
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log(`✅ Clicked button: ${buttonId}`);
+    
+                const isActive = button.classList.contains('active');
+    
+                // Hide all divs
+                divs.forEach((divId) => {
+                    const div = document.getElementById(divId);
+                    if (div) {
+                        console.log(`🔴 Hiding: ${divId}`);
+                        div.classList.add('hidden');
+                    }
+                });
+    
+                // Reset all buttons
+                buttons.forEach((btnId) => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        btn.innerHTML = originalContent[btnId];
+                        btn.classList.remove('active');
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        btn.style.display = '';
+                    }
+                });
+    
+                if (!isActive) {
+                    trayCard.classList.add('hidden');
+    
+                    console.log(`🟢 Showing: ${divs[index]}`);
+                    correspondingDiv.classList.remove('hidden'); // Ensure class is removed
+    
+                    button.innerHTML = '<i class="fas fa-times"></i> ' + originalContent[buttonId];
+                    button.classList.add('active');
+                    button.style.backgroundColor = '#285436';
+                    button.style.color = 'white';
+    
+                    // Hide other buttons
+                    buttons.forEach((btnId) => {
+                        if (btnId !== buttonId) {
+                            const otherButton = document.getElementById(btnId);
+                            if (otherButton) otherButton.style.display = 'none';
+                        }
+                    });
+                } else {
+                    console.log(`🔄 Resetting: ${divs[index]}`);
+                    correspondingDiv.classList.add('hidden');
+                    trayCard.classList.remove('hidden');
+    
+                    button.innerHTML = originalContent[buttonId];
+                    button.classList.remove('active');
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+    
+                    buttons.forEach((btnId) => {
+                        const btn = document.getElementById(btnId);
+                        if (btn) btn.style.display = '';
+                    });
+                }
+            });
+        });
+    });
+    
+    </script>
+    
+<script>
+    const openResetCard = document.getElementById('openResetCard');
+    const resetPassCard = document.getElementById('resetPassCard');
+    const closeResetCard = document.getElementById('closeResetCard');
+    const confirmReset = document.getElementById('confirmReset');
+
+    // Show confirmation modal
+    openResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'flex';
+    });
+
+    // Hide confirmation modal
+    closeResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'none';
+    });
+
+    // Confirm password reset and send request
+    confirmReset.addEventListener('click', function(e) {
+        e.preventDefault();
+        const residentId = confirmReset.getAttribute('data-id');
+
+        fetch(`/reset-resident/${residentId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Password reset successfully!");
+                resetPassCard.style.display = 'none';
+            } else {
+                alert("Failed to reset password.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const suspendCard = document.getElementById("suspendCard");
+        const closeSuspendCard = document.getElementById("closeSuspendCard");
+        const confirmSuspend = document.getElementById("confirmSuspend");
+    
+        document.querySelectorAll(".openSuspendCard").forEach((button) => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                suspendCard.style.display = "flex";
+    
+                const residentId = this.getAttribute("data-resident-id");
+                confirmSuspend.setAttribute("data-id", residentId);
+            });
+        });
+    
+        closeSuspendCard.addEventListener("click", function (e) {
+            e.preventDefault();
+            suspendCard.style.display = "none";
+        });
+    
+        confirmSuspend.addEventListener("click", async function (e) {
+            e.preventDefault();
+            const residentId = this.getAttribute("data-id");
+    
+            try {
+                const response = await fetch(`/suspend-resident/${residentId}`, { method: "POST" });
+                const data = await response.json();
+    
+                if (data.success) {
+                    alert("User suspended successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to suspend user.");
+                }
+            } catch (error) {
+                alert("Error suspending user.");
+            }
+        });
+    });
+    </script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let allRows = Array.from(dirTable.getElementsByTagName("tbody")[0].rows);
+    
+    function renderTable() {
+        if (allRows.length === 0) {
+            dirTable.style.display = "none";
+            totalRecordsLabel.innerText = "Pending Cases: No Record Found";
+            paginationContainer.innerHTML = "";
+            return;
+        } else {
+            dirTable.style.display = "table";
+        }
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        for (let row of allRows) {
+            row.style.display = "none";
+        }
+
+        for (let i = start; i < end && i < allRows.length; i++) {
+            allRows[i].style.display = "";
+        }
+
+        totalRecordsLabel.innerText = `Pending Cases: Found ${allRows.length}`;
+        renderPagination(allRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = (i === currentPage) ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    renderTable();
+});
+</script>
+    
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('unseen')) {
+        newCard.classList.remove('unseen');
+        newCard.classList.add('seen');
+    }
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('seen')) {
+        newCard.classList.remove('seen');
+        newCard.classList.add('unseen');
+    }
+});
+
+</script>    
+
+            
+        </div>

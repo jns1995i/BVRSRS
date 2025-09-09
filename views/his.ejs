@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BVRSRS</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+        .card {
+            width: 45%;
+            padding: 20px;
+            height: auto;
+            flex-direction: column;
+            align-items: start;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+        .card.fl {
+            width: 25%;
+        }
+
+        
+@media screen and (max-width: 1025px) {
+    .mobile {
+        display: none;
+    }
+    .responsive {
+        display: none;
+    }
+    .unresponsive {
+        display: flex;
+    }
+    body {
+        padding: 5px !important;
+    }
+    .card {
+        width: 100%;
+    }
+    .card.fl {
+        position: initial;
+        left: initial;
+        top: initial;
+        width: 100%;
+        padding: 10px !important;
+        justify-content: center;
+        align-items: center;
+    }
+    #logoCard {
+        width: 50% !important;
+    }
+}
+    </style>
+<body class="block abstractBG overflow-y1 padding0">
+    <div class="height0 justifyStart marginBottom10 hidden unresponsive">
+        <a href="/hom" class="nav cnav"><i class="fas fa-chevron-left"></i></a>
+    </div>
+    <div class="height0 borderRadius10 relative padding30 col justifyStart overflow-y1">
+
+        <a href="/hom" class="nav absolute left20 top20 responsive"><i class="fas fa-chevron-left"></i>Go Back</a>
+
+        <div class="card fl absolute top80 left20 width15" style="padding: 0; gap: 20px; background-color: transparent; box-shadow: none;">
+            <div class="card" style="margin-bottom: 0; align-items: center !important; width: 100%;">
+                <img src="/images/logo.png" alt="" class="width60 height0 borderRadius10" id="logoCard">
+            </div>
+        </div>
+        
+
+        <div class="card">
+            <p class="size26 str500 colorPrimary">Barangay Valdefuente</p>
+            <p class="size12 str400 textJustify">Valdefuente, a barangay in Cabanatuan City, Nueva Ecija, Philippines, is known for its connection to historical events and its location along the General Luna Bridge and River. It is situated beside Barangay Mayapyap Sur and is along the Pan-Philippine Highway, also known as the Maharlika Highway. The area has been historically vulnerable to natural disasters like earthquakes and typhoons. </p>
+        </div>
+
+        <div class="card">
+            <p class="size26 str500 colorPrimary">Location</p>
+            <p class="size12 str400 textJustify">Valdefuente is situated at approximately 15.5090, 120.9615, in the island of Luzon. Elevation at these coordinates is estimated at 38.6 meters or 126.6 feet above mean sea level.</p>
+        </div>
+        
+        <div class="card fl absolute top30 right20 width15" style="padding: 0; gap: 20px; background-color: transparent; box-shadow: none;">
+            <img src="/images/map.png" alt="" class="width100 height0 borderRadius10">
+            <img src="/images/brgyhall.jpg" alt="" class="width100 height0 borderRadius10">
+        </div>
+        
+        <div class="card">
+            <p class="size26 str500 colorPrimary">Adjacent Barangays</p>
+            <p class="size12 str400 textJustify">Valdefuente shares a common border with the following barangay(s):</p>
+
+            <p class="size14 str400">&bull; Barlis</p>
+            <p class="size14 str400">&bull; Mayapyap</p>
+            <p class="size14 str400">&bull; Pagas</p>
+            <p class="size14 str400">&bull; Daan Sarile</p>
+            <p class="size14 str400">&bull; Mayapyap Sur</p>
+            <p class="size14 str400">&bull; Aduas Centro</p>
+            <p class="size14 str400">&bull; Aduas Norte</p>
+        </div>
+
+        <div class="card">
+            <p class="size26 str500 colorPrimary">General Luna Bridge <br> and its significance:</p>
+            <p class="size12">&bull; The General Luna Bridge, also known as Puente Nazas, is a notable landmark in Valdefuente.</p>
+            <p class="size12">&bull; It was originally constructed in 1926 but was destroyed in 1941.</p>
+            <p class="size12">&bull; The bridge is a truss bridge design, evident from its structural framework.</p>
+            <p class="size12">&bull; It played a role in transportation and potentially even railway transport in the past.</p>
+            <p class="size12">&bull; A Facebook post shows a photo of the bridge from 1926-1941 and another from 1947 after a temporary wooden truss was installed.</p>
+        </div>
+
+        <div class="card">
+            <p class="size26 str500 colorPrimary">Valdefuente's connection<br>to World War II:</p>
+            <p class="size12">&bull; The area is near the former Cabanatuan Prison Camp, where American soldiers were held during World War II.</p>
+            <p class="size12">&bull; The Raid at Cabanatuan, a successful rescue mission by American forces, took place near Valdefuente. </p>
+        </div>
+
+    </div>
+</body>
+</html>

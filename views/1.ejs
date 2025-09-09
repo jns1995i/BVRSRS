@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRAR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+<style>
+</style>
+</head>
+<body class="col">
+
+<h2>Select Document</h2>
+<div class="height0 doc-type gap10">
+    <a data-type="Barangay Clearance">Barangay Clearance</a>
+    <a data-type="Indigency">Indigency</a>
+    <a data-type="Certification">Certification</a>
+</div>
+
+<div class="height0 purpose-container width0" style="display:none;">
+    <label>Purpose: </label>
+    <div class="selectBar">
+        <select id="purposeSelect" class="height0 width0">
+            <option value="">Select purpose</option>
+        </select>
+    </div>
+</div>
+
+<div class="height0 qty-container" style="display:none;">
+    <label>Copies: </label>
+    <button class="nav cnav" id="minusBtn">-</button>
+    <input type="text" id="qtyInput" value="1" readonly style="text-align:center;" class="width0">
+    <button class="nav cnav" id="plusBtn">+</button>
+</div>
+
+<button class="nav" id="addBtn" style="display:none;">Add to List</button>
+
+<div id="message" class="height0 "></div>
+
+<h3>Selected Documents:</h3>
+<div id="list" class="height0"></div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const docLinks = document.querySelectorAll('.doc-type a');
+    const purposeContainer = document.querySelector('.purpose-container');
+    const purposeSelect = document.getElementById('purposeSelect');
+    const qtyContainer = document.querySelector('.qty-container');
+    const qtyInput = document.getElementById('qtyInput');
+    const plusBtn = document.getElementById('plusBtn');
+    const minusBtn = document.getElementById('minusBtn');
+    const addBtn = document.getElementById('addBtn');
+    const listDiv = document.getElementById('list');
+    const messageDiv = document.getElementById('message');
+
+    let selectedType = '';
+    let qty = 1;
+    const maxItems = 5;
+
+    const purposes = {
+        "Barangay Clearance": ["Employment", "School", "Others"],
+        "Indigency": ["Scholarship", "Financial Aid", "Others"],
+        "Certification": ["Custom Purpose 1", "Custom Purpose 2", "Others"]
+    };
+
+    function updateAddButtonState() {
+        if (listDiv.children.length >= maxItems) {
+            addBtn.disabled = true;
+            messageDiv.textContent = "You can only add up to 5 items!";
+            messageDiv.style.display = "block";
+        } else {
+            addBtn.disabled = false;
+            messageDiv.style.display = "none";
+        }
+    }
+
+    docLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            selectedType = link.dataset.type;
+            
+            // Populate purposes
+            purposeSelect.innerHTML = '<option value="">Select purpose</option>';
+            purposes[selectedType].forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                purposeSelect.appendChild(opt);
+            });
+
+            purposeContainer.style.display = 'block';
+            qtyContainer.style.display = 'flex';
+            addBtn.style.display = 'inline-block';
+            qty = 1;
+            qtyInput.value = qty;
+        });
+    });
+
+    plusBtn.addEventListener('click', () => {
+        if (qty < 3) {
+            qty++;
+            qtyInput.value = qty;
+        }
+    });
+
+    minusBtn.addEventListener('click', () => {
+        if (qty > 1) {
+            qty--;
+            qtyInput.value = qty;
+        }
+    });
+
+    addBtn.addEventListener('click', () => {
+        const selectedPurpose = purposeSelect.value;
+        if (!selectedType || !selectedPurpose) {
+            messageDiv.textContent = "Please select both document type and purpose!";
+            messageDiv.style.display = 'block';
+            return;
+        }
+
+        // Add to list
+        const itemDiv = document.createElement('div');
+        itemDiv.textContent = `${selectedType} - ${selectedPurpose} (Copies: ${qty})`;
+        listDiv.appendChild(itemDiv);
+
+        // Reset form
+        purposeContainer.style.display = 'none';
+        qtyContainer.style.display = 'none';
+        addBtn.style.display = 'none';
+        selectedType = '';
+        qty = 1;
+
+        updateAddButtonState();
+    });
+});
+</script>
+
+</body>
+</html>

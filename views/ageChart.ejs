@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Distribution Bar Chart</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        canvas {
+            width: 100% !important;
+            height: 250px !important;
+        }
+    </style>
+</head>
+<body>
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Fetch data from API
+                const response = await fetch("/api/age-distribution");
+                const data = await response.json();
+        
+                console.log("Age Groups Data:", data.ageGroups);
+                console.log("Total Residents:", data.totalResidents); // Debugging
+        
+                if (!data || !data.ageGroups || typeof data.ageGroups !== 'object') {
+                    throw new Error("Invalid data format received");
+                }
+        
+                // Create an array of labels (age groups) and their corresponding population counts
+                const labels = Object.keys(data.ageGroups);
+                const values = Object.values(data.ageGroups);
+        
+                // Calculate max value dynamically for y-axis scaling
+                const maxPopulation = Math.max(...values);
+        
+                // Get chart context
+                const canvas = document.getElementById('myBarChart');
+                const ctx = canvas.getContext('2d');
+        
+                // Create gradient for bars
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, "#285436"); // Dark green at the top
+                gradient.addColorStop(0.6, "#166c5b"); // Dark green at the top
+                gradient.addColorStop(1, "#083a3c"); // Lighter green at the bottom 
+        
+                // Create chart
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Population Count',
+                            data: values,
+                            backgroundColor: gradient,
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            borderRadius: 12,
+                            hoverOffset: 10 // Slight expansion on hover
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { 
+                                grid: { display: true },
+                                ticks: { 
+                                    font: { 
+                                        size: 10,
+                                        family: 'Poppins' // Set the font to Poppins
+                                    },
+                                    color: 'black' // Change the tick labels color (White)
+                                }
+                            },
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: maxPopulation * 1.2,  // Adding some space above the max population
+                                grid: { display: false }, 
+                                ticks: {
+                                    stepSize: Math.ceil(maxPopulation / 5)  // Adjust step size dynamically
+                                }
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + " residents"; // Add 'residents' label in tooltip
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+        
+            } catch (error) {
+                console.error("Error fetching or processing data:", error);
+            }
+        });
+        </script>
+        
+</body>
+</html>

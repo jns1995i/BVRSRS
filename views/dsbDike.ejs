@@ -1,0 +1,1405 @@
+<% layout('layout') %>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BVRSRS</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&display=swap">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="icon" href="/images/logo.png">
+        <style>
+            .linkX:hover {
+                transform: scale(1.01);
+                transition: transform 0.4s ease-in-out;
+            }
+            .card.keyPlain {
+                position: relative;
+                align-items: start;
+                padding: 20px;
+                height: 100px;
+                justify-content: space-between;
+                box-shadow: none;
+            }
+            .card.keyPlain:hover {
+                transform: scale(1.02);
+                transition: transform 0.6s ease-in-out;
+                box-shadow: 0 4px 4px 0 rgba(128, 128, 128, 0.553);
+            }
+            .graphIcon {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: var(--shade1);
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.4vw;
+                font-weight: 500;
+                color: var(--shade5)
+            }
+            .keyL {
+                font-size: 0.9vw;
+                font-weight: 300;
+                line-height: 1.5vw;
+            }
+            .tbl {
+                height: 30vw;
+                gap: 14px;
+                padding: 5px;
+            }
+            .card.keyLarge {
+                justify-content: start;
+                align-items: start;
+                padding: 1.2vw;
+                flex-direction: column;
+                background: var(--eco);
+                position: relative;
+            }
+            .card.keyLarge table, .card.keyLarge td, .card.keyLarge tr {
+                background-color: transparent;
+            }
+            tr:nth-child(odd) {
+                background-color: transparent;
+            }
+
+            tr:nth-child(even) {
+                background-color: transparent;
+            }
+            .gapX {
+                gap: 20px;
+            }
+            iframe {
+                width: 100%;
+                height: 320px;
+                background-color: white;
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                border: none;
+                padding: 10px;
+            }
+            .softX {
+                box-shadow: var(--softShadow);
+                height: auto;
+            }
+            .pie {
+                height: 80px;
+                width: 80px;
+                padding: 0;
+            }
+            .pieFrame {
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                border-radius: none;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                overflow-y: hidden;
+                overflow-x: hidden;
+            }
+            table {
+                box-shadow: none;
+                padding: 0;
+            }
+            #dirTable {
+                padding: 10px;
+            }
+            td {
+                font-size: 12px !important;
+                font-weight: 500;
+                background-color: transparent;
+            }
+            .mainf {
+                border-radius: 0;
+            }
+            .card.key.grandTotal {
+                background-color: var(--shade6);
+            }
+            .clrd {
+                color: white;
+            }
+            .clrd .keyT {
+                font-size: 24px;
+            }
+            .clrd p {
+                color: white;
+                font-size: 16px;
+            }
+.clrd:nth-child(1) { background-color: var(--witch); }
+.clrd:nth-child(2) { background-color: var(--shade10); }
+.clrd:nth-child(3) { background-color: var(--shade8); }
+.clrd:nth-child(4) { background-color: var(--shade5); }
+.clrd:nth-child(5) { background-color: var(--shade7); }
+.clrd:nth-child(6) { background-color: var(--shade5); }
+.clrd:nth-child(7) { background-color: var(--shade8); }
+
+            .special {
+                background-color: var(--witch);
+                min-height: 150px;
+                justify-content: center !important;
+                display: flex;
+            }
+            .special .keyT {
+                font-size: 2.5vw !important;
+            }
+            .special .keyL {
+                font-size: 1.2vw !important;
+            }
+            .keyL.greenDark i {
+                background-color: transparent;
+                border-radius: 50%;
+                height: 28px;
+                width: 30px;
+                border: 1px solid lightgray;
+            }
+            .keyL.greenDark {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+                height: 32px;
+                width: 100%;
+                border-radius: 10px;
+                padding: 10px !important;
+                font-weight: 400 !important;
+                border: 0.5px solid lightgray;
+            }
+            #prf:hover {
+                box-shadow: 0 4px 6px 1px rgba(0, 0, 0, 0.2);
+            }
+            #employment {
+                max-width: 250px;
+            }
+        </style>
+    </head>
+        <div class="head">
+            <div class="ctrl left">
+                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                <a href="/srv" class="nav relative">
+                    <i class="fas fa-bell"></i>Notification
+                    <p class="size14 str500 marginRight30"></p>
+                    <span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua">
+                        <%= pendingCount %>
+                    </span>
+                </a>
+                <a href="/abt" class="nav cnav hidden">
+                    <i class="fas fa-cog"></i>
+                </a>
+                <% } %>
+            </div>
+            <div class="ctrl">
+                <p class="title">DASHBOARD</p>
+            </div>
+            <div class="ctrl right" style="padding: 0;">
+                <div class="logoLabel col">
+                    <p>Welcome <%= user.position %></p>
+                    <p class="p10"><%= user.firstName %> <%= user.lastName %> <%= user.ExtName %></p>
+                </div>
+                <div class="logo">
+                    <a href="/user" id="prf" style="border: 1px solid gray; border-radius: 50%;">
+                        <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" alt="Profile Image">
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="main bgSoft borderRadius15">
+            
+        <% if (!isUpdated.resident || !isUpdated.business || !isUpdated.case) { %>
+            <div class="height0 padding20 hidden">
+                <div class="height0 padding30 borderRadius10 abstractBG textCenter">
+                    <p class="size16">Some resident records have not been updated recently.<br>Please update now to ensure accuracy of information!</p>
+                </div>
+            </div>
+        <% } %>
+
+        
+        <div class="height0 gap10 padding20">
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user"></i></a>
+                <p class="keyT"><%= totalPopulation %></p>
+                <a href="/vtr" class="width0 height0 linkX">
+                <p class="keyL">
+                    Population <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
+                <p class="keyT"><%= totalFamilies %></p>
+                <a href="/vtr" class="width0 height0 linkX">
+                <p class="fml">
+                    Families <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+                <p class="keyT"><%= uniqueHouseholds %></p>
+                <a href="/hsh" class="width0 height0 linkX">
+                <p class="keyL">
+                    Household <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-building"></i></a>
+                <p class="keyT"><%= businesses %></p>
+                <a href="/bus" class="width0 height0 linkX">
+                <p class="keyL">
+                    Businesses <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-check-circle"></i></a>
+                <p class="keyT"><%= registeredVoters %></p>
+                <a href="/vtr" class="width0 height0 linkX">
+                <p class="keyL">
+                    Registered Voters <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+        </div>
+
+        <div class="height0 paddingBlock0 paddingInline25 paddingBottom5">
+            <div class="height0 col width50 alignStart">
+                <p class="size20 str500">Keep your records up to date!</p>
+                <p class="size12">Make sure to update them every three months for accuracy and efficiency ✅</p>
+            </div>
+            <div class="height0 gap10 justifyAround width50 bgWhite padding15 borderRadius15 darkShadow">
+                <p class="size18 str500">Need Report?</p>
+                <div class="height0 gap10 justifyEnd width0 padding5">
+                    <a href="/rpt" class="btn btn-primary nav"> <i class="fas fa-filter"></i>Filter&Generate</a>
+                    <a href="/export-residents2" class="nav">
+                        <i class="fa-solid fa-file-excel"></i>
+                        Export Excel
+                    </a>
+                    <a href="/exportPDF" class="nav">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        Export PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+            <div class="height0 paddingInline20 gap20 paddingBlock10">
+                <div class="width30  col gap10 paddingInline5 paddingBottom5" style="height: 530px;">
+                    <div class="height12 abstractBG relative padding10 borderRadius10 aqua darkShadow">
+                        <a href="" class="nav cnav disabled size30 absolute right0 padding10" style="opacity: 0.1; transform: scale(1.5); bottom: -0px; padding: 5px;"><i class="fas fa-leaf size20"></i></a>
+                        <p class="size20 white str400">Demographics Overview</p>
+                    </div>
+                    <div class="card keyLarge padding10 height50" style="align-items: center !important;">
+                        <canvas id="genderChart" class="index50" width="200" height="200"></canvas>
+                    </div>
+                    <div class="card keyLarge height35" style="text-align: center; justify-content: space-around;">
+                        <p class="keyL greenDark" style="font-weight: 600;">
+                            <i class="fas fa-person"></i>
+                            Gender Distribution
+                        </p>
+                        <table id="userInfo">
+                            <tr>
+                                <td>Male</td>
+                                <td><%= maleCount %></td>
+                                <td class="textCenter green"><%= malePercentage %>%</td>
+                            </tr>
+                            <tr>
+                                <td>Female</td>
+                                <td><%= femaleCount %></td>
+                                <td class="textCenter green"><%= femalePercentage %>%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="h600 col gap10 width70 paddingInline5">
+                    <div class="height0 bgWhite col padding5 borderRadius10 darkShadow justifyStart">
+                        <div class="card keyLarge padding10 h260 shadowNone" style="align-items: center !important;">
+                            <canvas id="myBarChart" width="200" height=""></canvas>
+                        </div>
+                        
+                        <div class="card keyLarge h240 width98 marginBottom10">
+                            <p class="keyL greenDark" style="font-weight: 600;">
+                                <i class="fas fa-baby"></i>
+                                Age Distribution
+                            </p>
+                            <%
+                                const entries = Object.keys(ageGroups);
+                                const half = Math.ceil(entries.length / 2); // split point
+                                const firstHalf = entries.slice(0, half);
+                                const secondHalf = entries.slice(half);
+                            %>
+                            <%
+                            // Define a helper function to format the age group key
+                            const formatAgeGroupKey = (key) => {
+                                switch (key) {
+                                    case "0-5":
+                                        return "0-5 Months";
+                                    case "6-11":
+                                        return "6-11 Months";
+                                    case "1-5":
+                                        return "1-5 Years Old";
+                                    case "6-12":
+                                        return "6-12 Years Old";
+                                    case "13-17":
+                                        return "13-17 Years Old";
+                                    case "18-59":
+                                        return "18-59 Years Old";
+                                    case "Youth":
+                                        // Specific expansion for Youth, matching the key received
+                                        return "Youth (15 to 29)";
+                                    case "Senior":
+                                        // Specific expansion for Senior, matching the key received
+                                        return "Senior (60 & Above)";
+                                    default:
+                                        // Fallback for any other unexpected keys, returns the key as is
+                                        return key;
+                                }
+                            };
+                            %>
+                            <div class="gap25">
+                                <table id="userInfo">
+                                    <% firstHalf.forEach(key => { %>
+                                        <tr>
+                                            <td class="str600" style="width: 60%;"><%= formatAgeGroupKey(key) %></td>
+                                            <td class="textCenter"><%= ageGroups[key] %></td>
+                                            <td class="textCenter green">
+                                                <%
+                                                    let percentage = parseFloat(ageGroupPercentages[key]);
+                                                    let formattedPercentage = (isNaN(percentage) || percentage === 0) 
+                                                        ? '-' 
+                                                        : (percentage.toFixed(2).endsWith('.00') 
+                                                            ? parseInt(percentage) 
+                                                            : percentage.toFixed(2)) + '%';
+                                                %>
+                                                <%= formattedPercentage %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>                               
+                                </table>
+                                <table id="userInfo">
+                                    <% secondHalf.forEach(key => { %>
+                                        <tr>
+                                            <td style="width: 50%;"><%= formatAgeGroupKey(key) %></td>
+                                            <td class="textCenter"><%= ageGroups[key] %></td>
+                                            <td class="textCenter green">
+                                                <%
+                                                    let percentage = parseFloat(ageGroupPercentages[key]);
+                                                    let formattedPercentage = (isNaN(percentage) || percentage === 0) 
+                                                        ? '-' 
+                                                        : (percentage.toFixed(2).endsWith('.00') 
+                                                            ? parseInt(percentage) 
+                                                            : percentage.toFixed(2)) + '%';
+                                                %>
+                                                <%= formattedPercentage %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+// Get chart context
+const ctx = document.getElementById('genderChart').getContext('2d');
+
+// Create Gradient for Male Section
+const maleGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+maleGradient.addColorStop(0, "#285436");  // Dark green at the top
+maleGradient.addColorStop(0.2, "#166c5b");  // Mid-tone green
+maleGradient.addColorStop(0.4, "#083a3c");  // Even darker at the bottom 083a3c
+
+// Create Gradient for Female Section
+const femaleGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+femaleGradient.addColorStop(0, "darkgreen"); // Dark emerald at the top
+femaleGradient.addColorStop(0.8, "yellowgreen"); // Mid-tone green
+femaleGradient.addColorStop(1, "#335e3e"); // Deep dark green at the bottom
+
+const genderChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Male', 'Female'],
+        datasets: [{
+            label: 'Gender Distribution',
+            data: [<%= maleCount %>, <%= femaleCount %>], // Dynamic values
+            backgroundColor: [maleGradient, femaleGradient],
+            borderWidth: 8, // Remove border for a cleaner look
+            hoverOffset: 10 // Slight expansion on hover
+        }]
+    },
+    options: {
+        responsive: true,
+        cutout: '60%', // Makes the donut ring thinner
+        plugins: {
+            legend: {
+                position: 'top'
+            }
+        }
+    }
+});
+
+            </script>
+
+            <div class="height0 gap10 padding10 alignStart">
+                <div class="padding10 gap10 borderRadius10 bgWhite width55 darkShadow" style="align-items: start !important; height: 330px;">
+                    <div class="card keyLarge shadowNone padding10 width65" style="align-items: center !important; justify-content: start;">
+                        <p class="keyL greenDark" style="font-weight: 600;">
+                            <i class="fas fa-hand-holding-heart"></i>
+                            Priority Groups
+                        </p>
+                        <br>
+                        <canvas id="priorityGroupsChart" width="400" height="400"></canvas>
+                    </div>
+                    <div class="card keyLarge height0 width35 marginTop20">
+                        <table id="userInfo">
+                            <tr>
+                                <td style="width: 50%;">PWD</td>
+                                <td class="textCenter"><%= pwdCount %></td>
+                                <td class="textCenter green"><%= pwdPercentage %>%</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%;">Pregnant</td>
+                                <td class="textCenter"><%= pregCount %></td>
+                                <td class="textCenter green"><%= pregPercentage %>%</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%;">Senior</td>
+                                <td class="textCenter"><%= seniorCitizenCount %></td>
+                                <td class="textCenter green"><%= seniorCitizenPercentage  %>%</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%;">Solo Parent</td>
+                                <td class="textCenter"><%= soloParentCount %></td>
+                                <td class="textCenter green"><%= soloParentPercentage %>%</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="width45 bgWhite darkShadow borderRadius15 padding10 gap10 alignStart" style="height: 330px">
+                    <div class="card keyLarge shadowNone padding10 width50 height100" style="align-items: center !important; justify-content: end;">
+                            <p class="keyL greenDark width100" style="font-weight: 600;">
+                                <i class="fas fa-suitcase inline"></i>
+                                Employment Status
+                            </p>
+                        <canvas id="employment" class="" width="400" height="400"></canvas>
+                    </div>
+                    <div class="col darkShadow borderRadius10 padding10 width50 relative marginRight10">
+                        <div class="col height100">
+                            <table id="userInfo">
+                                <tr>
+                                    <td style="width: 50%;">Employed</td>
+                                    <td class="textCenter"><%= empCount %></td>
+                                    <td class="textCenter green"><%= empPercentage %>%</td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 50%;">Unemployed</td>
+                                    <td class="textCenter"><%= emp2Count %></td>
+                                    <td class="textCenter green"><%= emp2Percentage %>%</td>
+                                </tr>
+                                <tr><td style="width: 50%;">Self-Employed</td><td class="textCenter"><%= emp3Count %></td class="textCenter green"><td class="textCenter green"><%= emp3Percentage %>%</td></tr>
+                                <tr><td style="width: 50%;">Student</td><td class="textCenter"><%= emp4Count %></td><td class="textCenter green"><%= emp4Percentage %>%</td></tr>
+                                <tr><td style="width: 50%;">Dependent</td><td class="textCenter"><%= emp5Count %></td><td class="textCenter green"><%= emp5Percentage %>%</td></tr>
+                                <tr><td style="width: 50%;">Pensioner</td><td class="textCenter"><%= emp6Count %></td><td class="textCenter green"><%= emp6Percentage %>%</td></tr>
+                                <tr><td style="width: 50%;">Retired</td><td class="textCenter"><%= emp7Count %></td><td class="textCenter green"><%= emp7Percentage %>%</td></tr>
+                            </table>
+                        </div> 
+                    </div>
+                </div> 
+            </div>
+            
+            <div class="height0 gap20 padding10 alignStart">
+                <div class="h350 gap10 darkShadow bgWhite width50 borderRadius10 padding20">         
+                    <div class="h250 width50 bgWhite col gap5">
+                        <p class="keyL greenDark" style="font-weight: 600;">
+                            <i class="fas fa-hand-holding-heart"></i>
+                            Family Poverty Distribution
+                        </p>
+                        <div class="card paddingInline10 paddingBlock40" style="align-items: center !important; width: 100% !important;">
+                            <canvas id="indigentChart" class=""></canvas>
+                        </div>
+                    </div> 
+                    <div class="card keyLarge width45 height0">
+                        <table id="userInfo">
+                            <tr>
+                                <td style="width: 50%;">Indigent</td>
+                                <td class="textCenter"><%= indigentCount %></td>
+                                <td class="textCenter green"><%= indigentPercentage %>%</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%;">Low Income</td>
+                                <td class="textCenter"><%= npoorCount %></td>
+                                <td class="textCenter green"><%= npoorPercentage %>%</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 50%;">Non Indigent</td>
+                                <td class="textCenter"><%= nonIndigent %></td>
+                                <td class="textCenter green"><%= nonIndigentPercentage %>%</td>
+                            </tr>
+                        </table>
+                    </div> 
+                </div>
+                <div class="h350 gap10 darkShadow bgWhite width50 borderRadius10 padding20 col">
+                        <p class="keyL greenDark" style="font-weight: 600;">
+                            <i class="fas fa-hand-holding-heart"></i>
+                            Poverty Threshold Guide
+                        </p>
+                    <table id="userInfo">
+                        <thead>
+                            <tr>
+                                <th class="textCenter">Family Size</th>
+                                <th class="textCenter">Indigent<br>(Below)</th>
+                                <th class="textCenter">Low Income<br>(Range)</th>
+                                <th class="textCenter">Non-Indigent<br>(Above)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="textCenter">1 - 2</td>
+                                <td class="textCenter">₱7,499 and below</td>
+                                <td class="textCenter">₱7,500 - ₱10,000</td>
+                                <td class="textCenter">Above ₱10,000</td>
+                            </tr>
+                            <tr>
+                                <td class="textCenter">3 - 4</td>
+                                <td class="textCenter">₱9,999 and below</td>
+                                <td class="textCenter">₱10,000 - ₱13,000</td>
+                                <td class="textCenter">Above ₱13,000</td>
+                            </tr>
+                            <tr>
+                                <td class="textCenter">5 - 6</td>
+                                <td class="textCenter">₱12,499 and below</td>
+                                <td class="textCenter">₱12,500 - ₱15,000</td>
+                                <td class="textCenter">Above ₱15,000</td>
+                            </tr>
+                            <tr>
+                                <td class="textCenter">7 - 8</td>
+                                <td class="textCenter">₱14,999 and below</td>
+                                <td class="textCenter">₱15,000 - ₱18,000</td>
+                                <td class="textCenter">Above ₱18,000</td>
+                            </tr>
+                            <tr>
+                                <td class="textCenter">9 and above</td>
+                                <td class="textCenter">₱16,999 and below</td>
+                                <td class="textCenter">₱17,000 - ₱20,000</td>
+                                <td class="textCenter">Above ₱20,000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get chart context for the new canvas ID
+            const ctx = document.getElementById('priorityGroupsChart').getContext('2d');
+
+            // Define gradients for each bar
+            // PWD Gradient (e.g., Green shades)
+            const pwdGradient = ctx.createLinearGradient(0, ctx.canvas.height, 0, 0); // Vertical gradient
+            pwdGradient.addColorStop(0, "#19C998");
+            pwdGradient.addColorStop(1, "#083a3c");
+
+            // Pregnant Gradient (e.g., Purple shades)
+            const pregnantGradient = ctx.createLinearGradient(0, ctx.canvas.height, 0, 0);
+            pregnantGradient.addColorStop(0, "#BB8FCE");
+            pregnantGradient.addColorStop(1, "#5B2C6F");
+
+            // Senior Gradient (e.g., Orange/Yellow shades)
+            const seniorGradient = ctx.createLinearGradient(0, ctx.canvas.height, 0, 0);
+            seniorGradient.addColorStop(0, "#F7DC6F");
+            seniorGradient.addColorStop(1, "#D35400");
+
+            // Solo Parent Gradient (e.g., Blue shades)
+            const soloParentGradient = ctx.createLinearGradient(0, ctx.canvas.height, 0, 0);
+            soloParentGradient.addColorStop(0, "#AED6F1");
+            soloParentGradient.addColorStop(1, "#21618C");
+
+            const priorityGroupsChart = new Chart(ctx, {
+                type: 'bar', // Changed to 'bar' chart type
+                data: {
+                    labels: ['PWD', 'Pregnant', 'Senior', 'Solo Parent'],
+                    datasets: [{
+                        label: 'Number of Individuals', // Updated label for clarity
+                        data: [
+                            <%= pwdCount %>,     // Dynamic PWD count
+                            <%= pregCount %>,    // Dynamic Pregnant count
+                            <%= seniorCitizenCount %>, // Dynamic Senior count
+                            <%= soloParentCount %> // Dynamic Solo Parent count
+                        ],
+                        backgroundColor: [
+                            pwdGradient,
+                            pregnantGradient,
+                            seniorGradient,
+                            soloParentGradient
+                        ],
+                        borderColor: [
+                            '#083a3c', // Darker border for PWD
+                            '#5B2C6F', // Darker border for Pregnant
+                            '#D35400', // Darker border for Senior
+                            '#21618C'  // Darker border for Solo Parent
+                        ],
+                        borderRadius: 10, // Slightly rounded corners for bars
+                        barPercentage: 0.7, // Adjust bar width (default is 0.9)
+                        categoryPercentage: 0.8 // Adjust space between categories (default is 0.8)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allows flexible sizing
+                    plugins: {
+                        legend: {
+                            display: false // Kept legend hidden as per previous request
+                        },
+                        title: {
+                            display: false,
+                            text: 'Distribution by Priority Group', // Chart title
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#333'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: {
+                                    display: false
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Start Y-axis from zero
+                            title: {
+                                display: false,
+                                text: 'Count',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            grid: {
+                                display: false,
+                                color: 'rgba(0, 0, 0, 0.05)' // Lighter grid lines
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: false,
+                                text: 'Priority Group',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            grid: {
+                                display: true // No vertical grid lines
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 10,
+                            bottom: 10,
+                            left: 10,
+                            right: 10
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+            <script>
+                // Get chart context
+                const ctx2 = document.getElementById('indigentChart').getContext('2d');
+                
+                // Create Gradient for Male Section
+                const maleGradient2 = ctx2.createLinearGradient(0, 0, 0, ctx2.canvas.height);
+                maleGradient2.addColorStop(0, "#1976c9");  // Dark green at the top
+                maleGradient2.addColorStop(0.8, "#11838E");  // Mid-tone green
+                maleGradient2.addColorStop(1, "#0d3558");  // Even darker at the bottom 083a3c
+                
+                // Create Gradient for Female Section
+                const femaleGradient2 = ctx2.createLinearGradient(0, 0, 0, ctx2.canvas.height);
+                femaleGradient2.addColorStop(0, "#285436");  // Dark green at the top
+                femaleGradient2.addColorStop(0.6, "#166c5b");  // Dark green at the top
+                femaleGradient2.addColorStop(1, "#083a3c");  // Lighter green at the bottom
+                
+                // Fetch dynamic values from server-side variables
+                const indigentCount = <%= JSON.stringify(indigentCount) %>;
+                const nonIndigent = <%= JSON.stringify(nonIndigent) %>;
+                const npoorCount = <%= JSON.stringify(npoorCount) %>;
+            
+                // Create the Doughnut Chart
+                const indigentChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Indigent', 'Low Income', 'Non-Indigent'],
+                        datasets: [{
+                            label: 'Living Condition',
+                            data: [indigentCount, npoorCount, nonIndigent], // Use the dynamic values here
+                            backgroundColor: [maleGradient2, maleGradient2, maleGradient2], // Apply gradient color for the first two sections, solid color for the last one
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            borderRadius: 12,
+                            barThickness: 56,
+                            hoverOffset: 10 // Slight expansion on hover
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                barPercentage: 0.5,
+                                categoryPercentage: 0.6,
+                                maxBarThickness: 10,
+                                grid: { display: true },
+                                ticks: { 
+                                    font: { 
+                                        size: 10,
+                                        family: 'Poppins' // Set the font to Poppins
+                                    },
+                                    color: 'black' // Change the tick labels color (White)
+                                }
+                            },
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: Math.max(indigentCount, nonIndigent, npoorCount) * 1.2,  // Add space above the max population
+                                grid: { display: false }, 
+                                ticks: {
+                                    stepSize: Math.ceil(Math.max(indigentCount, nonIndigent, npoorCount) / 5)  // Adjust step size dynamically
+                                }
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + " families"; // Add 'residents' label in tooltip
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+            
+            <script>
+                // Get chart context
+                const ctx3 = document.getElementById('employment').getContext('2d');
+                
+
+            const employedGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            employedGradient.addColorStop(0, "#19C998");  // Dark green at the top
+            employedGradient.addColorStop(0.2, "#11838E");  // Mid-tone green
+            employedGradient.addColorStop(0.4, "#14737F");  // Even darker at the bottom
+
+            // Create Gradient for Unemployed Section
+            const unemployedGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            unemployedGradient.addColorStop(0, "#0D3558"); // Darker slate blue at the top
+            unemployedGradient.addColorStop(0.8, "#5A6ACF"); // Main slate blue tone
+            unemployedGradient.addColorStop(1, "#0c5594"); // Lighter bluish tone at the bottom
+
+            // Create Gradient for Self-Employed Section
+            const selfEmployedGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            selfEmployedGradient.addColorStop(0, "#F7DC6F"); // Yellowish
+            selfEmployedGradient.addColorStop(0.5, "#F39C12"); // Orange
+            selfEmployedGradient.addColorStop(1, "#D35400"); // Darker Orange
+
+            // Create Gradient for Student Section
+            const studentGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            studentGradient.addColorStop(0, "#BB8FCE"); // Light Purple
+            studentGradient.addColorStop(0.5, "#8E44AD"); // Purple
+            studentGradient.addColorStop(1, "#5B2C6F"); // Dark Purple
+
+            // Create Gradient for Dependent Section
+            const dependentGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            dependentGradient.addColorStop(0, "#AED6F1"); // Light Blue
+            dependentGradient.addColorStop(0.5, "#3498DB"); // Blue
+            dependentGradient.addColorStop(1, "#21618C"); // Dark Blue
+
+            // Create Gradient for Pensioner Section
+            const pensionerGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            pensionerGradient.addColorStop(0, "#F5B7B1"); // Light Red
+            pensionerGradient.addColorStop(0.5, "#E74C3C"); // Red
+            pensionerGradient.addColorStop(1, "#B03A2E"); // Dark Red
+
+            // Create Gradient for Retired Section
+            const retiredGradient = ctx3.createLinearGradient(0, 0, 0, ctx3.canvas.height);
+            retiredGradient.addColorStop(0, "#D2B4DE"); // Light Magenta
+            retiredGradient.addColorStop(0.5, "#AF7AC5"); // Magenta
+            retiredGradient.addColorStop(1, "#884EA0"); // Dark Magenta
+             
+                const employment = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Employed', 'Unemployed','Self-Employed','Student', 'Dependent', 'Pendioner', 'Retired'],
+                        datasets: [{
+                            label: 'Employment Distribution',
+                            data: [<%= empCount %>, <%= emp2Count %>, <%= emp3Count %>, <%= emp4Count %>, <%= emp5Count %>, <%= emp6Count %>, <%= emp7Count %>], // Dynamic values
+                            backgroundColor: [
+                            employedGradient,
+                            unemployedGradient,
+                            selfEmployedGradient,
+                            studentGradient,
+                            dependentGradient,
+                            pensionerGradient,
+                            retiredGradient],
+                            borderWidth: 8, // Remove border for a cleaner look
+                            hoverOffset: 10 // Slight expansion on hover
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '60%', // Makes the donut ring thinner
+                        plugins: {
+                            legend: {
+                                display: false,
+                                position: 'top'
+                            }
+                        }
+                    }
+                });
+                
+                            </script>
+            
+
+            <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+            <br><hr><br>
+            
+        <div class="head">
+            <div class="ctrl left">
+                <p class="title">Documents</p>
+            </div>
+            <div class="ctrl">
+            </div>
+            <div class="ctrl right">
+                <div class="selectBar hidden">
+                    <select name="" id="">
+                        <option value="">Up to Date</option>
+                        <option value="">Today</option>
+                        <option value="">This Week</option>
+                        <option value="">This Month</option>
+                        <option value="">This Year</option>
+                    </select>
+                </div>
+                <a href="" class="nav hidden">
+                    <i class="fa-solid fa-download"></i>
+                    Export Report
+                </a>
+            </div>
+        </div>
+            
+            <div class="section">
+                <div class="section smallWidth gap10" style="padding: 0;">
+                    <div class="section col gap20" style="padding: 5px;">
+                        <div class="card keyPlain special abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-check-circle"></i></a>
+                            <p class="keyT" style="color: white;"><%= sumReq.totalRequests %></p>
+                            <p class="keyL white">
+                               Success Transactions
+                            </p>
+                        </div>
+                        <div class="card keyPlain special abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-stamp"></i></a>
+                            <p class="keyT" style="color: white;"><%= sumDoc.totalDocuments %></p>
+                            <p class="keyL white">
+                                Issued Documents
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="section col largeWidth gap10" style="padding: 0;">
+                    <div class="section gap20" style="padding: 5px;">
+                        <div class="section">
+                            <iframe src="/issuedChart"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section col gap10" style="padding: 0;">
+                    <div class="section gap20" style="padding: 5px;">
+                        <% sumDoc.documentTypeCounts.forEach(doc => { %>
+                            <div class="card keyPlain">
+                                <a 
+                                
+                                <% if (doc.type === "Barangay Clearance") { %>
+                                    href="/ovvB"
+                                <% } else if (doc.type === "Barangay Indigency") { %>
+                                    href="/ovvI"
+                                <% } else if (doc.type === "Residency") { %>
+                                    href="/ovvR"
+                                <% } else if (doc.type === "Good Moral") { %>
+                                    href="/ovvG"
+                                <% } else if (doc.type === "Certification") { %>
+                                    href="/ovvC"
+                                <% } else { %>
+                                    href=""
+                                <% } %>
+                                
+                                class="nav cnav graphIcon">
+                                    <% if (doc.type === "Barangay Clearance") { %>
+                                        <i class="fas fa-house"></i>
+                                    <% } else if (doc.type === "Barangay Indigency") { %>
+                                        <i class="fas fa-hands-helping"></i>
+                                    <% } else if (doc.type === "Residency") { %>
+                                        <i class="fas fa-location-dot"></i>
+                                    <% } else if (doc.type === "Good Moral") { %>
+                                        <i class="fas fa-user"></i>
+                                    <% } else if (doc.type === "Certification") { %>
+                                        <i class="fas fa-award"></i>
+                                    <% } else { %>
+                                        <i class="fas fa-building"></i> <!-- Default icon -->
+                                    <% } %>
+                                </a>
+                                <p class="keyT height0 flex justifyStart alignCenter gap5">
+                                    <%= doc.count %> 
+                                    <span class="size8 padding5 borderRadius5 bgTint7"><%= doc.percentage %>%</span>
+                                </p>
+                                <p class="keyL">
+                                    <%= doc.type %>
+                                </p>
+                            </div>
+                        <% }) %>
+                        
+                    </div>
+                </div>
+            </div>
+
+
+            <br><br><hr><br><br>
+
+            <div class="head hidden">
+                <div class="ctrl left">
+                    <p class="title">Complaints</p>
+                </div>
+                <div class="ctrl">
+                </div>
+                <div class="ctrl right">
+                    <div class="selectBar">
+                        <select name="" id="">
+                            <option value="">Up to Date</option>
+                            <option value="">Today</option>
+                            <option value="">This Week</option>
+                            <option value="">This Month</option>
+                            <option value="">This Year</option>
+                        </select>
+                    </div>
+                    <a href="" class="nav">
+                        <i class="fa-solid fa-download"></i>
+                        Export Report
+                    </a>
+                </div>
+            </div>
+             
+            <div class="section col hidden" style="gap: 0; padding: 0;">
+                <div class="section gap20" style="padding: 5px;">
+                    <div class="card keyPlain">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-hourglass"></i>
+                        </a>
+                        <p class="keyT">513</p>
+                        <p class="keyL">
+                            Pending Cases
+                        </p>
+                    </div>
+                    <div class="card keyPlain">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-check-circle"></i>
+                        </a>
+                        <p class="keyT">120</p>
+                        <p class="keyL">
+                            Unresolved
+                        </p>
+                    </div>
+                    <div class="card keyPlain">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-xmark-circle"></i>
+                        </a>
+                        <p class="keyT">489</p>
+                        <p class="keyL">
+                            Cancelled
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section col hidden" style="gap: 0; padding: 0;">
+                <div class="section gap20" style="padding: 5px;">
+                    <div class="card keyPlain">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-hourglass"></i>
+                        </a>
+                        <p class="keyT">513</p>
+                        <p class="keyL">
+                            Escalated
+                        </p>
+                    </div>
+                    <div class="card keyPlain">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-balance-scale"></i>
+                        </a>
+                        <p class="keyT">489</p>
+                        <p class="keyL" style="font-weight: 500;">
+                            Settled & Resolved
+                        </p>
+                    </div>
+                    <div class="card keyPlain abstractBG" style="background-color: var(--shade5);">
+                        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+                            <i class="fas fa-balance-scale"></i>
+                        </a>
+                        <p class="keyT" style="color: white;">489</p>
+                        <p class="keyL white" style="font-weight: 500;">
+                            Total on Record
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="section hidden">
+                    <iframe src="/complaintChart"></iframe>
+            </div>
+
+            
+        <div class="head hidden">
+            <div class="ctrl left">
+                <p class="title" style="line-height: 2em;">Total Records per Category</p>
+            </div>
+            <div class="ctrl right">
+                <div class="searchBar">
+                    <input type="search" id="univ"><i class="fas fa-search"></i>
+                </div>
+            </div>
+        </div>
+
+            <div class="section tableCard hidden">
+                <p class="p14" id="noRecords" style="display: none;">No Records</p>
+                <table id="dirTable">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(1)">Category</th>
+                            <th onclick="sortTable(2)">Total Record</th>
+                            <th onclick="sortTable(3)">Pending</th>
+                            <th onclick="sortTable(4)">Settled</th>
+                            <th onclick="sortTable(4)">Unsettled</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <td>Type of Case</td>
+                                <td>189</td>
+                                <td>30</td>
+                                <td>140</td>
+                                <td>19</td>
+                            </tr>
+                            <tr>
+                                <td>Type of Case</td>
+                                <td>189</td>
+                                <td>30</td>
+                                <td>140</td>
+                                <td>19</td>
+                            </tr>
+                            <tr>
+                                <td>Type of Case</td>
+                                <td>189</td>
+                                <td>30</td>
+                                <td>140</td>
+                                <td>19</td>
+                            </tr>
+                            <tr>
+                                <td>Type of Case</td>
+                                <td>189</td>
+                                <td>30</td>
+                                <td>140</td>
+                                <td>19</td>
+                            </tr>
+                            <tr>
+                                <td>Type of Case</td>
+                                <td>189</td>
+                                <td>30</td>
+                                <td>140</td>
+                                <td>19</td>
+                            </tr>
+                    </tbody>
+                </table>
+
+            <div class="sub">
+                <div class="ctrl left">
+                    <span id="totalRecords" class="totalRecords green" style="display: none;"></span>
+                </div>
+                <div class="ctrl right">
+                    <p>
+                        Display Per Page:
+                    </p>
+                    <div class="selectBar" style="width: 70px;"> 
+                        <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                            <option value="15">15</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="1000000000000">All</option>
+                        </select>
+                    </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+    </div>
+    <% } %>
+
+            
+    
+    </div>
+            
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 10) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "block";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+
+        if (searchInput.value.trim()) return;
+
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+<script>
+    // Ensure these variables always stringify to valid JSON.
+    // If 'ageGroups' is null/undefined from the server, it will default to an empty object {}.
+    const ageGroups = <%- JSON.stringify(ageGroups || {}) %>;
+    const totalPopulation = <%- JSON.stringify(totalPopulation || 0) %>; // Default to 0 for numbers
+    const ageGroupPercentages = <%- JSON.stringify(ageGroupPercentages || {}) %>; // Default to empty object for percentages
+
+    // Add console logs here to verify the data on the client-side
+    console.log("Client-side Data Check:");
+    console.log("ageGroups:", ageGroups);
+    console.log("totalPopulation:", totalPopulation);
+    console.log("ageGroupPercentages:", ageGroupPercentages);
+</script>
+
+    <!-- Your Chart.js initialization script (from your code) -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            try {
+                // Now, ageGroups, totalPopulation, and ageGroupPercentages
+                // are directly available because they were defined in the <script> block above.
+
+                // No need for a fetch call here as data is already provided by EJS.
+                // const response = await fetch("/api/age-distribution");
+                // const data = await response.json();
+
+                // Basic check for data presence (though it should be there if EJS passes it)
+                if (typeof ageGroups === 'undefined' || typeof totalPopulation === 'undefined') {
+                    console.error("Error: ageGroups or totalPopulation not found in client-side scope, check EJS data injection.");
+                    return;
+                }
+
+                // Prepare data for Chart.js
+                const labels = Object.keys(ageGroups);
+                const values = Object.values(ageGroups);
+                const maxPopulation = Math.max(...values);
+
+                // Get chart context
+                const canvas = document.getElementById('myBarChart');
+                if (!canvas) {
+                    console.warn("Canvas element with ID 'myBarChart' not found. Chart will not render.");
+                    return;
+                }
+                const ctx = canvas.getContext('2d');
+
+                // Create gradient for bars
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, "#285436"); // Dark green at the top
+                gradient.addColorStop(0.6, "#166c5b"); // Dark green at the top
+                gradient.addColorStop(1, "#083a3c"); // Lighter green at the bottom
+
+                // Create chart
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            // Label intentionally omitted as requested
+                            data: values,
+                            backgroundColor: gradient,
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            borderRadius: 12,
+                            hoverOffset: 10 // Slight expansion on hover
+                        }],
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                grid: { display: true },
+                                ticks: {
+                                    font: {
+                                        size: 10,
+                                        family: 'Poppins'
+                                    },
+                                    color: 'black'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: maxPopulation * 1.2,
+                                grid: { display: false },
+                                ticks: {
+                                    stepSize: Math.ceil(maxPopulation / 5)
+                                }
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false // Explicitly hide the legend
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.raw + " residents"; // Shows value + " residents"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error initializing chart:", error);
+            }
+        });
+    </script>
+
+        
+        </div>

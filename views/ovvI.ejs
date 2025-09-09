@@ -1,0 +1,261 @@
+<% layout('layout') %>
+
+
+
+
+<div class="height0">
+    <div class="ctrl left">
+        <p class="title">DOCUMENT SERVICES</p>
+    </div>
+    <div class="ctrl right">
+        <a href="/export-business" class="nav hidden">
+            <i class="fa-solid fa-download"></i>
+            Export Report
+        </a>
+    </div>
+</div>
+
+<div class="height0">
+    <div class="ctrl left">
+        <div class="selectBar hidden">
+            <select name="" id="">
+                <option value="">Filter by Purok</option>
+                <option value="">Dike Street</option>
+                <option value="">Cantarilla</option>
+                <option value="">Bagong Daan</option>
+                <option value="">Shortcut</option>
+                <option value="">Highway</option>
+                <option value="">Perigola</option>
+            </select>
+        </div>
+    </div>
+    <div class="ctrl">
+        <p class="title">Barangay Indigency</p>
+    </div>
+    <div class="ctrl right">
+        <div class="searchBar">
+            <input type="search" id="univ">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+</div>
+
+<div class="main bgSoft borderRadius10 height70">
+
+
+    <div class="section tableCard">
+        <p class="p14" id="noRecords" style="display: none;">No Records</p>
+        <table id="dirTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(4)" style="width: 15%;">Request At</th>
+                    <th onclick="sortTable(1)" style="width: 25%;">Requested By</th>
+                    <th onclick="sortTable(2)">Qty</th>
+                    <th onclick="sortTable(3)" style="width: 15%;">Transaction Status</th>
+                    <th onclick="sortTable(5)" class="thCtrl">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            <% if (requests && requests.length > 0) { %>
+                <% requests.forEach(request => { %>
+                    <% 
+                        // Check if the request has at least one document with type 'Barangay Clearance'
+                        const hasBarangayClearance = request.documents && request.documents.some(doc => doc.type === 'Barangay Indigency');
+                    %>
+            
+                    <% if (hasBarangayClearance) { %>
+                        <tr>
+                            <td>
+                                <%= new Date(request.createdAt).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: '2-digit' 
+                                }) + ' • ' + new Date(request.createdAt).toLocaleTimeString('en-US', { 
+                                    hour: 'numeric', 
+                                    minute: '2-digit', 
+                                    hour12: true 
+                                }) %>
+                            </td>                            
+                            <td>
+                                <div class="height0 width0 justifyStart gap5">
+                                    <img src="<%= request.resident && request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" 
+                                         alt="" class="h25 w25 borderRadius500 borderPrimary">
+                                    <%= request.resident ? `${request.resident.firstName} ${request.resident.middleName || ''} ${request.resident.lastName} ${request.resident.extName || ''}` : 'Unknown' %>
+                                </div>
+                            </td>
+                            <td>
+                                <% 
+                                    let totalQty = 0;
+                                    request.documents.forEach(doc => {
+                                        if (doc.type === "Barangay Indigency") {
+                                            totalQty += doc.qty;
+                                        }
+                                    });
+                                %>
+                            
+                                <% if (totalQty > 0) { %>
+                                    <p><%= totalQty %> Copies</p>
+                                <% } else { %>
+                                    <p>No Barangay Indigency requested</p>
+                                <% } %>
+                            </td>
+                                                                                  
+                            <td><%= request.status %></td>
+                            <td class="tdCtrl">
+                                <a href="/srvView/<%= request._id %>" class="nav"><i class="fas fa-eye"></i> &nbsp; Details</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% }); %>
+            <% } %>
+            
+            <% 
+                // If no requests with Barangay Clearance were found, show a message
+                const filteredRequests = requests.filter(request => request.documents.some(doc => doc.type === 'Barangay Indigency'));
+                if (filteredRequests.length === 0) { 
+            %>
+                <tr>
+                    <td colspan="5">No requests found with Requested Barangay Indigency.</td>
+                </tr>
+            <% } %>
+            
+            </tbody>
+        </table>
+
+    
+</div>
+
+<script>
+function enforceNumericInput(event) {
+    event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInputs = document.querySelectorAll('.phone');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', enforceNumericInput);
+    });
+});
+</script>
+
+<script>document.addEventListener("DOMContentLoaded", function() {
+const dirTable = document.getElementById("dirTable");
+const tableBody = dirTable.getElementsByTagName("tbody")[0];
+const paginationContainer = document.getElementById("pagination");
+const rowsPerPageSelect = document.getElementById("rowsPerPage");
+const totalRecordsLabel = document.getElementById("totalRecords");
+const searchInput = document.getElementById("univ");
+const noRecordsMessage = document.getElementById("noRecords");
+const subDiv = document.querySelector(".sub");
+
+let currentPage = 1;
+let rowsPerPage = parseInt(rowsPerPageSelect.value);
+let allRows = Array.from(tableBody.rows);
+let filteredRows = allRows;
+
+function renderTable() {
+const start = (currentPage - 1) * rowsPerPage;
+const end = start + rowsPerPage;
+
+if (filteredRows.length === 0) {
+    dirTable.style.display = "none";
+    noRecordsMessage.style.display = "block";
+} else {
+    dirTable.style.display = "table";
+    noRecordsMessage.style.display = "none";
+}
+
+if (filteredRows.length <= 5) {
+    subDiv.style.display = "none";
+} else {
+    subDiv.style.display = "flex";
+}
+
+allRows.forEach(row => (row.style.display = "none"));
+filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+renderPagination(filteredRows.length);
+}
+
+function renderPagination(totalRows) {
+paginationContainer.innerHTML = "";
+
+if (searchInput.value.trim()) return;
+
+const totalPages = Math.ceil(totalRows / rowsPerPage);
+if (totalPages <= 1) return;
+
+const prevButton = document.createElement("button");
+prevButton.innerHTML = "« Previous";
+prevButton.disabled = currentPage === 1;
+prevButton.onclick = () => {
+    currentPage--;
+    renderTable();
+};
+paginationContainer.appendChild(prevButton);
+
+for (let i = 1; i <= totalPages; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.innerHTML = i;
+    pageButton.className = i === currentPage ? "active" : "";
+    pageButton.onclick = () => {
+        currentPage = i;
+        renderTable();
+    };
+    paginationContainer.appendChild(pageButton);
+}
+
+const nextButton = document.createElement("button");
+nextButton.innerHTML = "Next »";
+nextButton.disabled = currentPage === totalPages;
+nextButton.onclick = () => {
+    currentPage++;
+    renderTable();
+};
+paginationContainer.appendChild(nextButton);
+}
+
+function updateRowsPerPage() {
+rowsPerPage = parseInt(rowsPerPageSelect.value);
+currentPage = 1;
+renderTable();
+}
+
+function searchTable() {
+const query = searchInput.value.toLowerCase().trim();
+filteredRows = allRows.filter(row =>
+    Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+);
+
+currentPage = 1;
+rowsPerPageSelect.style.display = query ? "none" : "block";
+renderTable();
+}
+
+rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+searchInput.addEventListener("input", searchTable);
+renderTable();
+});
+</script>
+</div>
+<div class="sub row flex">
+    <div class="ctrl left height0 width50">
+        <span id="totalRecords" class="totalRecords green"></span>
+    </div>
+    <div class="ctrl right height0 width50">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>

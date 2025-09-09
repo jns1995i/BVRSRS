@@ -1,0 +1,580 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .card.keyPlain {
+                position: relative;
+                align-items: center;
+                padding: 20px;
+                height: 150px;
+                width: 400px;
+                justify-content: center;
+                gap: 5px;
+            }
+
+            .graphIcon {
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                color: var(--shade1);
+                border: none;
+            }
+            .modifyIcon {
+                color: var(--shade1);
+                padding: 5px;
+                width: auto;
+                max-width: none;
+                border-radius: 8px;
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.5vw;
+                font-weight: 500;
+                color: white;
+            }
+            .keyL {
+                font-size: 1.2vw;
+                font-weight: 400;
+                line-height: 1.5vw;
+                color: white;
+            }
+            .tbl {
+                height: 28vw;
+                gap: 10px;
+            }
+            .card.keyLarge {
+                justify-content: start;
+                align-items: start;
+                padding: 1.5vw;
+                flex-direction: column;
+                box-shadow: none;
+            }
+            .gapX {
+                gap: 20px;
+            }
+            iframe {
+                width: 100%;
+                height: 320px;
+                background-color: white;
+                border-radius: 20px;
+                box-shadow: var(--shadow);
+                border: none;
+                padding: 10px;
+            }
+            .softX {
+                box-shadow: var(--softShadow);
+                height: auto;
+            }
+            .pie {
+                height: 250px;
+                width: 250px;
+                padding: 0;
+            }
+            .pieFrame {
+                width: 100%;
+                height: 100%;
+                background-color: white;
+                border-radius: none;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                overflow-y: hidden;
+                overflow-x: hidden;
+            }
+            table {
+                box-shadow: none;
+            }
+            td {
+                font-size: 14px;
+                font-weight: 500;
+            }
+            .mainf {
+                border-radius: 0;
+            }
+            .card.key.grandTotal {
+                background-color: var(--shade6);
+            }
+            .mainf {
+                position: relative;
+            }
+            .editHtl {
+                position: absolute;
+                z-index: 50;
+                height: auto;
+                width: 25%;
+                flex-direction: column;
+                padding: 0;
+                background-color: rgba(255, 255, 255, 0.142);
+                display: none;
+            }
+        </style>
+    </head>
+
+<div class="gap10 rowReverse">
+    <div class="width25 col padding20 gap20 bgSoft borderRadius10 justifyStart">
+        <% hotlineData.forEach(function(hotline) { %>        
+                    <% if (["City Health Office", "PNP Cabanatuan", "BFP Cabanatuan", "CDRRMO"].includes(hotline.office)) { %>
+                        <div class="card keyPlain white
+                            <% if (hotline.office === 'City Health Office') { %>
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                witch
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                witch
+                            <% } %>
+                             abstractBG col" style="width: 100% !important; align-items: start; justify-content: space-between; padding: 30px !important">
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas 
+                            <% if (hotline.office === 'City Health Office') { %>
+                                fa-heartbeat
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                fa-shield-alt
+                            <% } else if (hotline.office === 'BFP Cabanatuan') { %>
+                                fa-fire-extinguisher
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                fa-cloud-showers-heavy
+                            <% } %>
+                            "></i></a>
+                            <p class="size20 str400 marginBottom10"><%= hotline.office %></p>
+                            <div class="height0 col alignStart">
+                                <p class="size16 str300"><%= hotline.phone1 %></p>
+                                <p class="size16 str300"><%= hotline.phone2 %></p>
+                            </div>
+                        </div>
+                    <% } %>
+        <% }); %>
+    </div>
+    <div class="width75 col">
+        <% hotlineData.forEach(function(hotline) { %>
+        <div id="editFormContainer<%= hotline._id %>" class=" borderRadius20 unseen">
+            <form action="/update-hotline/<%= hotline._id %>" method="POST" class="justifyStart flex alignStart width30">
+                <p class="title">UPDATE HOTLINE</p>
+                <br>
+
+                <!-- Office -->
+                <label for="office<%= hotline._id %>">Office</label>
+                <input type="text" id="office<%= hotline._id %>" name="office" value="<%= hotline.office %>" required>
+                <br>
+
+                <!-- Phone Numbers -->
+                <label for="phone1<%= hotline._id %>">Primary Phone</label>
+                <input type="text" id="phone1<%= hotline._id %>" name="phone1" value="<%= hotline.phone1 %>" required>
+                <br>
+
+                <label for="phone2<%= hotline._id %>">Secondary Phone</label>
+                <input type="text" id="phone2<%= hotline._id %>" name="phone2" value="<%= hotline.phone2 %>">
+                <br>
+
+                <input type="hidden" id="phone3<%= hotline._id %>" name="phone3" value="<%= hotline.phone3 %>">
+
+                <input type="hidden" id="email<%= hotline._id %>" name="email" value="<%= hotline.email %>">
+
+                <input type="hidden" id="web<%= hotline._id %>" name="web" value="<%= hotline.web %>">
+                <br>
+                <div class="height0 gap5 justifyBetween">
+                    <button type="button" class="nav" onclick="closeEditForm('<%= hotline._id %>')">Cancel</button>
+                    <button type="submit" class="nav pnav">Update Hotline</button>
+                </div>
+            </form>
+        </div>
+    <% }); %>
+
+      
+  
+    <div class="unseen height80 borderRadius20 transparent" id="newHtl">
+        <form action="/add-hotline" method="POST" class="flex borderRadius20 width30 height80">
+            <div class="col flex gap20">
+                <div class="field">
+                    <p class="p18 str500 green">New Contact</p>
+                </div>
+                <div class="field">
+                    <label for="">Name of Office or Agency</label>
+                    <input type="text" placeholder="e.g. City Assessor's Office" name="office" id="office" required>
+                    <div id="exist" class="hidden width0 marginLeft5" style="color: red;"></div>
+                </div>
+                <div class="field">
+                    <label for="">Primary Number</label>
+                    <input type="text" inputmode="numeric" class="phone" placeholder="Enter mobile or telephone number" name="phone1" required>
+                </div>
+                <div class="field">
+                    <label for="">Secondary Number</label>
+                    <input type="text" inputmode="numeric" class="phone" placeholder="Enter mobile or telephone number" name="phone2">
+                </div>
+                <div class="field hidden">
+                    <input type="email" placeholder="Email" name="email">
+                </div>
+                <div class="field hidden">
+                    <input type="text" placeholder="Website" name="web">
+                </div>
+                <div class="height0">
+                    <button class="nav fnav pnav" type="submit">Add</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const office = document.getElementById("office");
+        const existMessage = document.getElementById("exist");
+
+        async function checkCaseNumberExistence() {
+            const officeValue = office.value.trim();
+
+            if (!officeValue) {
+                existMessage.classList.add("hidden");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/check-office?office=${encodeURIComponent(officeValue)}`);
+                const data = await response.json();
+
+                if (data.exists) {
+                    existMessage.textContent = "Already Exist!";
+                    existMessage.classList.remove("hidden");
+                } else {
+                    existMessage.classList.add("hidden");
+                }
+            } catch (error) {
+                console.error("Error checking office name:", error);
+            }
+        }
+
+        office.addEventListener("input", checkCaseNumberExistence);
+    });
+</script>
+
+
+    <div class="height0 aqua abstractBG padding20 borderRadius15 col alignStart">
+        <a href="" class="nav cnav disabled marginBottom15 absolute right30 bottom0" style="opacity: 0.1; transform: scale(3.8);"><i class="fas fa-phone"></i></a>
+        <p class="size16 str400 white">List of Essential &</p>
+        <p class="size34 str400 white">Emergency Hotlines</p>
+        <div class="height0 gap5 width0 marginTop5">
+                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                    <a href="javascript:void()" id="toggleButtonH" class="nav borderNone paddingBlock10 borderRadius10"><i class="fas fa-plus"></i>New Record</a>
+                <a href="/export-hotline" class="nav paddingBlock10 borderRadius10">
+                    <i class="fa-solid fa-download"></i>
+                    Export Copy
+                </a>    
+                <% } %>
+                <div class="searchBar absolute right25 top20">
+                    <input type="search" id="univ">
+                    <i class="fas fa-search"></i>
+                </div>
+        </div>
+    </div>
+    <br>
+
+        <div class="main bgSoft borderRadius10 height65">
+                <script>
+                    function editHotline(id, office, phone1, phone2, phone3, email, web) {
+                        // Populate the form fields with the hotline data
+                        document.getElementById("office" + id).value = office;
+                        document.getElementById("phone1" + id).value = phone1;
+                        document.getElementById("phone2" + id).value = phone2;
+                        document.getElementById("phone3" + id).value = phone3;
+                        document.getElementById("email" + id).value = email;
+                        document.getElementById("web" + id).value = web;
+                
+                        // Show the form by adding 'seen' and removing 'unseen'
+                        document.getElementById("editFormContainer" + id).classList.remove('unseen');
+                        document.getElementById("editFormContainer" + id).classList.add('seen');
+                    }
+                
+                    // Function to close the edit form
+                    function closeEditForm(id) {
+                        // Hide the form by adding 'unseen' and removing 'seen'
+                        document.getElementById("editFormContainer" + id).classList.remove('seen');
+                        document.getElementById("editFormContainer" + id).classList.add('unseen');
+                    }
+                </script>
+    <div class="section tableCard borderRadius10" style="padding: 0;">
+        <p class="p14" id="noRecords" style="display: none;">No Records</p>
+    <table id="dirTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Office/Agency</th>
+                <th onclick="sortTable(1)">Contact No.</th>
+                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                <th onclick="sortTable(5)" class="thCtrl">Action</th>
+                <% } %>
+            </tr>
+        </thead>
+        <tbody>
+            <% hotlineData.forEach(function(hotline) { %>
+                <tr>
+                    <td class="str600"><%= hotline.office %></td>
+                    <td class="str500">
+                        <%= hotline.phone1 %>
+                        <%= hotline.phone1 && hotline.phone2 ? ', ' + hotline.phone2 : hotline.phone2 || '' %>
+                        <%= (hotline.phone2 || hotline.phone1) && hotline.phone3 ? ', ' + hotline.phone3 : hotline.phone3 || '' %>
+                    </td>
+                    <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+                    <td class="tdCtrl gap10">
+                        <a href="javascript:void(0);" class="nav" onclick="editHotline('<%= hotline._id %>', '<%= hotline.office %>', '<%= hotline.phone1 %>', '<%= hotline.phone2 %>', '<%= hotline.phone3 %>', '<%= hotline.email %>', '<%= hotline.web %>')">
+                            <i class="fas fa-edit"></i> Update
+                        </a>
+                        <a href="javascript:void(0)" onclick="confirmArchive('<%= hotline._id %>')" class="nav dnav-fill">
+                            <i class="fas fa-trash"></i> Trash
+                        </a>                        
+                    </td>
+                    <% } %>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+<script>
+    function confirmArchive(hotlineId) {
+        // Ask for confirmation before archiving the hotline
+        const confirmation = confirm("Are you sure you want to archive this hotline?");
+        
+        if (confirmation) {
+            // If the user confirmed, redirect to the archive route
+            window.location.href = '/archive-htl/' + hotlineId;
+        } else {
+            // If the user canceled, do nothing
+            return;
+        }
+    }
+</script>
+
+    </div>
+<div class="sub">
+    <div class="ctrl left">
+        <span id="totalRecords" class="totalRecords green"></span>
+    </div>
+    <div class="ctrl right">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+</div>
+</div>
+     
+    <script>
+        const newHtl = document.getElementById('newHtl');
+        const toggleButtonH = document.getElementById('toggleButtonH');
+        
+        toggleButtonH.addEventListener('click', (e) => {
+            e.preventDefault();
+        
+            // Toggle between unseen and seen states
+            if (newHtl.classList.contains('unseen')) {
+                newHtl.classList.remove('unseen');
+                newHtl.classList.add('seen');
+                toggleButtonH.innerHTML = '<i class="fa fa-times"></i> Close Form';
+            } else {
+                newHtl.classList.remove('seen');
+                newHtl.classList.add('unseen');
+                toggleButtonH.innerHTML = '<i class="fa fa-plus"></i> New Contact';
+            }
+        });
+    </script>
+    
+
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+ 
+function renderPagination(totalRows) {
+    paginationContainer.innerHTML = "";
+
+    if (searchInput.value.trim()) return;
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "« Previous";
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        currentPage--;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // --- New Logic for displaying a limited number of page buttons ---
+
+    // Display all buttons if total pages are 7 or less
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+                renderPagination(totalRows);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    } else { // Display condensed pagination for more than 7 pages
+        const startPages = [1, 2, 3];
+        const endPages = [totalPages - 2, totalPages - 1, totalPages];
+        const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+
+        // Function to create a page button
+        const createPageButton = (page, isEllipsis = false) => {
+            const btn = document.createElement("button");
+            btn.innerHTML = isEllipsis ? "..." : page;
+            btn.disabled = isEllipsis;
+            if (!isEllipsis) {
+                btn.className = page === currentPage ? "active" : "";
+                btn.onclick = () => {
+                    currentPage = page;
+                    renderTable();
+                    renderPagination(totalRows);
+                };
+            }
+            return btn;
+        };
+
+        // Add first pages
+        for (const page of startPages) {
+            if (page <= totalPages) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+        
+        // Add ellipsis if current page is not near the start
+        if (currentPage > 4) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add middle pages (current page and its neighbors)
+        if (currentPage > 3 && currentPage < totalPages - 2) {
+            for (const page of middlePages) {
+                if (page > 0 && page <= totalPages) {
+                    paginationContainer.appendChild(createPageButton(page));
+                }
+            }
+        }
+
+        // Add ellipsis if current page is not near the end
+        if (currentPage < totalPages - 3) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add last pages
+        for (const page of endPages) {
+            if (page > 3) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+    }
+
+    // Next Button
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next »";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        currentPage++;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        //rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+
+        
+        </div>

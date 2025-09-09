@@ -1,0 +1,1520 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+                display: flex;
+            }
+            .resetPassCard, .newAccCard, .suspendCard {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                z-index: 50;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .resetCard, .newCard, .suspend {
+                width: 500px;
+                height: 450px;
+                background-color: white;
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+            }
+            .block.s {
+                width: 15%;
+                height: auto;
+                flex-direction: column;
+                justify-content: start;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 50px 150px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: start;
+                justify-items: start;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                position: absolute;
+                bottom: 0;
+                right: 38px;
+                z-index: 50;
+                flex-direction: column-reverse;
+                height: 100%;
+                gap: 10px;
+                width: 15%;
+                align-items: center;
+                justify-content: space-between;
+                padding-block: 20px;
+            }
+            .docHead .ctrl {
+                height: auto;
+                padding: 0;
+                width: 100%;
+                flex-direction: column;
+            }
+            .docHead .ctrl.right {
+                flex-direction: row;
+            }
+            .docHead .ctrl.left .nav {
+                width: 100%
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 60px;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            .userPhoto {
+                height: 100px;
+                width: 100px;
+                outline: 1px solid lightgray;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            .headCtrl {
+                padding: 5px;
+            }
+            .headCtrl .ctrl {
+                width: 97.5%;
+                border-radius: 0.5vw;
+            }
+            .certContent {
+                position: absolute;
+                z-index: 50;
+                left: 10px;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: auto;
+                padding: 15px;
+                width: 18%;
+            }
+            .certTA, .certTA:hover, .certTA:focus {
+                height: calc(38 * 1em);
+            }
+            .seen {
+                padding: 30px;
+                height: 200px;
+                max-height: 200px;
+            }
+        </style>
+    </head>
+
+    <div class="resetPassCard" id="resetPassCard" style="display: none;">
+        <div class="resetCard col">
+            <p class="P40"><i class="fas fa-warning" style="font-size: 60px;"></i></p>
+            <p class="p40">WARNING!</p>
+            <p class="p16 str500">This action cannot be undone!</p>
+            <br>
+            <p class="p10 str400">The user will receive a new password.</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmReset" data-id="<%= resident._id %>">Reset Password</a>
+                <a href="#" class="nav fnav" id="closeResetCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="suspendCard" id="suspendCard" style="display: none;">
+        <div class="suspend col padding30">
+            <p class="P40"><i class="fas fa-archive" style="font-size: 60px;"></i></p>
+            <p class="p40">OH NO!</p>
+            <p class="p16 str500 textCenter">Are you sure you want to suspend this user?</p>
+            <br>
+            <p class="p10 str400">This action cannot be undone!</p>
+            <br>
+            <div class="section col">
+                <a href="#" class="nav pnav fnav" id="confirmSuspend" data-id="<%= resident._id %>">Suspend</a>
+                <a href="#" class="nav fnav" id="closeSuspendCard">Cancel</a>
+            </div>
+        </div>
+    </div>
+
+        <div class="main height100">
+
+            <div class="head headCtrl">
+                <div class="ctrl">
+                    <a href="javascript:void()" class="nav docBtn" id="doc1Btn">
+                        <i class="fas fa-home"></i>
+                        Clearance
+                    </a>
+                    <a href="javascript:void()" class="nav docBtn" id="doc2Btn">
+                        <i class="fas fa-hands-helping"></i>
+                        Indigency
+                    </a>
+                    <a href="javascript:void()" class="nav docBtn" id="doc5Btn">
+                        <i class="fas fa-pen"></i>
+                        Customize Certification
+                    </a>
+                    <a href="javascript:void()" class="nav docBtn" id="doc3Btn">
+                        <i class="fas fa-location-dot"></i>
+                        Residency
+                    </a>
+                    <a href="javascript:void()" class="nav docBtn" id="doc4Btn">
+                        <i class="fas fa-user"></i>
+                        Good Moral
+                    </a>
+                </div>
+            </div>
+            <div class="block col" id="trayCard" style="position: relative;">
+                <div class="card col tray" style="padding: 20px;">
+                    <div class="height0 abstractBG col padding20 index0 borderRadius20 relative">
+                        <a href="javascript:history.back()" class="nav index10" style="position: absolute; left: 20px; top: 20px;">
+                            <i class="fas fa-chevron-left"></i>
+                            Previous
+                        </a>
+                        <div class="section relative">
+                            <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="User Photo" class="userPhoto">
+                        </div>                
+                        <div class="head userH">
+                            <div class="ctrl">
+                                <p class="p20 str500 white"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section" style="align-items: start;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td>Position</td>
+                                    <td class="str"><%= resident.position || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Address</td>
+                                    <td class="str"><%= resident.houseNo || "" %> <%= resident.purok || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Age</td>
+                                    <td class="str"><%= calculateAge(resident.bDay, resident.bMonth, resident.bYear) %> Years Old</td>
+                                </tr>
+                                <tr>
+                                    <td>Birthday</td>
+                                    <td class="str"><%= resident.bMonth %> <%= resident.bDay %>, <%= resident.bYear %></td>
+                                </tr>
+                                <tr>
+                                    <td>Birth Place</td>
+                                    <td class="str"><%= resident.birthPlace || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Gender</td>
+                                    <td class="str"><%= resident.gender || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Civil Status</td>
+                                    <td class="str"><%= resident.civilStatus || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Priority</td>
+                                    <td class="str"><%= resident.priority || "Not a Member" %> <%= resident.priorityType || "" %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Family Role</td>
+                                    <td class="str"><%= resident.role || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Precinct</td>
+                                    <td class="str"><%= resident.precinct || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Contact</td>
+                                    <td class="str"><%= resident.phone || "N" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td class="str"><%= resident.email || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="border: none;">
+                                        <span class="str" style="font-size: 12px;">Community Tax Certificate: </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>CTC No.</td>
+                                    <td class="str"><%= resident.ctcNo || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Issued Date</td>
+                                    <td class="str"><%= resident.ctcDate || "" %></td>
+                                </tr>
+                                <tr>
+                                    <td>Issued At</td>
+                                    <td class="str"><%= resident.ctcLoc || "" %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section tableCard">
+                        <div class="sub">
+                            <div class="ctrl left">
+                                <span id="totalRecords" class="totalRecords green"></span>
+                            </div>
+                            <div class="ctrl right hidden">
+                                <p>
+                                    Display Per Page:
+                                </p>
+                                <div class="selectBar" style="width: 70px;"> 
+                                    <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                                        <option value="10">10</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="1000000000000">All</option>
+                                    </select>
+                                </div>
+                                <div class="pagination" id="pagination"></div>
+                            </div>
+                        </div>
+                        <table id="dirTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)" style="width: 15%;">Case No.</th>
+                                    <th onclick="sortTable(1)">Type</th>
+                                    <th onclick="sortTable(2)" style="width: 30%;">Complainant</th>
+                                    <th onclick="sortTable(4)" style="width: 30%;">Complainee</th>
+                                    <th onclick="sortTable(4)">Date Filed</th>
+                                    <th onclick="sortTable(0)">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>013256</td>
+                                    <td>Physical Injury</td>
+                                    <td>Santiago, John Ferry Niebre</td>
+                                    <td>Santiago, John Ferry Niebre</td>
+                                    <td>Pending</td>
+                                    <td>
+                                        <a href="../views/viewCmp.html" class="nav">
+                                            <i class="fas fa-eye"></i>
+                                            Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+        
+                    
+            </div>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc1">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                        <div class="selectBar" id="purpose">
+                            <select name="" id="purposeSelect" style="min-height: 40px;">
+                                <option value="">Select Purpose</option>
+                                <option value="ANY LEGAL">ANY LEGAL</option>
+                                <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                <option value="BOARD EXAM">BOARD EXAM</option>
+                                <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                <option value="LCR">LCR</option>
+                                <option value="LEGALIZATION">LEGALIZATION</option>
+                                <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                <option value="PHILHEALTH">PHILHEALTH</option>
+                                <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                <option value="PRIME WATER">PRIME WATER</option>
+                                <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                <option value="XXX">XXX</option>
+                            </select>
+                        </div>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('clearance')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('clearance')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('clearance')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="clearance" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div>
+                            <div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">BARANGAY CLEARANCE</p>
+                                <br>
+                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that 
+                                    <span class="paragStr"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></span>, 
+                                    <% const age = calculateAge(resident.bDay, resident.bMonth, resident.bYear); %>
+                                    <%= age >= 18 ? "of Legal Age" : age + " Years Old" %>
+                                     , <span class="paragStr"><%= resident.civilStatus %></span>, is a bonifide resident of this barangay with permanent address at <span class="paragStr">
+                                    <%= resident.houseNo %> <%= resident.purok %>
+                                    , Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag">That the above-mentioned has <span class="paragStr blue">NO DEROGATORY RECORD</span> on file in this office as of this date.</p>
+                                    <br>
+                                    <p class="p10 parag">This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef"></span> Reference Purpose only.</p>
+                                    <br>
+                                    <p class="p10 parag">Given this <span class="paragStr thisDay" id=""></span> day of <span class="paragStr thisMonth" id=""></span>, <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City with his/her Community Tax Certificate No. CCI2017 25788065 issued at Cabanatuan City.</p>
+                                <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr  txtStr" style="width: 50%; justify-content: start;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                
+                                <div class="section col" style="align-items: start; gap: 0;">
+                                    <p class="p12 tnr txtStr" style="width: 45%; justify-content: start;">APPROVED BY:</p>
+                                    <br><br><br>
+                                    <p class="p10 tnr txtStr blue" style="width: 55%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 55%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            
+
+            <div class="block col hidden" id="doc2">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                        <div class="selectBar" id="purpose2">
+                            <select name="" id="purposeSelect2" style="min-height: 40px;">
+                                <option value="">Select Purpose</option>
+                                <option value="ANY LEGAL">ANY LEGAL</option>
+                                <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                <option value="BOARD EXAM">BOARD EXAM</option>
+                                <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                <option value="LCR">LCR</option>
+                                <option value="LEGALIZATION">LEGALIZATION</option>
+                                <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                <option value="PHILHEALTH">PHILHEALTH</option>
+                                <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                <option value="PRIME WATER">PRIME WATER</option>
+                                <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                <option value="XXX">XXX</option>
+                            </select>
+                        </div>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('Indigency')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('Indigency')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('Indigency')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="Indigency" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div>
+                            <div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">CERTIFICATE OF INDIGENCY</p>
+                                <br>
+                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that 
+                                    <span class="paragStr"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></span>,
+                                    <%= age >= 18 ? "of Legal Age" : age + " Years Old" %>
+                                     , <span class="paragStr"><%= resident.civilStatus %></span>, is a bonifide resident of this barangay with permanent address at <span class="paragStr">
+                                    <%= resident.houseNo %> <%= resident.purok %>
+                                    , Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag">THIS IS TO CERTIFY ALSO that the name mentioned above is a member of an <span class="paragStr blue">INDIGENT FAMILY</span> of this barangay.</p>
+                                    <br>
+                                    <p class="p10 parag">This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef2"></span> Reference Purpose only.</p>
+                                    <br>
+                                    <p class="p10 parag">Given this <span class="paragStr thisDay" id=""></span> day of <span class="paragStr thisMonth" id=""></span>, <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City.</p>
+                                <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr  txtStr" style="width: 50%; justify-content: start;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                
+                                <div class="section col" style="align-items: start; gap: 0;">
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: start;">APPROVED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr blue" style="width: 55%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 55%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc3">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                        <div class="selectBar" id="purpose2">
+                            <select name="" id="purposeSelect3" style="min-height: 40px;">
+                                <option value="">Select Purpose</option>
+                                <option value="ANY LEGAL">ANY LEGAL</option>
+                                <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                <option value="BOARD EXAM">BOARD EXAM</option>
+                                <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                <option value="LCR">LCR</option>
+                                <option value="LEGALIZATION">LEGALIZATION</option>
+                                <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                <option value="PHILHEALTH">PHILHEALTH</option>
+                                <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                <option value="PRIME WATER">PRIME WATER</option>
+                                <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                <option value="XXX">XXX</option>
+                            </select>
+                        </div>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('resid')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('resid')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('resid')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="resid" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="./images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div><div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    BARANGAY CERTIFICATE OF RESIDENCY
+                                </p>
+                                <br>
+                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that <span class="paragStr"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></span>, <span class="paragStr">
+                                    <%= calculateAge(resident.bDay, resident.bMonth, resident.bYear) %> Year Old, born on 
+                                    <span class="paragStr"><%= resident.bMonth %> <%= resident.bDay %>, <%= resident.bYear %></span>,
+                                     is a bonifide resident of this barangay with permanent address at 
+                                     <span class="paragStr"><%= resident.houseNo %> <%= resident.purok %>, Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag">This certification is issued upon request of the subject for <span class="paragStr blue" id="purposeRef3"></span> Reference Purpose only.</p>
+                                    <br>
+                                    <p class="p10 parag">Given this <span class="paragStr thisDay" id=""></span> day of <span class="paragStr thisMonth" id=""></span>, <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City.</p>
+                                <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr  txtStr" style="width: 50%; justify-content: start;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                
+                                <div class="section col" style="align-items: start; gap: 0;">
+                                    <p class="p12 tnr txtStr" style="width: 45%; justify-content: start;">APPROVED BY:</p>
+                                    <br><br><br>
+                                    <p class="p10 tnr txtStr blue" style="width: 55%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 55%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc4">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                        <div class="selectBar" id="purpose2">
+                            <select name="" id="purposeSelect4" style="min-height: 40px;">
+                                <option value="">Select Purpose</option>
+                                <option value="ANY LEGAL">ANY LEGAL</option>
+                                <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                <option value="BOARD EXAM">BOARD EXAM</option>
+                                <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                <option value="LCR">LCR</option>
+                                <option value="LEGALIZATION">LEGALIZATION</option>
+                                <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                <option value="PHILHEALTH">PHILHEALTH</option>
+                                <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                <option value="PRIME WATER">PRIME WATER</option>
+                                <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                <option value="XXX">XXX</option>
+                            </select>
+                        </div>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('moral')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('moral')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('moral')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="moral" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div><div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    GOOD MORAL CERTIFICATE
+                                </p>
+                                <br>
+                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that 
+                                    <span class="paragStr"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></span>,
+                                    <%= age >= 18 ? "of Legal Age" : age + " Years Old" %>
+                                     , <span class="paragStr"><%= resident.civilStatus %></span>, is a bonifide resident of this barangay with permanent address at <span class="paragStr">
+                                    <%= resident.houseNo %> <%= resident.purok %>
+                                    , Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">That the above mentioned has known to me as a good person with a <span class="paragStr">GOOD MORAL CHARACTER and NO DEROGATORY RECORD</span> on file in this office as of this date. </p>
+                                    <br>
+                                    <p class="p10 parag">This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef4"></span> Reference Purpose only.</p>
+                                    <br>
+                                    <p class="p10 parag">Given this <span class="paragStr thisDay" id=""></span> day of <span class="paragStr thisMonth" id=""></span>, <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City.</p>
+                                <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr  txtStr" style="width: 50%; justify-content: start;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                
+                                <div class="section col" style="align-items: start; gap: 0;">
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: start;">APPROVED BY:</p>
+                                    <br><br><br>
+                                    <p class="p10 tnr txtStr blue" style="width: 55%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 55%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            <div class="block col hidden" id="doc5">
+                <div class="head docHead">
+                    <div class="ctrl left">
+                        <textarea name="" id="certContent" class="certTA" placeholder="Type here the content of the Certification"></textarea>
+                        <div class="selectBar" id="purpose2">
+                            <select name="" id="purposeSelect5" style="min-height: 40px;">
+                                <option value="">Select Purpose</option>
+                                <option value="ANY LEGAL">ANY LEGAL</option>
+                                <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                <option value="BOARD EXAM">BOARD EXAM</option>
+                                <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                <option value="LCR">LCR</option>
+                                <option value="LEGALIZATION">LEGALIZATION</option>
+                                <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                <option value="PHILHEALTH">PHILHEALTH</option>
+                                <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                <option value="PRIME WATER">PRIME WATER</option>
+                                <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                <option value="XXX">XXX</option>
+                            </select>
+                        </div>
+                        <a href="#" class="nav" onclick="printDiv()">
+                            <i class="fas fa-print"></i>
+                            Print Document
+                        </a>
+                    </div>
+                    <div class="ctrl right">
+                        <a href="#" class="nav cnav" onclick="zoomIn('cus')">
+                            <i class="bi bi-zoom-in"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="zoomOut('cus')">
+                            <i class="bi bi-zoom-out"></i>
+                        </a>
+                        <a href="#" class="nav cnav" onclick="resetZoom('cus')">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <section class="certContent">
+                </section>
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage" id="cus" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div><div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p18 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    PAGPAPATUNAY
+                                </p>
+                                <br>
+                                <p class="p10 tnr">PARA SA KINAUUKULAN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">Ito ang pagpapatunay na si <span class="paragStr"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></span>
+                                        , <%= calculateAge(resident.bDay, resident.bMonth, resident.bYear) %> taong gulang, ay lehitimong mamamayan ng aming Barangay na kasalukuyang nakatira sa 
+                                        <span class="paragStr"><%= resident.houseNo %> <%= resident.purok %>, Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag certContentM" id="certContentM"></p>
+                                    <br>
+                                    <p class="p10 parag">Ang pagapatunay na ito ay ginawa sa kahilingan ng nabanggit para sa anumang pangangailangan.
+                                    <br>
+                                    <p class="p10 parag">Ginawa ngayong ika-<span class="paragStr thisDay2" id=""></span> ng <span class="paragStr thisMonth2" id=""></span>, taong <span class="paragStr thisYear" id=""></span>.</p>
+                                <br>
+                                <div class="section col" style="align-items: end; gap: 0;">
+                                    <p class="p10 tnr  txtStr" style="width: 50%; justify-content: start;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="p10 tnr" style="width: 45%; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                
+                                <div class="section col" style="align-items: start; gap: 0;">
+                                    <p class="p10 tnr txtStr" style="width: 45%; justify-content: start;">APPROVED BY:</p>
+                                    <br><br>
+                                    <p class="p10 tnr txtStr blue" style="width: 55%; justify-content: start;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="p10 tnr" style="width: 55%; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect = document.getElementById('purposeSelect');
+                    const purposeRef = document.getElementById('purposeRef');
+            
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect.addEventListener('change', function() {
+                        purposeRef.textContent = purposeSelect.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect2 = document.getElementById('purposeSelect2');
+                    const purposeRef2 = document.getElementById('purposeRef2');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect2.addEventListener('change', function() {
+                        purposeRef2.textContent = purposeSelect2.value;
+                    });
+                });
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect3 = document.getElementById('purposeSelect3');
+                    const purposeRef3 = document.getElementById('purposeRef3');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect3.addEventListener('change', function() {
+                        purposeRef3.textContent = purposeSelect3.value;
+                    });
+                });
+            </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect4 = document.getElementById('purposeSelect4');
+                    const purposeRef4 = document.getElementById('purposeRef4');
+
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect4.addEventListener('change', function() {
+                        purposeRef4.textContent = purposeSelect4.value;
+                    });
+                });
+            </script>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Get the dropdown and the span element
+                                const purposeSelect5 = document.getElementById('purposeSelect5');
+                                const purposeRef5 = document.getElementById('purposeRef5');
+            
+                                // Update the span with the selected value whenever the selection changes
+                                purposeSelect5.addEventListener('change', function() {
+                                    purposeRef5.textContent = purposeSelect5.value;
+                                });
+                            });
+                        </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+    <script>
+        // Array of IDs for buttons and their corresponding divs
+        const buttons = ['doc1Btn', 'doc2Btn', 'doc3Btn', 'doc4Btn', 'doc5Btn'];
+        const divs = ['doc1', 'doc2', 'doc3', 'doc4', 'doc5'];
+        const trayCard = document.getElementById('trayCard');
+    
+        // Store original button content and styles
+        const originalContent = {};
+        buttons.forEach((buttonId) => {
+            const button = document.getElementById(buttonId);
+            originalContent[buttonId] = button.innerHTML;
+        });
+    
+        // Loop through all buttons and assign click event listeners
+        buttons.forEach((buttonId, index) => {
+            const button = document.getElementById(buttonId);
+            const correspondingDiv = document.getElementById(divs[index]);
+    
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+    
+                const isActive = button.classList.contains('active');
+    
+                // Reset all buttons and divs
+                divs.forEach((divId) => document.getElementById(divId).classList.add('hidden'));
+                buttons.forEach((btnId) => {
+                    const btn = document.getElementById(btnId);
+                    btn.innerHTML = originalContent[btnId];
+                    btn.classList.remove('active');
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                    btn.style.display = ''; // Show all buttons by default
+                });
+    
+                if (!isActive) {
+                    // Hide the tray card, show the corresponding div, and change button state
+                    trayCard.classList.add('hidden');
+                    correspondingDiv.classList.remove('hidden');
+                    button.innerHTML = '<i class="fas fa-times"></i> ' + button.textContent.trim();
+                    button.classList.add('active');
+                    button.style.backgroundColor = '#1d3b2f';
+                    button.style.color = 'white';
+    
+                    // Hide other buttons except the active one
+                    buttons.forEach((btnId) => {
+                        if (btnId !== buttonId) {
+                            document.getElementById(btnId).style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Hide the corresponding div, show tray card, and reset button state
+                    correspondingDiv.classList.add('hidden');
+                    trayCard.classList.remove('hidden');
+                    button.innerHTML = originalContent[buttonId];
+                    button.classList.remove('active');
+                    button.style.backgroundColor = '';
+                    button.style.color = '';
+    
+                    // Show all buttons again
+                    buttons.forEach((btnId) => {
+                        document.getElementById(btnId).style.display = '';
+                    });
+                }
+            });
+        });
+    </script>
+    
+              
+<script>
+const zoomStep = 0.1; // Zoom increment step
+const maxZoom = 1.2; // Maximum zoom level
+const minZoom = 0.5; // Minimum zoom level
+
+// Object to store scales for each element
+let scales = {};
+
+function zoomIn(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] < maxZoom) {
+        scales[elementId] += zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function zoomOut(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] > minZoom) {
+        scales[elementId] -= zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function resetZoom(elementId) {
+    scales[elementId] = 1; // Reset the scale
+    updateZoom(elementId);
+}
+
+function updateZoom(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.transform = `scale(${scales[elementId]})`;
+        element.style.transformOrigin = "top center";
+    }
+}
+
+
+</script>
+
+<script>
+document.getElementById('certContent').addEventListener('input', function() {
+    document.getElementById('certContentM').textContent = this.value; 
+});
+
+</script>
+<script>
+    const openResetCard = document.getElementById('openResetCard');
+    const resetPassCard = document.getElementById('resetPassCard');
+    const closeResetCard = document.getElementById('closeResetCard');
+    const confirmReset = document.getElementById('confirmReset');
+
+    // Show confirmation modal
+    openResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'flex';
+    });
+
+    // Hide confirmation modal
+    closeResetCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        resetPassCard.style.display = 'none';
+    });
+
+    // Confirm password reset and send request
+    confirmReset.addEventListener('click', function(e) {
+        e.preventDefault();
+        const residentId = confirmReset.getAttribute('data-id');
+
+        fetch(`/reset-resident/${residentId}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Password reset successfully!");
+                resetPassCard.style.display = 'none';
+            } else {
+                alert("Failed to reset password.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const suspendCard = document.getElementById("suspendCard");
+        const closeSuspendCard = document.getElementById("closeSuspendCard");
+        const confirmSuspend = document.getElementById("confirmSuspend");
+    
+        document.querySelectorAll(".openSuspendCard").forEach((button) => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                suspendCard.style.display = "flex";
+    
+                const residentId = this.getAttribute("data-resident-id");
+                confirmSuspend.setAttribute("data-id", residentId);
+            });
+        });
+    
+        closeSuspendCard.addEventListener("click", function (e) {
+            e.preventDefault();
+            suspendCard.style.display = "none";
+        });
+    
+        confirmSuspend.addEventListener("click", async function (e) {
+            e.preventDefault();
+            const residentId = this.getAttribute("data-id");
+    
+            try {
+                const response = await fetch(`/suspend-resident/${residentId}`, { method: "POST" });
+                const data = await response.json();
+    
+                if (data.success) {
+                    alert("User suspended successfully!");
+                    location.reload();
+                } else {
+                    alert("Failed to suspend user.");
+                }
+            } catch (error) {
+                alert("Error suspending user.");
+            }
+        });
+    });
+    </script>
+    
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    
+    let currentPage = 1;
+    let rowsPerPage = 10;
+    let allRows = Array.from(dirTable.getElementsByTagName("tbody")[0].rows);
+    
+    function renderTable() {
+        if (allRows.length === 0) {
+            dirTable.style.display = "none";
+            totalRecordsLabel.innerText = "Pending Cases: No Record Found";
+            paginationContainer.innerHTML = "";
+            return;
+        } else {
+            dirTable.style.display = "table";
+        }
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        for (let row of allRows) {
+            row.style.display = "none";
+        }
+
+        for (let i = start; i < end && i < allRows.length; i++) {
+            allRows[i].style.display = "";
+        }
+
+        totalRecordsLabel.innerText = `Pending Cases: Found ${allRows.length}`;
+        renderPagination(allRows.length);
+    }
+
+    function renderPagination(totalRows) {
+        paginationContainer.innerHTML = "";
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderTable();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = (i === currentPage) ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderTable();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    renderTable();
+});
+</script>
+    
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('unseen')) {
+        newCard.classList.remove('unseen');
+        newCard.classList.add('seen');
+    }
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('seen')) {
+        newCard.classList.remove('seen');
+        newCard.classList.add('unseen');
+    }
+});
+
+</script>    
+
+            
+        </div>

@@ -1,0 +1,758 @@
+<% layout('layout') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        
+.tnav, #pagination button {
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: fit-content;
+}
+        
+
+        .field {
+    height: auto;
+    width: 100%;
+    display: flex;
+    justify-content: end;
+    align-items: start;
+    flex-direction: column;
+    padding: 0;
+    margin-bottom: 10px;
+}
+label {
+    font-size: 12px;
+    margin-inline: 5px;
+    margin-block: none;
+    opacity: 0.8;
+}
+fieldset {
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid rgb(202, 202, 202);
+    background-color: white;
+    position: relative;
+    .selectBar, input {
+        background-color: white;
+    }
+}
+input, .selectBar, .searchBar, textarea {
+    height: fit-content;
+    width: 100%;
+    padding: 10px;
+    outline: none;
+    border: 1px solid var(--gray);
+    border-radius: 10px;
+    background-color: transparent;
+    font-weight: 500;
+    color: var(--primary);
+}
+input::placeholder {
+    opacity: 0.7;
+}
+input[type="file"] {
+    background-color: var(--yellow);
+    border: none;
+    cursor: pointer;
+}
+textarea {
+    height: 120px !important;
+    resize: none;
+}
+input::placeholder {
+    color: black;
+}
+input:focus::placeholder {
+    color: transparent;
+}
+select {
+    border: none;
+    width: 100%;
+    background-color: inherit;
+    outline: none;
+    height: 100%;
+}   
+        .horizon {
+            display: flex;
+            overflow-x: auto;
+            white-space: nowrap;
+            gap: 20px;
+            padding: 15px 0;
+            justify-content: start;
+            scroll-snap-type: x mandatory;
+            border: 1px solid rgba(255, 255, 255, 0);
+            border-radius: 10px;
+        }
+        .horCard {
+            flex: 0 0 auto;
+            padding: 20px;
+            width: 23%;
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease-in-out, opacity 0.8s ease-in-out, padding 0.4s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .details.show {
+            max-height: fit-content;
+            opacity: 1;
+            padding: 10px 0;
+        }
+
+        .newsCard {
+            transition: all 0.8s ease-in-out;
+        }
+        #assignDepCard {
+            max-width: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: 100;
+        }
+        #assignDepCard.active {
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            padding: 0;
+            position: absolute;
+            z-index: 100;
+        }
+        .unseen {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        .seen2 {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0;
+            transition: max-height 0.1s ease, opacity 0.6s ease;
+            position: absolute;
+        }
+        textarea {
+            background-color: white;
+        }
+        .headf {
+            border: none;
+        }
+        .noteCard {
+    background-color: var(--bs-yellow);
+    font-size: 12px;
+    padding: 20px;
+    border-radius: 10px;
+    color: var(--brown);
+    height: auto;
+    margin: 0;
+}
+    </style>
+<body class="block bgWhite relative">
+    <div class="overflow-y1 absolute top0 left0" id="assignDepCard" style="overflow-y: auto !important; background-color: rgba(0, 0, 0, 0.5);">
+        <div class="height95 width90 padding10 borderRadius20 justifyCenter alignCenter bgWhite darkShadow">
+            <div class="height100 padding40 width45 col justifyStart abstractBG borderRadius20">
+                <% if (pendingCases > 0 || user.indigent !== "YES") { %>
+                    <div class="height25 padding20 borderRadius10 darkShadow col bgWhite">
+                        <p class="size12 str400 textCenter">NOTICE!<br>
+                            You are currently not eligible to request for 
+                            <% if (pendingCases > 0 && user.indigent !== "YES") { %>
+                                Barangay Clearance, Good Moral Certificate, and Certificate of Indigency.
+                            <% } else if (pendingCases > 0) { %>
+                                Barangay Clearance or a Good Moral Certificate.
+                            <% } else { %>
+                                Certificate of Indigency.
+                            <% } %>
+                            For further assistance, please visit the barangay office.
+                        </p>
+                    </div>
+                    <br>
+                <% } %>
+                <div class="height100 padding20 col borderPrimary borderRadius10 bgWhite blockX overflow-y1" style="display: block;">
+                    <p class="size14 str600 textCenter">Terms and Conditions for Document Request</p>
+                    <br>
+                    <p class="size14 textJustify">
+                        By submitting a document request through this system, you agree to the following terms and conditions:
+                        <br><br>
+                        1. Eligibility
+                        <br>
+                        You must be a registered resident of Barangay Valdefuente to request documents.
+                        All information provided must be accurate and up to date.
+                        Residents with pending case involvement are not eligible to request Barangay Clearance and Barangay Indigency.
+                        <br><br>
+                        2. Document Request Process
+                        <br>
+                        Only the document type, purpose, and number of copies are required when submitting a request.
+                        All requests are subject to approval by the Barangay Secretary and Punong Barangay.
+                        Requests that do not meet the barangay’s requirements may be denied.
+                        Residents can request up to five (5) documents per transaction, regardless of their purpose, with a limit of three (3) copies per document.
+                        <br><br>
+                        3. Request Approval & Status
+                        <br>
+                        All submitted requests will be initially marked as "Pending."
+                        Requests will be reviewed and processed, then either approved or denied based on eligibility and barangay policies.
+                        Applicants will be notified once the request has been approved, denied, or requires additional information.
+                        <br><br>
+                        4. No Payment Required
+                        <br>
+                        There are no fees for requesting documents.
+                        This system does not involve any payment processing.
+                        <br><br>
+                        5. Data Privacy
+                        <br>
+                        Personal information provided in this system will be used only for processing document requests.
+                        The barangay will not share any personal data with third parties unless required by law.
+                        <br>
+                        6. Changes to Terms
+                        These terms and conditions may be updated at any time.
+                        Continued use of the system after updates implies your acceptance of the revised terms.
+                        <br><br>
+                        7. Agreement
+                        <br>
+                        By checking the box and submitting your request, you confirm that you have read, understood, and agreed to the terms and conditions outlined above.
+                    </p>
+                </div>
+            </div>
+            <div class="height100 padding0 width55 blockX overflow-y1 borderRadius10">
+                <form action="/reqDocument" method="POST" enctype="application/x-www-form-urlencoded" class="height0 padding20 bgWhite borderRadius20 relative width100 shadowNone">
+                    <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                    <p class="size28 str500 colorPrimary">REQUEST FORM</p>
+                    <div class="fieldsetContainer height0 padding0 width100 col" id="fieldsetContainer">
+                        <fieldset class="marginBottom20 bgLightgray borderPrimary">
+                            <div class="height0 justifyEnd marginBottom5" id="removeBtnContainer">
+                                <button type="button" class="remove-btn nav fnav width0 border0">Remove</button>
+                            </div>
+                            
+                            <div class="row gap10">
+                                <div class="field width40">
+                                    <label>Document Type</label>
+                                    <div class="selectBar">
+                                        <select name="type[]" required class="docType">
+                                            <option value="" selected disabled>Select</option>
+                                            <% if (pendingCases === 0) { %>
+                                            <option value="Barangay Clearance">Barangay Clearance</option>
+                                            <% } %>
+                                            <% if (user.indigent === "YES") { %>
+                                            <option value="Barangay Indigency">Barangay Indigency</option>
+                                            <% } %>
+                                            <% if (pendingCases === 0) { %>
+                                            <option value="Good Moral">Good Moral</option>
+                                            <% } %>
+                                            <option value="Certificate of Residency">Certificate of Residency</option>
+                                            <option value="Certification">Certification</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width40">
+                                    <label>Purpose</label>
+                                    <div class="selectBar">
+                                        <select name="purpose[]" required>
+                                            <option value="ANY LEGAL">ANY LEGAL</option>
+                                            <option value="BURIAL ASSISTANCE">BURIAL ASSISTANCE</option>
+                                            <option value="EDUCATIONAL ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                            <option value="FINANCIAL ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                            <option value="MEDICAL ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                            <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                            <option value="BOARD EXAM">BOARD EXAM</option>
+                                            <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                            <option value="LCR">LCR</option>
+                                            <option value="LEGALIZATION">LEGALIZATION</option>
+                                            <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                            <option value="PHILHEALTH">PHILHEALTH</option>
+                                            <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                            <option value="PRIME WATER">PRIME WATER</option>
+                                            <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                            <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                            <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                            <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                            <option value="XXX">XXX</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width20">
+                                    <label>No. Copies</label>
+                                    <div class="selectBar">
+                                        <select name="qty[]" required>
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function () {
+    const docTypeSelect = document.querySelector(".docType");
+    const purposeSelect = document.querySelector("select[name='purpose[]']");
+
+    const defaultPurposes = [
+        "ANY LEGAL", "BURIAL ASSISTANCE", "EDUCATIONAL ASSISTANCE", "FINANCIAL ASSISTANCE",
+        "MEDICAL ASSISTANCE", "BANK TRANSACTION", "BOARD EXAM", "CELCOR/ELECTRIC METER",
+        "LCR", "LEGALIZATION", "LOCAL EMPLOYMENT", "PHILHEALTH", "POLICE CLEARANCE",
+        "PRIME WATER", "SCHOOL REQUIREMENT", "SENIOR CITIZEN", "SOLO PARENT PWD",
+        "TRAVEL ABROAD", "XXX"
+    ];
+
+    const indigencyPurposes = [
+        "Burial Assistance",
+        "Educational Assistance",
+        "Financial Assistance",
+        "Medical Assistance",
+        "PhilHealth",
+        "Senior Citizen",
+        "Solo Parent / PWD",
+        "School Requirement"
+    ];
+
+    function updatePurposeOptions() {
+        const selectedType = docTypeSelect.value;
+        purposeSelect.innerHTML = ""; // Clear existing options
+
+        let purposes = defaultPurposes; // Default list
+
+        if (selectedType === "Good Moral" || selectedType === "Certification") {
+            purposes = ["ANY LEGAL"];
+        } else if (selectedType === "Barangay Indigency") {
+            purposes = indigencyPurposes;
+        }
+
+        // Add options to select element
+        let defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        purposeSelect.appendChild(defaultOption);
+
+        purposes.forEach(purpose => {
+            let option = document.createElement("option");
+            option.value = purpose;
+            option.textContent = purpose;
+            purposeSelect.appendChild(option);
+        });
+    }
+
+    // Event listener for document type change
+    docTypeSelect.addEventListener("change", updatePurposeOptions);
+
+    // Initialize options on page load
+    updatePurposeOptions();
+});
+
+                                </script>
+                            </div>
+                            
+                            <div class="height0 col alignStart hidden" id="purposeCard">
+                                <label for="">Indicates here the content (Optional)</label>
+                                <textarea placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarks[]"></textarea>
+                            </div>                        
+                        </fieldset>
+                        <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addBtn = document.getElementById("addBtn");
+    const fieldsetContainer = document.getElementById("fieldsetContainer");
+
+    // Function to handle "Certification (Customizable)" selection
+    function togglePurposeCard(selectElement) {
+        const fieldset = selectElement.closest("fieldset");
+        const purposeCard = fieldset.querySelector(".purposeCard");
+        const remarksField = fieldset.querySelector(".remarks");
+
+        if (selectElement.value === "Certification") {
+            purposeCard.classList.remove("unseen");
+            purposeCard.classList.add("seen2");
+        } else {
+            purposeCard.classList.remove("seen2");
+            purposeCard.classList.add("unseen");
+        }
+
+        // Ensure remarks field is always visible
+        if (remarksField) {
+            remarksField.parentElement.classList.remove("unseen");
+        }
+    }
+
+    // Function to check fieldset count and toggle Add button
+    function checkFieldsetCount() {
+        const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+        if (fieldsets.length >= 5) {
+            addBtn.style.display = "none";
+            if (!document.getElementById("limitMessage")) {
+                const limitMessage = document.createElement("p");
+                limitMessage.id = "limitMessage";
+                limitMessage.style.color = "red";
+                limitMessage.textContent = "Request limit reached (5 items).";
+                fieldsetContainer.appendChild(limitMessage);
+            }
+        } else {
+            addBtn.style.display = "inline-block";
+            const limitMessage = document.getElementById("limitMessage");
+            if (limitMessage) {
+                limitMessage.remove();
+            }
+        }
+    }
+
+    // Function to check if required fields have data
+    function isFieldsetValid(fieldset) {
+        const requiredFields = fieldset.querySelectorAll("select[required], input[required], textarea[required]");
+        return Array.from(requiredFields).every(field => field.value.trim() !== "");
+    }
+
+    // Function to check if the last fieldset has data before allowing addition
+    function checkLastFieldsetBeforeAdding() {
+        const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1]; // Get the last fieldset
+
+        if (isFieldsetValid(lastFieldset)) {
+            addBtn.removeAttribute("disabled");
+        } else {
+            addBtn.setAttribute("disabled", "true");
+        }
+    }
+
+    // Add event listener to "Add" button
+    addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Prevent adding new fieldset if last one is empty
+        if (!isFieldsetValid(lastFieldset)) {
+            alert("Please fill in all required fields before adding a new request.");
+            return;
+        }
+
+        // Clone the first fieldset as a template
+        const firstFieldset = document.querySelector("fieldset");
+        if (!firstFieldset) return;
+
+        const newFieldset = firstFieldset.cloneNode(true);
+
+        // Clear values in the cloned fieldset
+        newFieldset.querySelectorAll("select, input, textarea").forEach((el) => {
+            if (el.tagName === "SELECT") {
+                el.selectedIndex = 0;
+            } else {
+                el.value = "";
+            }
+        });
+
+        // Ensure remarks field is always visible and cleared
+        const remarksField = newFieldset.querySelector(".remarks");
+        if (remarksField) {
+            remarksField.value = "";
+            remarksField.parentElement.classList.remove("unseen");
+        }
+
+        // Add remove button event listener
+        const removeBtn = newFieldset.querySelector(".remove-btn");
+        if (removeBtn) {
+            removeBtn.style.display = "inline-block";
+            removeBtn.addEventListener("click", function () {
+                newFieldset.remove();
+                checkFieldsetCount();
+                checkLastFieldsetBeforeAdding();
+            });
+        }
+
+        // Add event listener for document type
+        const newDocType = newFieldset.querySelector(".docType");
+        if (newDocType) {
+            newDocType.addEventListener("change", function () {
+                togglePurposeCard(this);
+            });
+        }
+
+        // Append new fieldset
+        fieldsetContainer.appendChild(newFieldset);
+
+        // Check fieldset count and button state
+        checkFieldsetCount();
+        checkLastFieldsetBeforeAdding();
+    });
+
+    // Ensure the first fieldset can't be removed
+    const firstRemoveBtn = document.querySelector(".remove-btn");
+    if (firstRemoveBtn) {
+        firstRemoveBtn.style.display = "none";
+    }
+
+    // Add event listener for document type in the first fieldset
+    const firstDocType = document.querySelector(".docType");
+    if (firstDocType) {
+        firstDocType.addEventListener("change", function () {
+            togglePurposeCard(this);
+        });
+    }
+
+    // Ensure remarks fields are shown on load
+    document.querySelectorAll(".remarks").forEach((el) => {
+        el.parentElement.classList.remove("unseen");
+    });
+
+    // Monitor inputs for validation
+    fieldsetContainer.addEventListener("input", checkLastFieldsetBeforeAdding);
+
+    // Initial check on load
+    checkFieldsetCount();
+    checkLastFieldsetBeforeAdding();
+});
+
+                            </script>
+                                                    
+                                    
+                    </div>
+                        
+                    <div class="height0 justifyStart">
+                        <a href="#" class="nav pnav tnav" id="addBtn">Additional</a>
+                    </div>
+                    <br>
+                            
+                    <div class="height0 col alignStart" id="">
+                        <label for="">Indicates here the content (Optional)</label>
+                        <textarea class="height0 overflow-y1" placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarkMain"></textarea>
+                    </div> 
+                    <br>
+                    <div class="borderRadius10 padding20 textCenter bgSoft">
+                        TAKE NOTE: Please review all the details carefully before submitting your request. Ensure that all selections and information are correct, as changes may not be allowed after submission.
+                    </div>
+                    <br>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I confirm that I am still a resident of Barangay Valdefuente</p>
+                    </div>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I hereby agree to the terms and conditions</p>
+                    </div>
+                    <div class="field height0 marginTop15 width100 alignEnd">
+                        <button type="submit" class="nav tnav pnav"><i class="fas fa-check-circle"></i>Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="height100 gap20">
+        <div class="alignStart gap0 col">
+            <div class="height95 col justifyStart borderRadius10 padding20 bgSoft alignStart">
+                <div class="height0 justifyBetween gap5 paddingInline10 paddingTop5 alignStart">
+                    <p class="size26 str500 colorPrimary width0">REQUEST DOCUMENT</p>
+                    <div class="height0 width0 gap5 justifyBetween alignStart">
+                        <a href="/rqtAll" class="nav border0 bgWhite"><i class="bi bi-arrow-up-right"></i> See All</a>
+                        <a href="javascript:void()" class="nav headf border0 bgWhite" id="assignBtn"><i class="fas fa-paper-plane"></i>New Request</a>
+                    </div>
+                </div>
+                <br>
+                <hr>
+                <br>
+                <div class="height85 justifyStart alignStart gap20 borderRadius15 padding10 wrap overflow-y1">
+                    <% if (requests.length > 0) { %>
+                        <% requests.slice(0, 5).forEach(request => { %>
+                            <div class="bgWhite height80 width50 borderRadius15 col justifyBetween alignStart padding20 darkShadow relative gap10 relative" style="max-width: 18%; max-height: 210px;">
+                                <a href="/rqtView/<%= request._id %>" class="nav cnav absolute right10 top10 border0  bgSoft"><i class="bi bi-arrow-up-right"></i></a>
+                                <div class="height0 col alignStart">
+                                    <p class="size10 gray">
+                                        <%= new Date(request.createdAt).toLocaleString('en-US', { month: 'short', day: '2-digit' }) %> 
+                                        <%= new Date(request.createdAt).getFullYear() %> 
+                                        &bull; <%= new Date(request.createdAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) %>
+                                    </p>
+                                    <p class="size18 str500">TR#<%= request.tr %></p>
+                                    <br>
+                                    <%
+                                    // Step 1: Merge documents with the same type and count occurrences
+                                    let mergedDocuments = {};
+                                
+                                    request.documents.forEach(doc => {
+                                        if (mergedDocuments[doc.type]) {
+                                            mergedDocuments[doc.type]++; // Count occurrences of the same type
+                                        } else {
+                                            mergedDocuments[doc.type] = 1;
+                                        }
+                                    });
+                                
+                                    // Step 2: Convert to an array for easy iteration
+                                    let mergedArray = Object.keys(mergedDocuments).map(type => ({
+                                        type: type,
+                                        count: mergedDocuments[type]
+                                    }));
+                                
+                                    // Step 3: Define how many items to show before "+X more"
+                                    let visibleItems = 2; // Show only first 2 items
+                                    let hiddenCount = mergedArray.length - visibleItems; // Count remaining hidden items
+                                %>
+                                
+                                <% if (mergedArray.length > visibleItems) { %>
+                                    <% for (let i = 0; i < visibleItems; i++) { %>
+                                        <p class="size12 colorPrimary str400"><%= mergedArray[i].count %> <%= mergedArray[i].type %></p>
+                                    <% } %>
+                                    <% if (hiddenCount > 0) { %> 
+                                        <p class="size12 colorPrimary str400 green">+<%= hiddenCount %> more items</p>
+                                    <% } %>
+                                <% } else { %>
+                                    <% mergedArray.forEach(document => { %>
+                                        <p class="size12 colorPrimary str400"><%= document.count %> <%= document.type %></p>
+                                    <% }) %>
+                                <% } %>
+                                                             
+                                </div>
+                                <% if (request.status === "Approved") { %> 
+                                <a href="" class="disabled nav tnav border0 green" id="statLabel">
+                                        <i class="fas fa-check-circle" style="color: green; padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+                                <% if (request.status === "Declined") { %> 
+                                <a href="" class="disabled nav borderRadius10 border0" id="statLabel" style=" background-color: rgb(222, 222, 222); color: rgb(53, 53, 53);">
+                                        <i class="fas fa-times" style="color: rgb(0, 0, 0); padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+
+                                <% if (request.status === "Processed") { %> 
+                                <a href="" class="disabled nav tnav border0" id="statLabel" style="color: rgb(3, 69, 3);">
+                                        <i class="fas fa-check-circle" style="color: rgb(3, 69, 3); padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+
+                                <% if (request.status === "For Pickup") { %> 
+                                <a href="" class="disabled nav tnav border0" id="statLabel" style="color: rgb(3, 69, 3);">
+                                        <i class="fas fa-check-circle" style="color: rgb(3, 69, 3); padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+
+                                <% if (request.status === "Claimed") { %> 
+                                <a href="" class="disabled nav tnav border0" id="statLabel" style="color: rgb(3, 69, 3);">
+                                        <i class="fas fa-check-circle" style="color: rgb(3, 69, 3); padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+                                <% if (request.status === "Pending") { %> 
+                                <a href="" class="disabled nav tnav border0" id="statLabel">
+                                        <i class="fas fa-hourglass" style="padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+                                <% if (request.status === "Processing") { %> 
+                                <a href="" class="disabled nav tnav border0" id="statLabel">
+                                        <i class="fas fa-clock" style="padding-inline: 2px;"></i>
+                                        <%= request.status %>
+                                </a>
+                                <% } %>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="size14 str400 textCenter">No Recent or Active Requests as of Now</p>
+                    <% } %> 
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".showBtn").forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default <a> behavior
+    
+                let newsCard = this.closest(".newsCard"); // Get parent newsCard
+                let details = newsCard.querySelector(".details"); // Get details inside the card
+                let icon = this.querySelector("i"); // Get icon inside the button
+    
+                details.classList.toggle("show"); // Toggle visibility
+                
+                // Toggle icon class
+                if (details.classList.contains("show")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+    });
+    
+    </script>
+    <script>
+        document.getElementById("univ").addEventListener("input", function () {
+    let filter = this.value.toLowerCase();
+    let newsCards = document.querySelectorAll(".newsCard");
+    let found = false;
+
+    // If the search field is empty, show all cards and hide "NOT FOUND"
+    if (filter === "") {
+        newsCards.forEach(card => card.style.display = "block");
+        document.getElementById("notFound").style.display = "none";
+        return;
+    }
+
+    // Hide cards that don't match the filter and show matching ones
+    newsCards.forEach(card => {
+        if (card.textContent.toLowerCase().includes(filter)) {
+            card.style.display = "flex";
+            found = true;
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    // Show "NOT FOUND" if no matches are found
+    document.getElementById("notFound").style.display = found ? "none" : "flex";
+});
+
+    </script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(?<!\S)(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|net|org|gov|edu|ph)\b)(?!\S)/g, '<a href="http://$1" target="_blank" class="inline blue str500">$1</a>');
+});
+</script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(^|\s)(#\w+)/g, '$1<span class="green str500">$2</span>');
+});
+</script>
+<script>
+document.getElementById("assignBtn").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent default link behavior
+    
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Toggle 'active' class
+    assignCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (assignCard.classList.contains("active")) {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    } else {
+        assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+    }
+});
+
+// Hide #assignDepCard when #closeNav is clicked
+document.getElementById("closeNav").addEventListener("click", function() {
+    let assignCard = document.getElementById("assignDepCard");
+    let assignBtn = document.getElementById("assignBtn");
+
+    // Remove 'active' class
+    assignCard.classList.remove("active");
+
+    // Reset button text & icon
+    assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+});
+</script>
+
+</body>
+</html>

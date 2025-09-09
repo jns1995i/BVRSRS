@@ -1,0 +1,279 @@
+<% layout('layout') %><!DOCTYPE html>
+
+<head>
+    <style>
+        .horizon {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        gap: 20px;
+        padding: 15px 0;
+        justify-content: start;
+        scroll-snap-type: x mandatory;
+        border: 1px solid rgba(255, 255, 255, 0);
+        border-radius: 10px;
+        }
+        .horCard {
+            flex: 0 0 auto;
+            padding: 20px;
+            width: 23%;
+        }
+        .details {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.6s ease-in-out, opacity 0.8s ease-in-out, padding 0.4s ease-in-out;
+            white-space: pre-line;
+        }
+
+        .details.show {
+            max-height: fit-content;
+            opacity: 1;
+            padding: 10px 0;
+        }
+
+        .newsCard {
+            transition: all 0.8s ease-in-out;
+        }
+        #assignDepCard {
+            max-width: 0;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+        }
+        #assignDepCard.active {
+            margin-bottom: 150px;
+            max-width: 100%;
+            max-height: 100%;
+            opacity: 1;
+            padding: 0;
+        }
+        .unseen {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+        }
+        .seen2 {
+            max-height: 400px;
+            opacity: 1;
+            padding: 0;
+            transition: max-height 0.9s ease, opacity 0.6s ease;
+        }
+        textarea {
+            background-color: white;
+        }
+        .docCard {
+            max-width: 100%;
+            margin-bottom: 20px;
+            color: rgb(3, 47, 3);
+        }
+.docCard:nth-child(1) { background-color: var(--tint7)}
+.docCard:nth-child(2) { background-color: var(--tint6)}
+.docCard:nth-child(3) { background-color: var(--tint5)}
+.docCard:nth-child(4) { background-color: var(--tint6)}
+.docCard:nth-child(5) { background-color: var(--tint7)}
+.docCard:nth-child(6) { background-color: var(--tint5)}
+.docCard:nth-child(7) { background-color: var(--tint6)}
+
+.tnav, #pagination button {
+    border-radius: 10px;
+    padding: 8px 12px;
+    width: fit-content;
+}
+    </style>
+    <div class="height100 gap20 block borderRadius15 relative ">
+        <div class="height100 justifyStart alignStart gap20 padding10">
+            <div class="height0 gap30 justifyStart col width30 padding30 bgSoft borderRadius15">
+                <div class="height0 justifyBetween">
+                    <a href="/rqt" class="nav width0" id="">
+                       <i class="fas fa-chevron-left"> </i>Go Back
+                    </a>
+                    <a href="" class="nav tnav width0 disabled" id="statLabel">
+                        <%= request.status %>
+                    </a>
+                </div>
+                <div class="borderRadius10 col alignStart padding40 justifyStart relative bgWhite darkShadow height0">
+                    
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const statLabel = document.getElementById("statLabel");
+                            const status = statLabel.textContent.trim(); // Get the status text
+                    
+                    
+                            if (status === "Processing") {
+                                statLabel.style.backgroundColor = "var(--tint8)";
+                                statLabel.style.color = "green";
+                            } else if (["Approved", "Success", "Processed"].includes(status)) {
+                                statLabel.style.backgroundColor = "green";
+                                statLabel.style.color = "white";
+                            } else if (status === "Declined") {
+                                statLabel.style.backgroundColor = "var(--tint8)"; // Light red
+                                statLabel.style.color = "black";
+                            } else if (["Pending", "Anything"].includes(status)) {
+                                statLabel.style.backgroundColor = "lightgray";
+                                statLabel.style.color = "black";
+                            }
+                        });
+                    </script>
+                    <p class="size24 str500 colorPrimary">REQUEST DETAILS</p>
+                    <br>
+                    <p class="size10 gray">TRANSACTION NUMBER</p>
+                    <p class="size18 str500 colorPrimary">TR#<%= request.tr %></p>
+                    <br>    
+                    <p class="size10 gray">REQUESTED AT</p>
+                    <p class="size18 str500 colorPrimary">
+                        <%= new Date(request.createdAt).toLocaleString('en-US', { 
+                            month: 'short', 
+                            day: '2-digit', 
+                            year: 'numeric' 
+                        }) + ' • ' + 
+                        new Date(request.createdAt).toLocaleString('en-US', { 
+                            hour: '2-digit', 
+                            minute: '2-digit', 
+                            hour12: true 
+                        }) %>
+                    </p>
+                </div>
+                <% if (request.status === 'Processed' || request.status === 'Approved' || request.status === 'Declined') { %>
+                <div class="height0 noteCard abstractBG textCenter size14 col gap10 darkShadow padding30 borderRadius10">
+                    <p class="size24 str500 white">Download Authorization Letter</p>
+                    <p class="size12 str400 bgSoft borderRadius10 padding15 colorPrimary">
+                        If someone else will claim the document on your behalf, they must present an authorization letter along with a valid ID of both the requester and the authorized person.
+                        <br><br>🔗 <a href="/downloadAuthLetter" class="inline str600">Download Here</a>
+                    </p>
+                </div>
+                <% } %>
+                <div class="height100 width40 noteCard bgSoft hidden">
+                    Instruction or Info
+                </div>
+            </div>
+            <div class="height0 alignStart justifyCenter bgSoft padding30 borderRadius10 wrap width70">
+                <div class="height0 justifyStart alignCenter padding10">
+                    <p class="size20 str500">Requested Documents</p>
+                </div>
+                <div class="height0 gap20 alignStart justifyStart padding5 borderRadius10 wrap">
+                    <% if (documents.length > 0) { %>
+                        <% documents.forEach(doc => { %>
+                            <div class="h250 borderRadius10 bgWhite padding10 col justifyStart gap10 darkShadow" style="max-width: 31%;">
+                                <div class="height60 padding20 borderRadius10 col justifyStart alignStart relative">
+                                    <a href="" class="nav width0 tnav absolute right10 top10 size12 disabled
+                                        <% if (doc.status === 'Declined') { %> bgSoft <% } else if (doc.status === 'Approved') { %>  bgSoft green border0 <% } else { %> bgSoft <% } %>">
+                                        <%= doc.status %>
+                                    </a>
+                                    <br>
+                                    <p class="size12 str400"><%= doc.qty %> <%= doc.qty > 1 ? 'Copies' : 'Copy' %></p>
+                                    <p class="size14 str600 colorPrimary"><%= doc.type %></p>
+                                    <p class="size10 str400">for <%= doc.purpose %> Purpose</p>
+                                </div>
+                                <% if (doc.status === 'Declined') { %>
+                                    <div class="height40 noteCard padding20 bgSoft">
+                                        <% if (doc.notes === 'Others') { %>
+                                            <p class="size12 str400 textCenter">
+                                                For further details, please visit us at the Barangay Hall.   
+                                            </p>
+                                        <% } else if (doc.notes === 'Pending Case') { %>
+                                            <p class="size12 str400 textCenter">
+                                                Declined due to involvement on a pending Case
+                                            </p>
+                                        <% } %>
+                                    </div>
+                                <% } else { %>
+                                    <div class="height40 noteCard padding20 bgSoft">
+                                        <p class="size12 str400">No Remarks</p>
+                                    </div>
+                                <% } %>                            
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No documents found.</p>
+                    <% } %>
+                </div>
+            </div>
+            </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".showBtn").forEach(button => {
+            button.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default <a> behavior
+    
+                let newsCard = this.closest(".newsCard"); // Get parent newsCard
+                let details = newsCard.querySelector(".details"); // Get details inside the card
+                let icon = this.querySelector("i"); // Get icon inside the button
+    
+                details.classList.toggle("show"); // Toggle visibility
+                
+                // Toggle icon class
+                if (details.classList.contains("show")) {
+                    icon.classList.remove("fa-chevron-down");
+                    icon.classList.add("fa-chevron-up");
+                } else {
+                    icon.classList.remove("fa-chevron-up");
+                    icon.classList.add("fa-chevron-down");
+                }
+            });
+        });
+    });
+    
+    </script>
+    <script>
+        document.getElementById("univ").addEventListener("input", function () {
+    let filter = this.value.toLowerCase();
+    let newsCards = document.querySelectorAll(".newsCard");
+    let found = false;
+
+    // If the search field is empty, show all cards and hide "NOT FOUND"
+    if (filter === "") {
+        newsCards.forEach(card => card.style.display = "block");
+        document.getElementById("notFound").style.display = "none";
+        return;
+    }
+
+    // Hide cards that don't match the filter and show matching ones
+    newsCards.forEach(card => {
+        if (card.textContent.toLowerCase().includes(filter)) {
+            card.style.display = "flex";
+            found = true;
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    // Show "NOT FOUND" if no matches are found
+    document.getElementById("notFound").style.display = found ? "none" : "flex";
+});
+
+    </script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(?<!\S)(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.(com|net|org|gov|edu|ph)\b)(?!\S)/g, '<a href="http://$1" target="_blank" class="inline blue str500">$1</a>');
+});
+</script>
+<script>
+    document.querySelectorAll('.details').forEach(div => {
+    div.innerHTML = div.innerHTML.replace(/(^|\s)(#\w+)/g, '$1<span class="green str500">$2</span>');
+});
+</script>
+
+<script>
+    document.getElementById("assignBtn").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent default link behavior
+        
+        let assignCard = document.getElementById("assignDepCard");
+        let assignBtn = document.getElementById("assignBtn");
+
+        // Toggle 'active' class
+        assignCard.classList.toggle("active");
+
+        // Change button text & icon based on active state
+        if (assignCard.classList.contains("active")) {
+            assignBtn.innerHTML = '<i class="fas fa-times"></i> Close Form';
+        } else {
+            assignBtn.innerHTML = '<i class="fas fa-plus"></i>Request Document';
+        }
+    });
+</script>

@@ -1,0 +1,549 @@
+<% layout('layout') %>
+
+<style>
+    input {
+        min-height: 42px;
+    }
+</style>
+
+<div class="height bgSoft padding10 borderRadius15 relative">
+    <a href="/hshView/<%= householdId %>" class="nav absolute left20 top20"><i class="fas fa-chevron-left"></i>Go Back</a>    
+    <div class="height100 blockX overflow-y1 padding10 borderRadius15">
+        <div class="height0 padding10">
+            <form id="residentForm" action="/add-member" method="POST" class="height0 width80">
+                <div class="gap10 justifyStart alignStart height0">
+                    <div class="height0 col justifyStart alignStart">
+                        <p class="size30 str500 colorPrimary">ADD FAMILY MEMBER</p>
+                        <br>
+                        <input type="text" class="hidden" name="familyId" value="<%= familyId %>" hidden>
+                        <input type="text" class="hidden" name="householdId" value="<%= householdId %>" hidden>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">First Name</label>
+                            <input type="text" name="firstName" required>
+                        </div>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">Middle Name</label>
+                            <input type="text" name="middleName">
+                        </div>
+                        <div class="height0 col gap5 alignStart">
+                            <label for="">Last Name</label>
+                            <input type="text" name="lastName" required>
+                        </div>
+                        <div class="height0 col gap5 alignStart width30">
+                            <label for="">Ext Name</label>
+                            <input type="text" name="extName">
+                        </div>
+                        <br>
+                        <label for="">Birthday</label>
+                        <div class="height0 gap5">
+                            <div class="height0 col alignStart width40">
+                                <div class="selectBar widthMax100"> 
+                                    <select id="bMonth" required name="bMonth"  placeholder="Month">
+                                        <option value="" selected disabled>Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart width20">
+                                <input name="bDay" type="number" id="bDay" min="1" max="31" placeholder="Day" required>
+                            </div>
+                            <div class="height0 col alignStart width40">
+                                <input name="bYear" type="number" id="bYear" min="1900" placeholder="Year" required>
+                            </div>
+                        </div>
+                        <label class="colorPrimary" id="ageWarning" style="display: none;"></label>
+                        <br>
+                        <div class="height0 col alignStart">
+                            <label for="">Birth Place</label>
+                            <div class="selectBar widthMin100">
+                                <select name="birthPlace" id="birthPlace" required>
+                                    <option value="">--Select City--</option>
+                                </select>
+                                
+                                <script>
+                                    // Array of Philippine cities
+                                    const cities = [
+                                        "Alaminos", "Angeles", "Antipolo", "Bacolod", "Bacoor", "Bago", "Baguio",
+                                        "Bais", "Balanga", "Batac", "Batangas City", "Bayawan", "Baybay", "Bayugan",
+                                        "Biñan", "Bislig", "Bogo", "Borongan", "Bulacan", "Butuan", "Cabadbaran",
+                                        "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calaca", "Calamba",
+                                        "Calapan", "Calbayog", "Caloocan", "Candon", "Canlaon", "Carcar", "Carmona",
+                                        "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City",
+                                        "Dagupan", "Danao", "Dapitan", "Dasmariñas", "Davao City", "Digos",
+                                        "Dipolog", "Dumaguete", "El Salvador", "Escalante", "Gapan", "General Santos",
+                                        "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan",
+                                        "Iloilo City", "Imus", "Iriga", "Isabela", "Kabankalan", "Kidapawan",
+                                        "Koronadal", "La Carlota", "Lamitan", "Laoag", "Lapu-Lapu", "Las Piñas",
+                                        "Legazpi", "Ligao", "Lipa", "Lucena", "Maasin", "Mabalacat", "Makati",
+                                        "Malabon", "Malaybalay", "Malolos", "Mandaluyong", "Mandaue", "Manila",
+                                        "Marawi", "Marikina", "Masbate City", "Mati", "Meycauayan", "Muñoz",
+                                        "Muntinlupa", "Naga", "Navotas", "Olongapo", "Ormoc", "Oroquieta", "Ozamiz",
+                                        "Pagadian", "Palayan", "Panabo", "Parañaque", "Pasay", "Pasig", "Passi",
+                                        "Puerto Princesa", "Quezon City", "Roxas", "Sagay", "Samal", "San Carlos",
+                                        "San Fernando", "San Jose", "San Jose del Monte", "San Pablo", "San Pedro",
+                                        "Santa Rosa", "Santo Tomas", "Santiago", "Silay", "Sipalay", "Sorsogon City",
+                                        "Surigao City", "Tabaco", "Tabuk", "Tacloban", "Tacurong", "Tagaytay",
+                                        "Tagbilaran", "Taguig", "Tagum", "Talisay", "Tanauan", "Tandag", "Tangub",
+                                        "Tanjay", "Tarlac City", "Tayabas", "Toledo", "Trece Martires", "Tuguegarao",
+                                        "Urdaneta", "Valencia", "Valenzuela", "Victorias", "Vigan", "Zamboanga City"
+                                    ];
+                                
+                                    // Get the select element
+                                    const birthPlaceSelect = document.getElementById("birthPlace");
+                                
+                                    // Loop through the cities array and add options dynamically
+                                    cities.forEach(city => {
+                                        let option = document.createElement("option");
+                                        option.value = city;
+                                        option.textContent = city;
+                                        birthPlaceSelect.appendChild(option);
+                                    });
+                                </script>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height0 col justifyStart alignStart">
+                        <div class="height0 gap10 marginBottom5">
+                            <div class="height0 col alignStart">
+                                <label for="">Gender</label>
+                                <div class="selectBar">
+                                    <select id="gender" name="gender" required>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <label for="">Civil Status</label>
+                                <div class="selectBar">
+                                    <select name="civilStatus" id="civilStatus" required>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Widowed">Widowed</option>
+                                        <option value="Separated">Separated</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <label for="">Precinct</label>
+                                <div class="selectBar">
+                                    <select name="precinct" id="precinct" required>
+                                        <option value="Non-Voter">Non-Voter</option>
+                                        <option value="Registered Vote">Registered Vote</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="height0 gap10 marginBlock15 hidden" id="emailField">
+                            <div class="height0 col justifyStart alignStart">
+                                <label for="">Phone</label>
+                                <input type="text" name="phone" id="phone" class="phone">
+                            </div>
+                            <div class="height0 col justifyStart alignStart">
+                                <label for="">Email</label>
+                                <input type="email" name="email" id="email">
+                            </div>
+                        </div>
+                        <div class="height0 gap10">
+                            <div class="height0 justifyStart gap10 bgSoft paddingInline10 borderRadius10" id="soloParent">
+                                <input type="checkbox" name="soloParent"><label for="">Solo Parent (Optional) </label>
+                            </div>
+                            <div class="height0 justifyStart gap10 bgSoft paddingInline10 borderRadius10"  id="pregnantLabel" style="display: none;">
+                                <input type="checkbox" name="pregnant" id="pregnant"><label for="">Pregnant (Optional) </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 gap10 bgSoft borderRadius10 paddingBlock5">
+                            <div class="height0 justifyStart gap10 paddingInline10">
+                                <input type="checkbox" id="pwdCheckbox" name="pwd"><label for="">PWD (Optional) </label>
+                            </div>
+                            <div class="height0 col alignStart">
+                                <div class="selectBar">
+                                    <select id="pwdType" name="pwdType" disabled>
+                                        <option value="" selected disabled>Select Disability Type</option>
+                                        <option value="Visual">Visual</option>
+                                        <option value="Hearing">Hearing</option>
+                                        <option value="Mobility">Mobility</option>
+                                        <option value="Mental">Mental</option>
+                                        <option value="Speech">Speech</option>
+                                        <option value="Intellectual">Intellectual</option>
+                                        <option value="Psychosocial">Psychosocial</option>
+                                        <option value="Learning">Learning</option>
+                                        <option value="Multiple">Multiple Disabilities</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 gap10">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="">Employment Status</label>
+                                <div class="selectBar"> 
+                                    <select id="employmentStatus" name="employmentStatus" required>
+                                        <option value="Unemployed">Unemployed</option>
+                                        <option value="Employed">Employed</option>
+                                        <option value="Self-Employed">Self-Employed</option>
+                                        <option value="Dependent">Dependent</option>
+                                        <option value="Retired">Retired</option>
+                                        <option value="Pensioner">Pensioner</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="height0 gap10 marginTop15" id="">
+                            <div class="height0 col gap5 alignStart  borderRadius10 bgSoft padding5"  id="workField"  style="display: none;">
+                                <label for="">Work or Source of Income</label>
+                                <input type="text" id="work" name="work">
+                            </div>
+                            <div class="height0 col gap5 alignStart  borderRadius10 bgSoft padding5"  id="incomeField"  style="display: none;">
+                                <label for="">Monthly Income</label>
+                                <input type="number" id="monthlyIncome" name="monthlyIncome">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 gap5">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="">Family Role</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="rel" id="rel" required>
+                                        <option value="" disabled selected>Select Role</option>
+                                        
+                                        <!-- Immediate Family -->
+                                        <option value="Father">Father</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Siblings">Siblings</option>
+                                    
+                                        <!-- Extended Family -->
+                                        <option value="Grand Parent">Grand Parent</option>
+                                        <option value="Grandchild">Grandchild</option>
+                                        <!-- Household Members -->
+                                        <option value="Relative">Relative</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="height0 col gap5 alignStart">
+                                <label for="">Position</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="position" id="position">
+                                        <option value="Resident">Resident</option>
+                                        <option value="Punong Barangay">Punong Barangay</option>
+                                        <option value="Barangay Kagawad">Barangay Kagawad</option>
+                                        <option value="Barangay Secretary">Barangay Secretary</option>
+                                        <option value="Barangay Treasurer">Barangay Treasurer</option>
+                                        <option value="Sk Chairman/Chairwoman">Sk Chairman/Chairwoman</option>
+                                        <option value="Barangay BHW">Barangay BHW</option>
+                                        <option value="Barangay BIC">Barangay BIC</option>
+                                        <option value="Barangay BNS">Barangay BNS</option>
+                                        <option value="Barangay BPO">Barangay BPO</option>
+                                        <option value="Barangay Clerk">Barangay Clerk</option>
+                                        <option value="Barangay DCW">Barangay DCW</option>
+                                        <option value="Barangay Driver">Barangay Driver</option>
+                                        <option value="Barangay Electrician">Barangay Electrician</option>
+                                        <option value="Barangay Justice">Barangay Justice</option>
+                                        <option value="Barangay Tanod">Barangay Tanod</option>
+                                        <option value="Barangay Tanod-Chief">Barangay Tanod-Chief</option>
+                                        <option value="Barangay Tanod-Deputy">Barangay Tanod-Deputy</option>
+                                        <option value="Barangay Worker">Barangay Worker</option>
+                                        <option value="BARC Chairman">BARC Chairman</option>
+                                        <option value="Environment Officer">Environment Officer</option>
+                                        <option value="Safety Officer">Safety Officer</option>
+                                        <option value="Vawc Desk Officer">Vawc Desk Officer</option>  
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="hidden height0 col bgSoft borderRadius10 padding10 gap10" id="childCare">
+                            <div class="height0 gap5">
+                                <div class="height0 col gap5 alignStart">
+                                    <label for="">Birth Height</label>
+                                    <input type="text" name="birthHeight">
+                                </div>
+                                <div class="height0 col gap5 alignStart">
+                                    <label for="">Birth Weight</label>
+                                    <input type="text" name="birthWeight">
+                                </div>
+                            </div>
+                            <div class="height0 col gap5 alignStart">
+                                <label for="">Health Center</label>
+                                <input type="text" name="healthCenter">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 justifyEnd"><button type="submit" class="nav pnav"><i class="fas fa-check-square"></i>Add to Record</button></div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('bYear').addEventListener('input', validateAge);
+    document.getElementById('bMonth').addEventListener('change', validateAge);
+    document.getElementById('bDay').addEventListener('input', validateAge);
+    document.getElementById('gender').addEventListener('change', togglePregnant);
+    document.getElementById('pwdCheckbox').addEventListener('change', function () {
+        document.getElementById('pwdType').disabled = !this.checked;
+    });
+
+    document.getElementById('employmentStatus').addEventListener('change', toggleWorkIncomeFields);
+    function validateAge() {
+    let bYear = parseInt(document.getElementById('bYear').value) || 0;
+    let bMonth = parseInt(document.getElementById('bMonth').value) || 1;
+    let bDay = parseInt(document.getElementById('bDay').value) || 1;
+
+    let today = new Date();
+    let birthDate = new Date(bYear, bMonth - 1, bDay);
+    let age = today.getFullYear() - bYear;
+
+    if (today.getMonth() < (bMonth - 1) || (today.getMonth() === (bMonth - 1) && today.getDate() < bDay)) {
+        age--;
+    }
+
+    // Prevent future dates
+    if (birthDate > today) {
+        alert("Invalid birthdate! Please enter a valid past date.");
+        document.getElementById('bYear').value = "";
+        document.getElementById('bMonth').value = "";
+        document.getElementById('bDay').value = "";
+        return;
+    }
+
+    document.getElementById('ageWarning').style.display = age < 15 ? 'flex' : 'none';
+
+    handleCivilStatus(age);
+    handlePosition(age);
+    updatePrecinctOption(age);
+    toggleFields(age);
+    setEmploymentStatus(age);
+    toggleEmailPhone(age);
+    toggleChildCare(age); // ✅ Ensure this function is called
+}
+
+    function handleCivilStatus(age) {
+        let civilStatus = document.getElementById('civilStatus');
+        if (!civilStatus) return;
+
+        let selectedValue = civilStatus.value;
+        civilStatus.innerHTML = '';
+
+        let statuses = ['Single'];
+        if (age >= 18) {
+            statuses.push('Married', 'Widowed', 'Divorced', 'Separated');
+        }
+
+        statuses.forEach(status => {
+            let option = document.createElement('option');
+            option.text = status;
+            option.value = status;
+            civilStatus.appendChild(option);
+        });
+
+        civilStatus.value = statuses.includes(selectedValue) ? selectedValue : 'Single';
+    }
+
+    function handlePosition(age) {
+        let position = document.getElementById('position');
+        if (!position) return;
+
+        let selectedValue = position.value;
+        position.innerHTML = '';
+
+        let allPositions = [
+            "Resident", "Punong Barangay", "Barangay Kagawad", "Barangay Secretary",
+            "Barangay Treasurer", "Barangay BHW", "Barangay BIC", "Barangay BNS",
+            "Barangay BPO", "Barangay Clerk", "Barangay DCW", "Barangay Driver",
+            "Barangay Electrician", "Barangay Justice", "Barangay Tanod",
+            "Barangay Tanod-Chief", "Barangay Tanod-Deputy", "Barangay Worker",
+            "BARC Chairman", "Environment Officer", "Safety Officer", "Vawc Desk Officer"
+        ];
+
+        if (age <= 14) {
+            allPositions = ["Resident"];
+        } else if (age >= 15 && age <= 17) {
+            allPositions = ["Resident", "Sk Chairman/Chairwoman"];
+        } else if (age >= 18 && age <= 30) {
+            allPositions.push("Sk Chairman/Chairwoman");
+        } else if (age >= 31) {
+            allPositions = allPositions.filter(pos => pos !== "Sk Chairman/Chairwoman");
+        }
+
+        allPositions.forEach(pos => {
+            let option = document.createElement('option');
+            option.text = pos;
+            option.value = pos;
+            position.appendChild(option);
+        });
+
+        position.value = allPositions.includes(selectedValue) ? selectedValue : "Resident";
+    }
+
+    function updatePrecinctOption(age) {
+        let precinct = document.getElementById('precinct');
+        if (!precinct) return;
+
+        let selectedValue = precinct.value;
+        precinct.innerHTML = '';
+
+        let nonVoterOption = document.createElement('option');
+        nonVoterOption.text = 'Non-Voter';
+        nonVoterOption.value = 'Non-Voter';
+        precinct.appendChild(nonVoterOption);
+
+        if (age >= 15) {
+            let voterOption = document.createElement('option');
+            voterOption.text = 'Registered Voter';
+            voterOption.value = 'Registered Voter';
+            precinct.appendChild(voterOption);
+        }
+
+        precinct.value = [...precinct.options].some(opt => opt.value === selectedValue) ? selectedValue : 'Non-Voter';
+    }
+
+    function toggleFields(age) {
+        let soloParent = document.getElementById('soloParent');
+        let pregnantLabel = document.getElementById('pregnantLabel');
+
+        if (soloParent) soloParent.style.display = age <= 14 ? 'none' : 'flex';
+
+        if (pregnantLabel) {
+            pregnantLabel.style.display = (document.getElementById('gender').value === 'Female' && age > 14) ? 'flex' : 'none';
+        }
+    }
+
+    function togglePregnant() {
+        let gender = document.getElementById('gender').value;
+        let pregnantLabel = document.getElementById('pregnantLabel');
+
+        if (!pregnantLabel) return;
+
+        let bYear = parseInt(document.getElementById('bYear').value) || 0;
+        let bMonth = parseInt(document.getElementById('bMonth').value) || 1;
+        let bDay = parseInt(document.getElementById('bDay').value) || 1;
+
+        let today = new Date();
+        let birthDate = new Date(bYear, bMonth - 1, bDay);
+        let age = today.getFullYear() - bYear;
+
+        if (today.getMonth() < (bMonth - 1) || (today.getMonth() === (bMonth - 1) && today.getDate() < bDay)) {
+            age--;
+        }
+
+        pregnantLabel.style.display = (gender === 'Female' && age > 14) ? 'flex' : 'none';
+    }
+
+    function setEmploymentStatus(age) {
+        let employmentStatus = document.getElementById('employmentStatus');
+        if (!employmentStatus) return;
+
+        let selectedValue = employmentStatus.value;
+        employmentStatus.innerHTML = '';
+
+        let statuses = [];
+
+        if (age <= 5) {
+            statuses = ["Dependent"];
+        } else if (age >= 6 && age <= 14) {
+            statuses = ["Student", "Dependent"];
+        } else if (age >= 15 && age <= 59) {
+            statuses = ["Unemployed", "Employed", "Self-Employed", "Student", "Dependent"];
+        } else if (age >= 60) {
+            statuses = ["Unemployed", "Employed", "Self-Employed", "Student", "Dependent", "Retired", "Pensioner"];
+        }
+
+        statuses.forEach(status => {
+            let option = document.createElement('option');
+            option.text = status;
+            option.value = status;
+            employmentStatus.appendChild(option);
+        });
+
+        employmentStatus.value = statuses.includes(selectedValue) ? selectedValue : statuses[0];
+
+        toggleWorkIncomeFields();
+    }
+
+    function toggleWorkIncomeFields() {
+        let employmentStatus = document.getElementById('employmentStatus').value;
+        let workField = document.getElementById('workField');
+        let incomeField = document.getElementById('incomeField');
+
+        if (!workField || !incomeField) return;
+
+        if (employmentStatus === "Employed" || employmentStatus === "Self-Employed") {
+            workField.style.display = "flex";
+            incomeField.style.display = "flex";
+        } else if (employmentStatus === "Retired" || employmentStatus === "Pensioner") {
+            workField.style.display = "none";
+            incomeField.style.display = "flex";
+        } else {
+            workField.style.display = "none";
+            incomeField.style.display = "none";
+        }
+    }
+
+    function toggleEmailPhone(age) {
+    let cntDiv = document.getElementById('emailField');
+
+    if (!cntDiv) {
+        console.error("Error: Element with ID 'cnt' not found!");
+        return;
+    }
+
+    if (age >= 18) {
+        cntDiv.classList.remove("hidden"); // Show the div
+    } else {
+        cntDiv.classList.add("hidden"); // Hide the div if below 18
+    }
+}
+
+
+    function toggleChildCare(age) {
+    let childCare = document.getElementById('childCare');
+    if (!childCare) {
+        console.error("Error: Element with ID 'childCare' not found!");
+        return;
+    }
+
+    console.log(`toggleChildCare called with age: ${age}`);
+
+    if (age <= 1) {
+        childCare.classList.remove("hidden");
+        console.log("childCare is now visible");
+    } else {
+        childCare.classList.add("hidden");
+        console.log("childCare is now hidden");
+    }
+}
+});
+</script>
+            
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>

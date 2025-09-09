@@ -1,0 +1,417 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .card.keyPlain {
+                position: relative;
+                align-items: start;
+                padding: 20px;
+                height: 100px;
+                justify-content: space-between;
+            }
+            .graphIcon {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: var(--shade1);
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.4vw;
+                font-weight: 500;
+                color: var(--shade5)
+            }
+            .keyL {
+                font-size: 0.9vw;
+                font-weight: 400;
+                line-height: 1.5vw;
+            }
+            .clrd {
+                color: white;
+                position: relative;
+                max-width: 24%;
+            }
+            .clrd .keyT {
+                font-size: 24px;
+            }
+            .clrd p {
+                color: white;
+                font-size: 16px;
+            }
+            label {
+                margin-top: 10px;
+            }
+.clrd:nth-child(1) { background-color: var(--shade1); }
+.clrd:nth-child(2) { background-color: var(--shade5); }
+.clrd:nth-child(3) { background-color: var(--shade7); }
+.clrd:nth-child(4) { background-color: var(--shade9); }
+.clrd:nth-child(5) { background-color: var(--shade1); }
+.clrd:nth-child(6) { background-color: var(--shade5); }
+.clrd:nth-child(7) { background-color: var(--shade8); }
+
+        </style>
+    </head>
+
+
+    <div class="height0 relative col">
+        <img src="/images/house.png" alt="" class="absolute bottom10 right10 h230 w230 index50">    
+           
+        <div class="height0">
+            <div class="ctrl left gap20">
+                <div class="selectBar">
+                    <i class="fas fa-filter inline w15"></i>
+                    <select id="purokSelector" class="">
+                        <option value="" disabled selected>Filter by Purok</option>
+                        <option value="/hsh">All Purok</option>
+                        <option value="/hshD">Dike</option>
+                        <option value="/hshS">Shortcut</option>
+                        <option value="/hshC">Cantarilla</option>
+                        <option value="/hshH">Maharlika Highway</option>
+                        <option value="/hshB">Bagong Daan</option>
+                        <option value="/hshP">Perigola</option>
+                    </select>
+                </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const purokSelector = document.getElementById("purokSelector");
+
+                if (purokSelector) { // Check if the selector exists
+                    purokSelector.addEventListener("change", function() {
+                        const selectedValue = this.value; // Get the 'value' of the selected option
+                        if (selectedValue) { // Ensure a valid option was selected (not the disabled one)
+                            window.location.href = selectedValue; // Redirect the browser to the selected URL
+                        }
+                    });
+                }
+            });
+        </script>
+            </div>
+        </div>
+        <div class="h180 abstractBG borderRadius10 padding25 justifyStart col alignStart relative">
+            <div class="height0 absolute left25 bottom25 justifyStart gap10">
+            <a href="/newRsd" class="nav borderNone paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>New Record</a>
+                <div class="searchBar">
+                    <input type="search" id="univ" placeholder="Search">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="height0 justifyStart alignStart col">
+                <p class="size34 white"><%= totalHouseholds %> Households</p>
+                <p class="size18 str300 white"><%= titlePage %></p>
+            </div>
+        </div>
+    </div>
+ 
+    <br>
+
+
+        <div class="main overflow-y1 bgSoft borderRadius15" style="height: 55% !important;">
+
+        
+
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('unseen')) {
+        newCard.classList.remove('unseen');
+        newCard.classList.add('seen');
+    }
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('seen')) {
+        newCard.classList.remove('seen');
+        newCard.classList.add('unseen');
+    }
+});
+
+</script>
+            <div class="section tableCard">
+                <p class="p14" id="noRecords" style="display: none;">No Records</p>
+                
+                <table id="dirTable" class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th onclick="sortTable(1)" class="width5 textCenter">#</th>
+                            <th onclick="sortTable(1)" class="width15 ">Address</th>
+                            <th onclick="sortTable(3)" class="width20 ">House</th>
+                            <th onclick="sortTable(6)" class="width15 ">Inhabitants</th>
+                            <th onclick="sortTable(7)" class="width10 ">Water</th>
+                            <th onclick="sortTable(7)" class="width10 ">Light</th>
+                            <th onclick="sortTable(7)" class="width10 ">Toilet</th>
+                            <th onclick="sortTable(8)" class="width10 thCtrl">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (households && households.length > 0) { %>
+                            <% households.forEach((household, index) => { %> 
+                                <tr>
+                                    <td class="textCenter"><%= index + 1 %></td>
+                                    <td>
+                                        <i class="fas fa-house size12 colorPrimary"></i>&nbsp; 
+                                        <%= household.houseNo %> <%= household.purok %>
+                                    </td>
+                                    <td class=""><%= household.ownership %> - <%= household.houseType %> House</td>
+                                    <td class=""><%= household.totalResidents  %> Residents, <%= household.totalFamilies %> Families</td>
+                                    <td class=""><%= household.waterSource %></td>
+                                    <td class=""><%= household.electricity %></td>
+                                    <td class=""><%= household.toiletType %></td>
+                                    <td class="tdCtrl">
+                                        <a href="/hshView/<%= household._id %>" class="nav">
+                                            <i class="fas fa-eye"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" class="text-center">No households found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>          
+                
+
+
+    </div>
+</div>
+<div class="sub height0 row flex">
+    <div class="ctrl left hidden">
+        <span id="totalRecords" class="totalRecords"></span>
+    </div>
+    <div class="ctrl right">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>            
+
+            
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+    
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+    
+function renderPagination(totalRows) {
+    paginationContainer.innerHTML = "";
+
+    if (searchInput.value.trim()) return;
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "« Previous";
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        currentPage--;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // --- New Logic for displaying a limited number of page buttons ---
+
+    // Display all buttons if total pages are 7 or less
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+                renderPagination(totalRows);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    } else { // Display condensed pagination for more than 7 pages
+        const startPages = [1, 2, 3];
+        const endPages = [totalPages - 2, totalPages - 1, totalPages];
+        const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+
+        // Function to create a page button
+        const createPageButton = (page, isEllipsis = false) => {
+            const btn = document.createElement("button");
+            btn.innerHTML = isEllipsis ? "..." : page;
+            btn.disabled = isEllipsis;
+            if (!isEllipsis) {
+                btn.className = page === currentPage ? "active" : "";
+                btn.onclick = () => {
+                    currentPage = page;
+                    renderTable();
+                    renderPagination(totalRows);
+                };
+            }
+            return btn;
+        };
+
+        // Add first pages
+        for (const page of startPages) {
+            if (page <= totalPages) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+        
+        // Add ellipsis if current page is not near the start
+        if (currentPage > 4) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add middle pages (current page and its neighbors)
+        if (currentPage > 3 && currentPage < totalPages - 2) {
+            for (const page of middlePages) {
+                if (page > 0 && page <= totalPages) {
+                    paginationContainer.appendChild(createPageButton(page));
+                }
+            }
+        }
+
+        // Add ellipsis if current page is not near the end
+        if (currentPage < totalPages - 3) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add last pages
+        for (const page of endPages) {
+            if (page > 3) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+    }
+
+    // Next Button
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next »";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        currentPage++;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        //rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+
+<script>
+    function toggleFamilyHead() {
+        const familyRole = document.getElementById("familyRole").value;
+        const inputFHead = document.getElementById("inputFHead");
+
+        if (familyRole === "Member") {
+            inputFHead.classList.remove("hidden");
+        } else {
+            inputFHead.classList.add("hidden");
+        }
+    }
+
+    function toggleDisability() {
+        const priority = document.getElementById("priority").value;
+        const disabilityField = document.getElementById("disabilityField");
+
+        if (priority === "PWD") {
+            disabilityField.classList.remove("hidden");
+        } else {
+            disabilityField.classList.add("hidden");
+        }
+    }
+</script>

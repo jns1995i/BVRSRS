@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case Details</title>
+</head>
+<body>
+    <h2>Case Details</h2>
+    <p><strong>Case No:</strong> <%= caseData.caseNo %></p>
+    <p><strong>Type:</strong> <%= caseData.type %></p>
+    <p><strong>Status:</strong> <%= caseData.status %></p>
+    <p><strong>Created At:</strong> <%= caseData.createdAt.toLocaleString() %></p>
+
+    <h3>Complainants</h3>
+    <ul>
+        <% if (complainants.length > 0) { %>
+            <% complainants.forEach(complainant => { %>
+                <li>
+                    <strong>Name:</strong> <%= complainant.name %><br>
+                    <strong>Address:</strong> <%= complainant.address %><br>
+                    <strong>Phone:</strong> <%= complainant.phone %>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <p>No complainants found.</p>
+        <% } %>
+    </ul>
+
+    <h3>Complainees</h3>
+    <ul>
+        <% if (complainees.length > 0) { %>
+            <% complainees.forEach(complainee => { %>
+                <li>
+                    <strong>Name:</strong> <%= complainee.name %><br>
+                    <strong>Address:</strong> <%= complainee.address %><br>
+                    <strong>Phone:</strong> <%= complainee.phone %>
+                </li>
+            <% }) %>
+        <% } else { %>
+            <p>No complainees found.</p>
+        <% } %>
+    </ul>
+
+    <button onclick="window.location.href='/'">Back to Home</button>
+</body>
+</html>

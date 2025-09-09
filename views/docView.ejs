@@ -1,0 +1,535 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            body {
+                height: auto;
+                background: transparent !important;
+            }
+            .sidef {
+                display: none !important;
+            }
+            .mainf {
+                position: relative;
+            }
+            .resetPassCard, .newAccCard {
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+                z-index: 50;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .resetCard, .newCard {
+                width: 500px;
+                height: 450px;
+                background-color: white;
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+            }
+            .main {
+                display: block;
+                gap: 0;
+                padding: 0;
+                flex-direction: column;
+                width: 100%;
+                height: auto !important;
+                overflow-y: auto;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block {
+                padding: 0 20px;
+                width: 100%;
+                position: relative;
+                background-color: var(--lightgray);
+                border-radius: 15px;
+            }
+            .block.s {
+                width: 15%;
+                height: auto;
+                flex-direction: column;
+                justify-content: start;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 50px 150px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: start;
+                justify-items: start;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                position: absolute;
+                bottom: 0;
+                right: 38px;
+                z-index: 50;
+                flex-direction: column-reverse;
+                height: 100%;
+                gap: 10px;
+                width: 15%;
+                align-items: center;
+                justify-content: space-between;
+                padding-block: 20px;
+            }
+            .docHead .ctrl {
+                height: auto;
+                padding: 0;
+                width: 100%;
+                flex-direction: column;
+            }
+            .docHead .ctrl.right {
+                flex-direction: row;
+            }
+            .docHead .ctrl.left .nav {
+                width: 100%
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 60px;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            .userPhoto {
+                height: 100px;
+                width: 100px;
+                outline: 1px solid lightgray;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            .headCtrl {
+                padding: 5px;
+            }
+            .headCtrl .ctrl {
+                width: 97.5%;
+                background-color: white;
+                border-radius: 0.5vw;
+            }
+            .certContent {
+                position: absolute;
+                z-index: 50;
+                left: 10px;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: auto;
+                padding: 15px;
+                width: 18%;
+            }
+            .certTA, .certTA:hover, .certTA:focus {
+                height: calc(38 * 1em);
+            }
+            .certContentM {
+                white-space: pre-wrap; /* Preserves new lines and spaces */
+            }
+            .hidden {
+                display: none !important;
+            }
+            @media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .maindocPage {
+                    background-image: url('your-background-image.png') !important;
+                    background-size: cover !important;
+                }
+                span {
+                    font-size: 12pt !important;
+                }
+                sup, sub {
+                    font-size: inherit !important;
+                }
+                p.docTLE {
+                    font-size: 18pt !important;
+                }.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+.certContent {
+    height: calc(8 * 1em);
+    width: 98%;
+}
+.certContentM {
+    white-space: pre-wrap; /* Preserves new lines and spaces */
+}
+            }
+            
+.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+
+    #viewD {
+        width: auto !important;
+        max-width: none !important;
+        min-width: none !important;
+        justify-self: start;
+        font-weight: 600;
+        color: var(--primary);
+    }
+    #viewD:hover {
+        transition: none;
+        transform: scale(1);
+    }
+
+        </style>
+    </head>
+<body class="abstractBG"> 
+        <a href="javascript:void(0)" class="nav absolute top20 left20 index50 str400 hidden" onclick="window.history.back()"><i class="fas fa-chevron-left"></i> Go Back</a>          
+    <div class="blockX overflow-y1 relative">
+        <div class="height0 col padding10 mdoc transparent" id="mdoc">
+            <div class="card col height0 shadowNone transparent" style="padding: 5px;">
+                <div class="height0 col relative vdoc borderRadius10" id="vdoc">
+                    <% if (documents.length > 0) { %>
+                        <% documents.forEach(doc => { %>
+                            <% for (let i = 0; i < doc.qty; i++) { %>
+                                <div class="height0 borderRadius10 doc" id="doc<%= i+1 %>" style="padding: 10px;">
+                                    <p class="status hidden"><%= doc.status %></p>
+                                    <p class="qty hidden"><%= doc.qty %></p>
+                                    <div class="maindocPage darkShadow  borderRadius5" id="clearance" style="position: relative;">
+                                        <br>
+                                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                                        <p class="str800 width100 gray" style="position: absolute; opacity: 0.3; z-index: 1;transform: translate(-50%, -50%); left: 5%; top: 35%; transform:rotate(-45deg); font-size: 75px;">SAMPLE DOCUMENT</p>
+                                        <p class="str600 width100 gray" style="position: absolute; opacity: 0.3; z-index: 1;transform: translate(-50%, -50%); left: 10%; top: 25%; transform:rotate(-45deg); font-size: 35px;">Not Valid &bull; Not Official</p>
+                                        <p class="str600 width100 gray" style="position: absolute; opacity: 0.3; z-index: 1;transform: translate(-50%, -50%); left: 25%; top: 30%; transform:rotate(-45deg); font-size: 35px;">Not Valid &bull; Not Official</p>
+                                        <br>
+                                        <div class="section letterhead">
+                                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                                <img src="/images/logo.png" alt="">
+                                            </div>
+                                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                                            </div>
+                                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                                <img src="/images/cablogo.png" alt="">
+                                            </div>
+                                        </div>
+                                        <center><hr class="docHR"></center>
+                                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                                <br>
+                                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                                <br><br><br>
+                                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                                <br><br>
+                                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                                <br><br>
+                                                <br><br>
+                                                <br><br>
+                                                <br><br>
+                                                <br><br>
+                                                <br><br>    
+                                            </div>
+                                            <div class="section largeWidth pageMainf">
+                                                <br>
+                                                <div class="height0"><p class="size8 tnr hidden">This is only a sample document. Not Valid</p></div>
+                                                <% if ( doc.type === 'Barangay Clearance' || doc.type === 'Barangay Indigency' || doc.type === 'Good Moral' || doc.type === 'Certificate of Residency' ) { %>
+                                                <p class="p18 str600 tnr docTLE" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                                    <% if (doc.type === 'Barangay Clearance') { %>
+                                                        BARANGAY CLEARANCE
+                                                    <% } else if (doc.type === 'Barangay Indigency') { %>
+                                                        CERTIFICATE OF INDIGENCY
+                                                    <% } else if (doc.type === 'Certificate of Residency') { %>
+                                                        CERTIFICATE OF   RESIDENCY
+                                                    <% } else if (doc.type === 'Good Moral') { %>
+                                                        GOOD MORAL CERTIFICATE
+                                                    <% } %>                            
+                                                </p>
+                                                <br>
+                                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                                <br>
+                                                <p class="p10 parag" style="display: inline;">
+                                                    THIS IS TO CERTIFY that 
+                                                    <span class="paragStr"><%= user.firstName %> <%= user.middleName %> <%= user.lastName %> <%= user.extName %></span>,
+                                                    <span class="paragStr"><%= user.civilStatus %></span>, is a bonafide resident of this barangay with permanent address at 
+                                                    <span class="paragStr">
+                                                        <%= household ? household.houseNo : 'N/A' %> <%= household ? household.purok : 'N/A' %>, Valdefuente, Cabanatuan City
+                                                    </span>.
+                                                </p>
+                                                <br>
+                                                <% if ( doc.type === 'Barangay Clearance') { %>
+                                                <p class="p10 parag">
+                                                    That the above-mentioned has <span class="paragStr blue">
+                                                        
+
+                                                    <% if (cases && cases.length > 0) { %>
+                                                        <% 
+                                                            const hasPendingCase = cases.some(caseItem => 
+                                                                caseItem.respondents.some(r => r._id && r._id.equals(user._id))
+                                                            ); 
+                                                        %>
+
+                                                        <% if (hasPendingCase) { %>
+                                                            PENDING CASE
+                                                        <% } else { %>
+                                                            NO DEROGATORY RECORD
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        NO DEROGATORY RECORD
+                                                    <% } %>
+                                                                                                            
+                                                    </span> on file in this office as of this date.
+                                                </p>
+                                                <% } %>
+                                                <% if ( doc.type === 'Barangay Indigency') { %>
+                                                    <p class="p10 parag">THIS IS TO CERTIFY ALSO that the name mentioned above is a member of an <span class="paragStr blue">INDIGENT FAMILY</span> of this barangay.</p>
+                                                <% } %>
+                                                <% if ( doc.type === 'Good Moral') { %>
+                                                    <p class="p10 parag" style="display: inline;">That the above mentioned has known to me as a good person with a <span class="paragStr">GOOD MORAL CHARACTER and NO DEROGATORY RECORD</span> on file in this office as of this date. </p>
+                                                <% } %>
+                                                <br>
+                                                <p class="p10 parag">
+                                                    This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef"><%= doc.purpose %></span> Reference Purpose only.
+                                                </p>
+                                                <br>
+                                                <p class="p10 parag">
+                                                    Given this <span class="paragStr thisDay" id=""></span> day of 
+                                                    <span class="paragStr thisMonth" id=""></span>, 
+                                                    <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City.
+                                                </p>
+                                                <br>
+                                                <% } %>
+                        
+                                                <% if ( doc.type === 'Certification') { %>
+                                                <p class="p18 str600 tnr docTLE" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                                    PAGPAPATUNAY
+                                                </p>
+                                                <br>
+                                                <p class="p10 tnr">PARA SA KINAUUKULAN:</p>
+                                                    <br>
+                                                    <p class="p10 parag" style="display: inline;">
+                                                        Ito ang pagpapatunay na si 
+                                                        <span class="paragStr"><%= user.firstName %> <%= user.middleName %> <%= user.lastName %> <%= user.extName %></span>, 
+                                                        ay lehitimong mamamayan ng aming Barangay na kasalukuyang nakatira sa 
+                                                        <span class="paragStr"><%= user.houseNo %> <%= user.purok %>, Valdefuente, Cabanatuan City</span>.
+                                                    </p>
+                                                    <br>
+                                                    <p class="p10 parag certContentM" id="certContentM"></p>
+                                                    <script>
+                                                        document.getElementById('certContent').addEventListener('input', function() {
+                                                            document.getElementById('certContentM').textContent = this.value; 
+                                                        });
+                                                        
+                                                        </script>
+                                                    <br>
+                                                    <p class="p10 parag">Ang pagapatunay na ito ay ginawa sa kahilingan ng nabanggit para sa anumang pangangailangan.
+                                                    <br>
+                                                    <p class="p10 parag">Ginawa ngayong ika-<span class="paragStr thisDay2" id=""></span> ng <span class="paragStr thisMonth2" id=""></span>, taong <span class="paragStr thisYear" id=""></span>.</p>
+                                                <br>
+                                                <% } %>
+                        
+                                                <div class="height0 col alignEnd">
+                                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: left;">PREPARED BY:</p>
+                                                    <br><br>
+                                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: center;">ARNOLD A. APAN</p>
+                                                    <p class="size14 tnr width60" style="display: flex; justify-content: center;">Barangay Secretary</p>
+                                                </div>
+                                                <div class="height0 col alignStart">
+                                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: left;">APPROVED BY:</p>
+                                                    <br><br>
+                                                    <p class="size14 txtStr tnr width60 blue" style="display: flex; justify-content: center;">FRANCISCO S. VELASQUEZ</p>
+                                                    <p class="size14 tnr width60" style="display: flex; justify-content: center;">Punong Barangay</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                            <br>
+                        <% }); %>
+                    <% } else { %>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+          
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+
+

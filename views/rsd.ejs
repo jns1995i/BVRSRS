@@ -1,0 +1,1017 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .card.keyPlain {
+                position: relative;
+                align-items: start;
+                padding: 20px;
+                height: 100px;
+                justify-content: space-between;
+            }
+            .graphIcon {
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                color: var(--shade1);
+            }
+            .card.key p {
+                line-height: 1.3em;
+            }
+            .keyT {
+                font-size: 1.4vw;
+                font-weight: 500;
+                color: var(--shade5)
+            }
+            .keyL {
+                font-size: 0.9vw;
+                font-weight: 400;
+                line-height: 1.5vw;
+            }
+            .clrd {
+                color: white;
+                position: relative;
+            }
+            .clrd .keyT {
+                font-size: 24px;
+            }
+            .clrd p {
+                color: white;
+                font-size: 16px;
+            }
+            label {
+                margin-top: 10px;
+            }
+.clrd:nth-child(1) { background-color: var(--shade1); }
+.clrd:nth-child(2) { background-color: var(--shade5); }
+.clrd:nth-child(3) { background-color: var(--shade7); }
+.clrd:nth-child(4) { background-color: var(--shade9); }
+.clrd:nth-child(5) { background-color: var(--shade1); }
+.clrd:nth-child(6) { background-color: var(--shade5); }
+.clrd:nth-child(7) { background-color: var(--shade8); }
+
+        </style>
+    </head>
+            <div class="abstractBG borderRadius15 unseen" id="newCard">
+                <form method="POST" action="/add-resident" class="width85 row padding20 height90 flex borderRadius20">
+                    <a href="javascript:void(0);" class="nav cnav xmark" id="closeBtn">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    <div class="section width35 col height0 gap0 justifyStart alignStart paddingInline20">
+                        <p class="size30 str500">NEW RESIDENT</p>
+                        <div class="row head">
+                            <p class="p12 str500">Complete Name</p>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label for="">Position</label>
+                                <div class="selectBar">
+                                    <select name="position"  required>
+                                        <option value="Resident">Resident</option>
+                                        <option value="Punong Barangay">Punong Barangay</option>
+                                        <option value="Barangay Kagawad">Barangay Kagawad</option>
+                                        <option value="Barangay Secretary">Barangay Secretary</option>
+                                        <option value="Barangay Treasurer">Barangay Treasurer</option>
+                                        <option value="Sk Chairman/Chairwoman">Sk Chairman/Chairwoman</option>
+                                        <option value="Barangay BHW">Barangay BHW</option>
+                                        <option value="Barangay BIC">Barangay BIC</option>
+                                        <option value="Barangay BNS">Barangay BNS</option>
+                                        <option value="Barangay BPO">Barangay BPO</option>
+                                        <option value="Barangay Clerk">Barangay Clerk</option>
+                                        <option value="Barangay DCW">Barangay DCW</option>
+                                        <option value="Barangay Driver">Barangay Driver</option>
+                                        <option value="Barangay Electrician">Barangay Electrician</option>
+                                        <option value="Barangay Justice">Barangay Justice</option>
+                                        <option value="Barangay Tanod">Barangay Tanod</option>
+                                        <option value="Barangay Tanod-Chief">Barangay Tanod-Chief</option>
+                                        <option value="Barangay Tanod-Deputy">Barangay Tanod-Deputy</option>
+                                        <option value="Barangay Worker">Barangay Worker</option>
+                                        <option value="BARC Chairman">BARC Chairman</option>
+                                        <option value="Environment Officer">Environment Officer</option>
+                                        <option value="Safety Officer">Safety Officer</option>
+                                        <option value="Vawc Desk Officer">Vawc Desk Officer</option>                                           
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="field">
+                                <label>First Name</label>
+                                <input type="text" name="firstName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Middle Name</label>
+                                <input type="text" name="middleName">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Last Name</label>
+                                <input type="text" name="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Ext Name</label>
+                                <input type="text" name="extName">
+                            </div>
+                        </div>
+                        <br><br><hr>
+                        <br>
+                        <div class="row head">
+                            <p class="p12 str500">Household Info</p>
+                        </div>
+                        <div class="row">
+                            <div class="field medium">
+                                <label>House No.</label>
+                                <input type="text" inputmode="numeric" class="phone" name="houseNo"  required>
+                            </div>
+                            <div class="field">
+                                <label>Purok</label>
+                                <div class="selectBar">
+                                    <select name="purok"  required>
+                                        <option>--select items</option>
+                                        <option value="Dike Street">Dike Street</option>
+                                        <option value="Bagong Daan Street">Bagong Daan</option>
+                                        <option value="Cantarilla Street">Cantarilla</option>
+                                        <option value="Maharlika Highway">Highway</option>
+                                        <option value="Perigola Street">Perigola</option>
+                                        <option value="Shorcut Street">Shortcut</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+                    <div class="section width65 col" style="border-left: 1px solid gray;">
+                        <script>
+                            function toggleFamilyRole() {
+                                const familyRole = document.getElementById("familyRole").value;
+                                const inputFHead = document.getElementById("inputFHead");
+                                const inputIndigent = document.getElementById("inputIndigent");
+                        
+                                // Hide both initially
+                                inputFHead.classList.add("hidden");
+                                inputIndigent.classList.add("hidden");
+                        
+                                // Show the relevant field based on selection
+                                if (familyRole === "Member") {
+                                    inputFHead.classList.remove("hidden");
+                                } else if (familyRole === "Head") {
+                                    inputIndigent.classList.remove("hidden");
+                                }
+                            }
+                        
+                            function toggleDisability() {
+                                const priorityCheckbox = document.getElementById("priority");
+                                const disabilityField = document.getElementById("disabilityField");
+                        
+                                // Show or hide the disability field based on checkbox
+                                if (priorityCheckbox.checked) {
+                                    disabilityField.classList.remove("hidden");
+                                } else {
+                                    disabilityField.classList.add("hidden");
+                                }
+                            }
+                        </script>
+                        
+                        <!-- Family Role Section -->
+                        <div class="row alignEnd">
+                            <div class="field">
+                                <label>Family Role</label>
+                                <div class="selectBar">
+                                    <select id="familyRole" onchange="toggleFamilyRole()" name="role" required>
+                                        <option value="" disabled selected>Select Role</option>
+                                        <option value="Head">Head</option>
+                                        <option value="Member">Member</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field hidden" id="inputFHead">
+                                <label>Select Family Head</label>
+                                <div class="selectBar">
+                                    <select name="headId">
+                                        <option>Select Name</option>
+                                        <% residents.forEach(resident => { %>
+                                            <option value="<%= resident._id %>"><%= resident.firstName %> <%= resident.middleName || '' %> <%= resident.lastName %> <%= resident.extName || '' %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Priority Group Section -->
+                        <div class="row bgSoft padding10 borderRadius10">
+                            <div class="field width50 alignStart h65 gap15">
+                                <label>Priority Group (Optional)</label>
+                                <div class="height0 gap10 justifyStart">
+                                    <div class="height0 gap5 justifyStart width0 hidden" id="inputIndigent">
+                                        <input type="checkbox" name="indigent" class="width0" id="indigentFamily">
+                                        Indigent
+                                    </div>
+                                    <div class="height0 gap5 justifyStart width0">
+                                        <input type="checkbox" name="soloParent" class="width0" id="soloParent">
+                                        Solo Parent
+                                    </div>
+                                    <div class="height0 gap5 justifyStart width0">
+                                        <input type="checkbox" name="pwd" class="width0" id="priority" onchange="toggleDisability()">
+                                        PWD
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="field hidden width50" id="disabilityField">
+                                <label>Disability</label>
+                                <div class="selectBar">
+                                    <select name="priorityType">
+                                        <option value="">Select Category</option>
+                                        <option value="Hearing Disability">Hearing Disability</option>
+                                        <option value="Intellectual Disability">Intellectual Disability</option>
+                                        <option value="Learning Disability">Learning Disability</option>
+                                        <option value="Multiple Disabilities">Multiple Disabilities</option>
+                                        <option value="Physical Disability">Physical Disability</option>
+                                        <option value="Psychosocial Disability">Psychosocial Disability</option>
+                                        <option value="Speech and Language Disability">Speech and Language Disability</option>
+                                        <option value="Visual Disability">Visual Disability</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <br>
+                        <div class="row head">
+                            <p class="p14 str500">Personal Info</p>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Birthday</label>
+                                <div class="height0 gap5">
+                                    <div class="selectBar">
+                                        <select name="bMonth" id="bMonth" required>
+                                            <option value="" selected disabled>Month</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="selectBar">
+                                        <select name="bDay" id="bDay" required>
+                                            <option value="" selected disabled>Day</option>
+                                            <option value="01">01</option>
+                                            <option value="02">02</option>
+                                            <option value="03">03</option>
+                                            <option value="04">04</option>
+                                            <option value="05">05</option>
+                                            <option value="06">06</option>
+                                            <option value="07">07</option>
+                                            <option value="08">08</option>
+                                            <option value="09">09</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                            <option value="25">25</option>
+                                            <option value="26">26</option>
+                                            <option value="27">27</option>
+                                            <option value="28">28</option>
+                                            <option value="29">29</option>
+                                            <option value="30">30</option>
+                                            <option value="31">31</option>
+                                        </select>                                        
+                                    </div>
+                                    
+                                    <div class="selectBar">
+                                        <select name="bYear" id="bYear" required>
+                                            <option value="" selected disabled>Year</option>
+                                            <!-- Year options will be added dynamically with JavaScript -->
+                                        </select>
+                                    </div>
+                                    <script>
+                                        // Populating the months (January to December)
+                                        const bMonthSelect = document.getElementById('bMonth');
+                                        const months = [
+                                            "January", "February", "March", "April", "May", "June", 
+                                            "July", "August", "September", "October", "November", "December"
+                                        ];
+                                    
+                                        months.forEach(month => {
+                                            const option = document.createElement('option');
+                                            option.value = month;
+                                            option.textContent = month;
+                                            bMonthSelect.appendChild(option);
+                                        });
+                                    
+                                        // Populating the years (current year first, down to 1920)
+                                        const bYearSelect = document.getElementById('bYear');
+                                        const currentYear = new Date().getFullYear();
+                                    
+                                        for (let i = currentYear; i >= 1920; i--) { // Start from the current year and decrement
+                                            const option = document.createElement('option');
+                                            option.value = i;
+                                            option.textContent = i;
+                                            bYearSelect.appendChild(option);
+                                        }
+                                    </script>
+                                    
+                                    
+                                    
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Birth Place</label>
+                                <div class="selectBar"><select name="birthPlace" required>
+                                    <option>--Select City--</option>
+                                    <option value="Alaminos">Alaminos</option>
+                                    <option value="Angeles">Angeles</option>
+                                    <option value="Antipolo">Antipolo</option>
+                                    <option value="Bacolod">Bacolod</option>
+                                    <option value="Bacoor">Bacoor</option>
+                                    <option value="Bago">Bago</option>
+                                    <option value="Baguio">Baguio</option>
+                                    <option value="Bais">Bais</option>
+                                    <option value="Balanga">Balanga</option>
+                                    <option value="Batac">Batac</option>
+                                    <option value="Batangas City">Batangas City</option>
+                                    <option value="Bayawan">Bayawan</option>
+                                    <option value="Baybay">Baybay</option>
+                                    <option value="Bayugan">Bayugan</option>
+                                    <option value="Biñan">Biñan</option>
+                                    <option value="Bislig">Bislig</option>
+                                    <option value="Bogo">Bogo</option>
+                                    <option value="Borongan">Borongan</option>
+                                    <option value="Bulacan">Bulacan</option>
+                                    <option value="Butuan">Butuan</option>
+                                    <option value="Cabadbaran">Cabadbaran</option>
+                                    <option value="Cabanatuan">Cabanatuan</option>
+                                    <option value="Cabuyao">Cabuyao</option>
+                                    <option value="Cadiz">Cadiz</option>
+                                    <option value="Cagayan de Oro">Cagayan de Oro</option>
+                                    <option value="Calaca">Calaca</option>
+                                    <option value="Calamba">Calamba</option>
+                                    <option value="Calapan">Calapan</option>
+                                    <option value="Calbayog">Calbayog</option>
+                                    <option value="Caloocan">Caloocan</option>
+                                    <option value="Candon">Candon</option>
+                                    <option value="Canlaon">Canlaon</option>
+                                    <option value="Carcar">Carcar</option>
+                                    <option value="Carmona">Carmona</option>
+                                    <option value="Catbalogan">Catbalogan</option>
+                                    <option value="Cauayan">Cauayan</option>
+                                    <option value="Cavite City">Cavite City</option>
+                                    <option value="Cebu City">Cebu City</option>
+                                    <option value="Cotabato City">Cotabato City</option>
+                                    <option value="Dagupan">Dagupan</option>
+                                    <option value="Danao">Danao</option>
+                                    <option value="Dapitan">Dapitan</option>
+                                    <option value="Dasmariñas">Dasmariñas</option>
+                                    <option value="Davao City">Davao City</option>
+                                    <option value="Digos">Digos</option>
+                                    <option value="Dipolog">Dipolog</option>
+                                    <option value="Dumaguete">Dumaguete</option>
+                                    <option value="El Salvador">El Salvador</option>
+                                    <option value="Escalante">Escalante</option>
+                                    <option value="Gapan">Gapan</option>
+                                    <option value="General Santos">General Santos</option>
+                                    <option value="General Trias">General Trias</option>
+                                    <option value="Gingoog">Gingoog</option>
+                                    <option value="Guihulngan">Guihulngan</option>
+                                    <option value="Himamaylan">Himamaylan</option>
+                                    <option value="Ilagan">Ilagan</option>
+                                    <option value="Iligan">Iligan</option>
+                                    <option value="Iloilo City">Iloilo City</option>
+                                    <option value="Imus">Imus</option>
+                                    <option value="Iriga">Iriga</option>
+                                    <option value="Isabela">Isabela</option>
+                                    <option value="Kabankalan">Kabankalan</option>
+                                    <option value="Kidapawan">Kidapawan</option>
+                                    <option value="Koronadal">Koronadal</option>
+                                    <option value="La Carlota">La Carlota</option>
+                                    <option value="Lamitan">Lamitan</option>
+                                    <option value="Laoag">Laoag</option>
+                                    <option value="Lapu-Lapu">Lapu-Lapu</option>
+                                    <option value="Las Piñas">Las Piñas</option>
+                                    <option value="Legazpi">Legazpi</option>
+                                    <option value="Ligao">Ligao</option>
+                                    <option value="Lipa">Lipa</option>
+                                    <option value="Lucena">Lucena</option>
+                                    <option value="Maasin">Maasin</option>
+                                    <option value="Mabalacat">Mabalacat</option>
+                                    <option value="Makati">Makati</option>
+                                    <option value="Malabon">Malabon</option>
+                                    <option value="Malaybalay">Malaybalay</option>
+                                    <option value="Malolos">Malolos</option>
+                                    <option value="Mandaluyong">Mandaluyong</option>
+                                    <option value="Mandaue">Mandaue</option>
+                                    <option value="Manila">Manila</option>
+                                    <option value="Marawi">Marawi</option>
+                                    <option value="Marikina">Marikina</option>
+                                    <option value="Masbate City">Masbate City</option>
+                                    <option value="Mati">Mati</option>
+                                    <option value="Meycauayan">Meycauayan</option>
+                                    <option value="Muñoz">Muñoz</option>
+                                    <option value="Muntinlupa">Muntinlupa</option>
+                                    <option value="Naga">Naga</option>
+                                    <option value="Navotas">Navotas</option>
+                                    <option value="Olongapo">Olongapo</option>
+                                    <option value="Ormoc">Ormoc</option>
+                                    <option value="Oroquieta">Oroquieta</option>
+                                    <option value="Ozamiz">Ozamiz</option>
+                                    <option value="Pagadian">Pagadian</option>
+                                    <option value="Palayan">Palayan</option>
+                                    <option value="Panabo">Panabo</option>
+                                    <option value="Parañaque">Parañaque</option>
+                                    <option value="Pasay">Pasay</option>
+                                    <option value="Pasig">Pasig</option>
+                                    <option value="Passi">Passi</option>
+                                    <option value="Puerto Princesa">Puerto Princesa</option>
+                                    <option value="Quezon City">Quezon City</option>
+                                    <option value="Roxas">Roxas</option>
+                                    <option value="Sagay">Sagay</option>
+                                    <option value="Samal">Samal</option>
+                                    <option value="San Carlos">San Carlos</option>
+                                    <option value="San Fernando">San Fernando</option>
+                                    <option value="San Jose">San Jose</option>
+                                    <option value="San Jose del Monte">San Jose del Monte</option>
+                                    <option value="San Pablo">San Pablo</option>
+                                    <option value="San Pedro">San Pedro</option>
+                                    <option value="Santa Rosa">Santa Rosa</option>
+                                    <option value="Santo Tomas">Santo Tomas</option>
+                                    <option value="Santiago">Santiago</option>
+                                    <option value="Silay">Silay</option>
+                                    <option value="Sipalay">Sipalay</option>
+                                    <option value="Sorsogon City">Sorsogon City</option>
+                                    <option value="Surigao City">Surigao City</option>
+                                    <option value="Tabaco">Tabaco</option>
+                                    <option value="Tabuk">Tabuk</option>
+                                    <option value="Tacloban">Tacloban</option>
+                                    <option value="Tacurong">Tacurong</option>
+                                    <option value="Tagaytay">Tagaytay</option>
+                                    <option value="Tagbilaran">Tagbilaran</option>
+                                    <option value="Taguig">Taguig</option>
+                                    <option value="Tagum">Tagum</option>
+                                    <option value="Talisay">Talisay</option>
+                                    <option value="Tanauan">Tanauan</option>
+                                    <option value="Tandag">Tandag</option>
+                                    <option value="Tangub">Tangub</option>
+                                    <option value="Tanjay">Tanjay</option>
+                                    <option value="Tarlac City">Tarlac City</option>
+                                    <option value="Tayabas">Tayabas</option>
+                                    <option value="Toledo">Toledo</option>
+                                    <option value="Trece Martires">Trece Martires</option>
+                                    <option value="Tuguegarao">Tuguegarao</option>
+                                    <option value="Urdaneta">Urdaneta</option>
+                                    <option value="Valencia">Valencia</option>
+                                    <option value="Valenzuela">Valenzuela</option>
+                                    <option value="Victorias">Victorias</option>
+                                    <option value="Vigan">Vigan</option>
+                                    <option value="Zamboanga City">Zamboanga City</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                                
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field">
+                                <label>Gender</label>
+                                <div class="selectBar">
+                                    <select name="gender" required>
+                                        <option>--select gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Civil Status</label>
+                                <div class="selectBar">
+                                    <select name="civilStatus" required>
+                                        <option>--select</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Widow">Widow</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>Precinct No.</label>
+                                <div class="selectBar">
+                                    <select name="precinct" id="precinct">
+                                        <option value="07889A">07889A</option>
+                                        <option value="07889B">07889B</option>
+                                        <option value="07990A">07990A</option>
+                                        <option value="07990B">07990B</option>
+                                        <option value="07991A">07991A</option>
+                                        <option value="07991B">07991B</option>
+                                        <option value="07992A">07992A</option>
+                                        <option value="07992B">07992B</option>
+                                        <option value="07993A">07993A</option>
+                                        <option value="07993B">07993B</option>
+                                        <option value="07994A">07994A</option>
+                                        <option value="07994B">07994B</option>
+                                        <option value="07995A">07995A</option>
+                                        <option value="07995B">07995B</option>
+                                        <option value="07996A">07996A</option>
+                                        <option value="07996B">07996B</option>
+                                        <option value="">Non-Voter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="field medium">
+                                <label>Phone</label>
+                                <input type="text" inputmode="numeric" class="phone" name="phone">
+                            </div>
+                            <div class="field">
+                                <label>Email</label>
+                                <input type="email" name="email">
+                            </div>
+                        </div>
+                        <br>
+    
+                        <div class="row">
+                            <div class="field btn">
+                                <button class="nav fnav" type="reset">Clear</button>
+                                <button class="nav fnav pnav" type="submit">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        <div class="head hidden">
+            <div class="ctrl left">
+                <p class="title">Residents Records</p>
+            </div>
+            <div class="ctrl right">
+                <div class="selectBar hidden">
+                    <select name="" id="">
+                        <option value="">Filter by Purok</option>
+                        <option value="">Dike Street</option>
+                        <option value="">Cantarilla</option>
+                        <option value="">Bagong Daan</option>
+                        <option value="">Shortcut</option>
+                        <option value="">Highway</option>
+                        <option value="">Perigola</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    <div class="height0 relative col">
+        <img src="/images/resident.png" alt="" class="absolute bottom10 right10 h230 w230 index50">    
+           
+        <div class="height0">
+            <div class="ctrl left gap10">
+                <div class="selectBar">
+                    <i class="fas fa-filter inline w15"></i>
+                    <select id="purokSelector" class="">
+                        <option value="" disabled selected>Filter by Purok</option>
+                        <option value="/rsd">All Purok</option>
+                        <option value="/rsdD">Dike</option>
+                        <option value="/rsdS">Shortcut</option>
+                        <option value="/rsdC">Cantarilla</option>
+                        <option value="/rsdH">Maharlika Highway</option>
+                        <option value="/rsdB">Bagong Daan</option>
+                        <option value="/rsdP">Perigola</option>
+                    </select>
+                </div>                
+                <a href="/rpt" class="nav borderNone paddingBlock12 borderRadius10">
+                    <i class="fa-solid fa-file"></i>
+                    Generate Report
+                </a>
+                <a href="/export-residents" class="nav borderNone paddingBlock12 borderRadius10">
+                    <i class="fa-solid fa-download"></i>
+                    Export Excel File
+                </a>
+                <a href="/newRsd" class="nav pnav borderNone paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>New Record</a>   
+                <a href="/nonRes" class="nav pnav borderNone paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>Add Non-Resident</a>             
+                <a href="/arcRsd" class="nav borderNone paddingBlock12 borderRadius10">
+                    <i class="fa-solid fa-archive"></i>
+                    Archive
+                </a>
+
+            <form action="/generate-households" method="POST" class="hidden height0 width0 padding0 shadowNone paddingInline5">
+                <button type="submit" class="nav">Create Households</button>
+            </form>
+            <form action="/delete-archived-households" method="POST"  class="hidden height0 width0 padding0 shadowNone paddingInline5">
+                <button type="submit" class="nav dnav borderRadius10 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    <i class="fas fa-trash"></i> Delete Dumps
+                </button>
+            </form>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const purokSelector = document.getElementById("purokSelector");
+
+                if (purokSelector) { // Check if the selector exists
+                    purokSelector.addEventListener("change", function() {
+                        const selectedValue = this.value; // Get the 'value' of the selected option
+                        if (selectedValue) { // Ensure a valid option was selected (not the disabled one)
+                            window.location.href = selectedValue; // Redirect the browser to the selected URL
+                        }
+                    });
+                }
+            });
+        </script>
+            </div>
+        </div>
+        <div class="h180 abstractBG borderRadius10 padding25 justifyStart col alignStart relative">
+            <div class="height0 absolute left25 bottom25 justifyStart gap10 paddingInline5">
+                <div class="searchBar">
+                    <input type="search" id="univ" placeholder="Search here ..">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <div class="height0 justifyStart alignStart col">
+                <p class="size34 white"><%= titlePage %></p>
+                <p class="size16 str300 white">Total of <%= totalInhabitants %> Residents on Record</p>
+            </div>
+        </div>
+    </div>
+
+        <div class="section hidden">
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.5); bottom: -10px;"><i class="fas fa-home"></i></a>
+                <p class="keyT"><%= totalHouseholds %></p>
+                <p class="keyL" style="display: flex;">
+                    Total Households
+                </p>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.5); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
+                <p class="keyT"><%= totalFamilies %></p>
+                <p class="keyL" style="display: flex;">
+                    Total Families
+                </p>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.5); bottom: -10px;"><i class="fas fa-user"></i></a>
+                <p class="keyT"><%= totalInhabitants %></p>
+                <p class="keyL" style="display: flex;">
+                    Total Inhabitants
+                </p>
+            </div>
+            <div class="card keyPlain clrd abstractBG">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.5); bottom: -10px;"><i class="fas fa-check-circle"></i></a>
+                <p class="keyT"><%= totalVoters %></p>
+                <p class="keyL">
+                    Registered Voters
+                </p>
+            </div>
+        </div>        
+            <br>
+
+        <div class="main overflow-y1 bgSoft borderRadius15" style="height: 55% !important;">
+
+        
+
+<script>
+    document.getElementById('newBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('unseen')) {
+        newCard.classList.remove('unseen');
+        newCard.classList.add('seen');
+    }
+});
+
+document.getElementById('closeBtn').addEventListener('click', function() {
+    var newCard = document.getElementById('newCard');
+    if (newCard.classList.contains('seen')) {
+        newCard.classList.remove('seen');
+        newCard.classList.add('unseen');
+    }
+});
+
+</script>
+            <div class="section tableCard">
+                <p class="p14" id="noRecords" style="display: none;">No Records</p>
+                
+                <table id="dirTable">
+                    <thead>
+                        <tr>
+                            <th class="width5 textCenter">#</th>
+                            <th onclick="sortTable(1)" style="width: 25%;">Complete Name</th>
+                            <th onclick="sortTable(2)" style="width: 15%;">Home Address</th>
+                            <th onclick="sortTable(4)" style="width: 10%;">Age</th>
+                            <th onclick="sortTable(4)" style="width: 10%;">Indigency</th>
+                            <th onclick="sortTable(0)" style="width: 10%;">Voting Status</th>
+                            <th onclick="sortTable(0)" style="width: 15%;">Priority</th>
+                            <th onclick="sortTable(5)" class="thCtrl" style="width: 10%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <% if (residents && residents.length > 0) { %>
+                            <% residents.forEach((resident, index) => { %>
+                                  <%
+                                    // Flags
+                                    let flags = [];
+                                    if (resident.pregnant && resident.pregnant.toString() === "on") flags.push("Pregnant");
+                                    if (resident.pwd && resident.pwd.toString() === "on") flags.push("PWD");
+                                    if (resident.soloParent && resident.soloParent.toString() === "on") flags.push("Solo Parent");
+
+                                    // Calculate age
+                                    function calculateAge(bMonth, bDay, bYear) {
+                                    if (!bMonth || !bDay || !bYear) return 0;
+                                    const month = isNaN(bMonth) ? moment().month(bMonth).format("M") : parseInt(bMonth);
+                                    const day = parseInt(bDay);
+                                    const year = parseInt(bYear);
+                                    return moment().diff(`${year}-${month}-${day}`, 'years');
+                                    }
+
+                                    const age = calculateAge(resident.bMonth, resident.bDay, resident.bYear);
+                                    if (age >= 60) flags.push("Senior");
+                                %>
+                                <tr>
+                                    <td class="textCenter"><%= index + 1 %></td>
+                                    <td>
+                                        <div class="height0 width0 justifyStart gap5">
+                                            <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h25 w25 borderRadius500 borderPrimary"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %> 
+                                            <% if (resident.suspend === 1) { %>
+                                            <i class="fas fa-lock red inline"></i>
+                                            <% } else { %>
+                                            <i class="bi bi-patch-check-fill green inline"></i>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td><%= resident.houseNo %> <%= resident.purok %></td>
+                                    <td> <%= age %> Years Old</td>
+                                    <td><%= resident.familyPoverty %></td>
+                                    <td><%= resident.precinct %></td>
+                                    <td>
+
+  <%= flags.length > 0 ? flags.join(", ") : "--" %>
+                                    </td>
+                                    <td class="tdCtrl">
+                                        <a href="/rsdView/<%= resident._id %>" class="nav"><i class="fas fa-eye"></i> &nbsp; Details</a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7">No residents found.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+                
+
+
+    </div>
+</div>
+<div class="sub height0 row flex">
+    <div class="ctrl left width20">
+        <span id="totalRecords" class="totalRecords"></span>
+    </div>
+    <div class="ctrl right width80">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>            
+
+            
+    <script>
+        const showHideButtons = document.querySelectorAll('.showPass');
+        
+        showHideButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const passwordInput = button.previousElementSibling;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    button.textContent = 'hide';
+                } else {
+                    passwordInput.type = 'password';
+                    button.textContent = 'show';
+                }
+            });
+        });
+    </script>
+    <script>
+        function enforceNumericInput(event) {
+            event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phoneInputs = document.querySelectorAll('.phone');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', enforceNumericInput);
+            });
+        });
+    </script>
+    
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+ 
+function renderPagination(totalRows) {
+    paginationContainer.innerHTML = "";
+
+    if (searchInput.value.trim()) return;
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "« Previous";
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        currentPage--;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // --- New Logic for displaying a limited number of page buttons ---
+
+    // Display all buttons if total pages are 7 or less
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+                renderPagination(totalRows);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    } else { // Display condensed pagination for more than 7 pages
+        const startPages = [1, 2, 3];
+        const endPages = [totalPages - 2, totalPages - 1, totalPages];
+        const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+
+        // Function to create a page button
+        const createPageButton = (page, isEllipsis = false) => {
+            const btn = document.createElement("button");
+            btn.innerHTML = isEllipsis ? "..." : page;
+            btn.disabled = isEllipsis;
+            if (!isEllipsis) {
+                btn.className = page === currentPage ? "active" : "";
+                btn.onclick = () => {
+                    currentPage = page;
+                    renderTable();
+                    renderPagination(totalRows);
+                };
+            }
+            return btn;
+        };
+
+        // Add first pages
+        for (const page of startPages) {
+            if (page <= totalPages) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+        
+        // Add ellipsis if current page is not near the start
+        if (currentPage > 4) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add middle pages (current page and its neighbors)
+        if (currentPage > 3 && currentPage < totalPages - 2) {
+            for (const page of middlePages) {
+                if (page > 0 && page <= totalPages) {
+                    paginationContainer.appendChild(createPageButton(page));
+                }
+            }
+        }
+
+        // Add ellipsis if current page is not near the end
+        if (currentPage < totalPages - 3) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add last pages
+        for (const page of endPages) {
+            if (page > 3) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+    }
+
+    // Next Button
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next »";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        currentPage++;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        //rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>
+
+<script>
+    function toggleFamilyRole() {
+        const familyRole = document.getElementById("familyRole").value;
+        const inputFHead = document.getElementById("inputFHead");
+        const inputIndigent = document.getElementById("inputIndigent");
+
+        // Hide both fields initially
+        inputFHead.classList.add("hidden");
+        inputIndigent.classList.add("hidden");
+
+        // Show the respective field based on selection
+        if (familyRole === "Member") {
+            inputFHead.classList.remove("hidden");
+        } else if (familyRole === "Head") {
+            inputIndigent.classList.remove("hidden");
+        }
+    }
+
+    function toggleDisability() {
+        const priorityCheckbox = document.getElementById("priority");
+        const disabilityField = document.getElementById("disabilityField");
+
+        if (priorityCheckbox.checked) {
+            disabilityField.classList.remove("hidden");
+        } else {
+            disabilityField.classList.add("hidden");
+        }
+    }
+</script>

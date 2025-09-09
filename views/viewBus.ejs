@@ -1,0 +1,564 @@
+<% layout('layout') %>
+<head>
+        <style>
+            .mainf {
+                position: relative;
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: row-reverse;
+                width: 100%;
+            }
+            .maindocPage {
+                display: block;
+                height: 1056px;
+                width: 816px;
+                background-color: white;
+                align-self: center !important;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+            }
+            .block2 {
+                padding: 0;
+                width: 100%;
+            }
+            .main .card {
+                padding: 40px;
+                align-items: start;
+                gap: 4px;
+            }
+            .title {
+                line-height: 2em;
+            }
+            .main p {
+                line-height: 1.5em;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+            }
+            .main p i {
+                width: 20px;
+                font-size: 12px;
+            }
+            .card.keyPlain {
+                height: 50%;
+            }
+            .card.Btn {
+                position: relative;
+                flex-direction: column;
+                padding: 10px 20px;
+                align-items: center;
+                justify-content: center;
+                height: auto;
+                font-size: 14px;
+                font-weight: 500;
+                gap: 20px;
+            }
+            .docBtn {
+                transform: scale(1);
+                width: 100%;
+                justify-content: center;
+                align-items: center;
+                height: 60px;
+                padding: 20px;
+                font-size: 16px;
+                border-radius: 12px;
+            }
+            .docBtn i {
+                width: 14px;
+            }
+            .tray p {
+                text-align: left;
+                justify-content: start;
+            }
+            #docButtonCard {
+                height: 100%;
+            }
+            #docf {
+                width: 100%;
+                height: 100%;
+                border-radius: 0;
+            }
+            #docPage {
+                padding: 0 10px;
+                border-radius: 0;
+                background-color: transparent;
+                justify-content: center;
+                justify-items: center;
+                padding-block: 50px;
+                height: 1050px;
+            }
+            .cmpCard {
+                flex-direction: column;
+                align-items: start;
+                padding: 10px;
+                height: auto;
+            }
+            .docHead {
+                height: 100px;
+            }
+            .docHR {
+                opacity: 1;
+                width: 90%;
+                border: 2px solid black;
+            }
+            .pageMainf {
+                padding-inline: 30px 60px;
+            }
+            .sub {
+                height: 30px;
+            }
+            .totalRecords {
+                font-size: 18px;
+                font-weight: 500;
+            }
+            .userPhoto {
+                height: 100px;
+                width: 100px;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            @media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .maindocPage {
+                    background-image: url('your-background-image.png') !important;
+                    background-size: cover !important;
+                }
+                span {
+                    font-size: 12pt !important;
+                }
+                sup, sub {
+                    font-size: inherit !important;
+                }
+                p.docTLE {
+                    font-size: 18pt !important;
+                }.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+.certContent {
+    height: calc(8 * 1em);
+    width: 98%;
+}
+.certContentM {
+    white-space: pre-wrap; /* Preserves new lines and spaces */
+}
+            }
+            
+.parag {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline !important;
+    font-family: 'Times New Roman', Times, serif;
+}
+.paragStr {
+    text-indent: 30px;
+    text-align: justify !important;
+    display: inline;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 1vw;
+}
+.txtStr {
+    font-weight: bold !important;
+}
+.blue {
+    color: rgb(1, 1, 111);
+}
+        </style>
+    </head>
+        <div class="head hidden">
+            <div class="ctrl left">
+                <a href="javascript:history.back()" class="nav" style="left: 30px; top: 30px;">
+                    <i class="fas fa-chevron-left"></i>
+                    Previous
+                </a>
+            </div>
+            <div class="ctrl hidden">
+                <a href="javascript:void()" class="nav cnav" onclick="zoomIn('clearance')">
+                    <i class="bi bi-zoom-in"></i>
+                </a>
+                <a href="javascript:void()" class="nav cnav" onclick="zoomOut('clearance')">
+                    <i class="bi bi-zoom-out"></i>
+                </a>
+                <a href="javascript:void()" class="nav cnav" onclick="resetZoom('clearance')">
+                    <i class="bi bi-arrow-repeat"></i>
+                </a>
+            </div>
+            <div class="ctrl right">
+                <div class="selectBar hidden" id="purpose">
+                    <select name="" id="purposeSelect" style="min-height: 40px;">
+                        <option value="">Select Purpose</option>
+                        <option value="ANY LEGAL">ANY LEGAL</option>
+                        <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                        <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                        <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                        <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                        <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                        <option value="BOARD EXAM">BOARD EXAM</option>
+                        <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                        <option value="LCR">LCR</option>
+                        <option value="LEGALIZATION">LEGALIZATION</option>
+                        <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                        <option value="PHILHEALTH">PHILHEALTH</option>
+                        <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                        <option value="PRIME WATER">PRIME WATER</option>
+                        <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                        <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                        <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                        <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                        <option value="XXX">XXX</option>
+                    </select>
+                </div>
+                <a href="#" class="nav" onclick="printDiv('doc1')">
+                    <i class="fas fa-print"></i>
+                    Print Document
+                </a>
+            </div>
+        </div>
+
+        <div class="main bgSoft borderRadius10 relative height100">
+            <div class="head absolute top0 transparent index50">
+                <div class="ctrl left">
+                    <a href="javascript:history.back()" class="nav" style="left: 30px; top: 30px;">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </a>
+                    <a href="#" class="nav" onclick="printDiv('doc1')">
+                        <i class="fas fa-print"></i>
+                        Print Document
+                    </a>
+                </div>
+                <div class="ctrl hidden">
+                    <a href="javascript:void()" class="nav cnav" onclick="zoomIn('clearance')">
+                        <i class="bi bi-zoom-in"></i>
+                    </a>
+                    <a href="javascript:void()" class="nav cnav" onclick="zoomOut('clearance')">
+                        <i class="bi bi-zoom-out"></i>
+                    </a>
+                    <a href="javascript:void()" class="nav cnav" onclick="resetZoom('clearance')">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </a>
+                </div>
+                <div class="ctrl right">
+                    <div class="selectBar hidden" id="purpose">
+                        <select name="" id="purposeSelect" style="min-height: 40px;">
+                            <option value="">Select Purpose</option>
+                            <option value="ANY LEGAL">ANY LEGAL</option>
+                            <option value="ASSISTANCE">BURIAL ASSISTANCE</option>
+                            <option value="ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                            <option value="ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                            <option value="ASSISTANCE">MEDICAL ASSISTANCE</option>
+                            <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                            <option value="BOARD EXAM">BOARD EXAM</option>
+                            <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                            <option value="LCR">LCR</option>
+                            <option value="LEGALIZATION">LEGALIZATION</option>
+                            <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                            <option value="PHILHEALTH">PHILHEALTH</option>
+                            <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                            <option value="PRIME WATER">PRIME WATER</option>
+                            <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                            <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                            <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                            <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                            <option value="XXX">XXX</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="block2 col" id="doc1">
+                <br>
+                <div class="card col tray docPage" id="docPage">
+                    <div class="maindocPage borderRadius5" id="clearance" style="position: relative;">
+                        <br>
+                        <img src="/images/logo.png" alt="" style="height: 800px; position: absolute; opacity: 0.1; z-index: 0;transform: translate(-50%, -50%); left: 50%; top: 55%;">
+                        <br>
+                        <div class="section letterhead">
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: end;">
+                                <img src="/images/logo.png" alt="">
+                            </div>
+                            <div class="ctrl col" style="flex: 1; gap: 0;">
+                                <p class="p14 oldEnglish">Republic of the Philippines</p>
+                                <p class="p10 tnr" style="text-align: center;">City of Cabanatuan<br>BARANGAY VALDEFUENTE</p>
+                                <p class="p16 impact">&nbsp;TANGGAPAN NG PUNONG BARANGAY&nbsp;</p>
+                            </div>
+                            <div class="ctrl" style="width: 200px; height: 150px; justify-content: start;">
+                                <img src="/images/cablogo.png" alt="">
+                            </div>
+                        </div>
+                        <center><hr class="docHR"></center>
+                        <div class="section" style="gap: 0; padding: 0; align-items: start;">
+                            <div class="section smallWidth pageSidef col" style="gap: 0;">
+                                <br>
+                                <p class="p10 tnr officialName">FRANCISCO s. VELASQUEZ</p>
+                                <p class="p10 tnr officialName">Punong Barangay</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">KAGAWAD:</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CARMELITA M. ANGELES</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">JOEY P. SAMSON</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">NOEMI N. ABULENCIA</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">CEAZAR T. CRUZ</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">TERESITA M. SANTIAGO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">ALEXANDER I. MATEO</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">VOLTAIRE B. GEMPESAW</p>
+                                <br><br><br>
+                                <p class="p10 tnr officialName">ARNOLD A. APAN</p>
+                                <p class="p10 tnr officialName">Barangay Secretary</p>
+                                <br><br>
+                                <p class="p10 tnr officialName">DIOSA P. PASCUAL</p>
+                                <p class="p10 tnr officialName">Barangay Treasurer</p>
+                                <br><br>
+                                <br><br>
+                                <br><br>
+                            </div>
+                            <div class="section largeWidth pageMainf">
+                                <br>
+                                <p class="p14 str600 tnr" style="text-align: center; justify-content: center; align-items: center; width: 100%; color: red;">
+                                    BARANGAY BUSINESS CERTIFICATION
+                                </p>
+                                <br>
+                                <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
+                                    <br>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that <span class="paragStr"><%= business.ownerName %></span> is the owner/manager of <span class="paragStr"><%= business.businessName %></span> located at <span class="paragStr"><%= business.houseNo %> <%= business.purok %>, Valdefuente, Cabanatuan City</span>.</p>
+                                    <br>
+                                    <p class="p10 parag">This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef">ANY LEGAL</span> Reference Purpose.</p>
+                                    <br>
+                                    <p class="p10 parag">Given this <span class="paragStr thisDay" id=""></span> day of <span class="paragStr thisMonth" id=""></span>, <span class="paragStr thisYear" id=""></span> at Barangay Valdefuente, Cabanatuan City</p>
+                                <br>
+                                <div class="height0 col alignEnd">
+                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: left;">PREPARED BY:</p>
+                                    <br><br>
+                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: center;">ARNOLD A. APAN</p>
+                                    <p class="size14 tnr width60" style="display: flex; justify-content: center;">Barangay Secretary</p>
+                                </div>
+                                <div class="height0 col alignStart">
+                                    <p class="size14 txtStr tnr width60" style="display: flex; justify-content: left;">APPROVED BY:</p>
+                                    <br><br>
+                                    <p class="size14 txtStr tnr width60 blue" style="display: flex; justify-content: center;">FRANCISCO S. VELASQUEZ</p>
+                                    <p class="size14 tnr width60" style="display: flex; justify-content: center;">Punong Barangay</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <br><br>
+                    </div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+
+            
+            
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Get the dropdown and the span element
+                    const purposeSelect = document.getElementById('purposeSelect');
+                    const purposeRef = document.getElementById('purposeRef');
+            
+                    // Update the span with the selected value whenever the selection changes
+                    purposeSelect.addEventListener('change', function() {
+                        purposeRef.textContent = purposeSelect.value;
+                    });
+                });
+            </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current date
+        const currentDate = new Date();
+    
+        // Get the current year, month (0-based, so +1 for the correct month), and day
+        const currentYear = currentDate.getFullYear();
+        const currentMonthIndex = currentDate.getMonth();  // Months are 0-indexed (0 = January, 11 = December)
+        const currentDay = currentDate.getDate();
+    
+        // Array of month names in English
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+    
+        // Array of month names in Tagalog
+        const monthNamesTagalog = [
+            "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo", 
+            "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre"
+        ];
+    
+        // Get the current month name in English and Tagalog
+        const currentMonth = monthNames[currentMonthIndex];
+        const currentMonthTagalog = monthNamesTagalog[currentMonthIndex];
+    
+        // Function to get the ordinal suffix for the day
+        function getOrdinalSuffix(day) {
+            if (day > 3 && day < 21) return day + "th";  // Handle 11th to 13th
+            switch (day % 10) {
+                case 1: return day + "st";
+                case 2: return day + "nd";
+                case 3: return day + "rd";
+                default: return day + "th";
+            }
+        }
+    
+        // Get the ordinal form of the day
+        const ordinalDay = getOrdinalSuffix(currentDay);
+    
+        // Update elements with the classes
+        document.querySelectorAll('.thisYear').forEach(el => el.textContent = currentYear);
+        document.querySelectorAll('.thisMonth').forEach(el => el.textContent = currentMonth);
+        document.querySelectorAll('.thisDay').forEach(el => el.textContent = ordinalDay);
+        
+        // Update elements with new requirements
+        document.querySelectorAll('.thisDay2').forEach(el => el.textContent = currentDay); // Only number
+        document.querySelectorAll('.thisMonth2').forEach(el => el.textContent = currentMonthTagalog); // Tagalog month name
+    });
+    </script>
+              
+<script>
+const zoomStep = 0.1; // Zoom increment step
+const maxZoom = 1.2; // Maximum zoom level
+const minZoom = 0.5; // Minimum zoom level
+
+// Object to store scales for each element
+let scales = {};
+
+function zoomIn(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] < maxZoom) {
+        scales[elementId] += zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function zoomOut(elementId) {
+    if (!scales[elementId]) {
+        scales[elementId] = 1; // Initialize scale if not set
+    }
+    if (scales[elementId] > minZoom) {
+        scales[elementId] -= zoomStep;
+        updateZoom(elementId);
+    }
+}
+
+function resetZoom(elementId) {
+    scales[elementId] = 1; // Reset the scale
+    updateZoom(elementId);
+}
+
+function updateZoom(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.transform = `scale(${scales[elementId]})`;
+        element.style.transformOrigin = "top center";
+    }
+}
+
+
+</script>
+<script>
+    function printDiv(divId) {
+        const divElement = document.querySelector(`#${divId} .maindocPage`);
+
+        if (!divElement) {
+            alert("Error: Document not found!");
+            return;
+        }
+
+        // Create a new print window
+        const printWindow = window.open("", "_blank");
+        printWindow.document.open();
+
+        // Copy all styles from the main document
+        let styles = "";
+        document.querySelectorAll("link[rel='stylesheet'], style").forEach((style) => {
+            styles += style.outerHTML;
+        });
+
+        // Write the new document with styles
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print Document</title>
+                ${styles} <!-- Include copied styles -->
+                <style>
+                    @media print {
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            color: black;
+                        }
+                        .maindocPage {
+                            width: 100%;
+                            max-width: 100%;
+                            font-size: 12pt !important; /* Set a proper font size */
+                            line-height: 1;
+                            page-break-before: always;
+                            page-break-inside: avoid;
+                        }
+                        h1, h2, h3 {
+                            font-size: 16pt !important;
+                        }
+                        p {
+                            font-size: 12pt !important;
+                        }
+                        .docTLE {
+                            font-size: 18px !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body onload="setTimeout(() => { window.print(); window.close(); }, 500)">
+                ${divElement.outerHTML}
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+    }
+</script>

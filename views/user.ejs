@@ -1,0 +1,170 @@
+<% layout('layout') %>
+    <head>
+        <style>
+            .mainf {
+                position: relative;
+            }
+            .main {
+                display: flex;
+                gap: 0;
+                padding: 0;
+                flex-direction: row-reverse;
+                width: 100%;
+            }
+            .card.col.tray {
+                box-shadow: none;
+                overflow-y: auto;
+                display: block;
+                align-items: start;
+                justify-content: start;
+                padding: 10px;
+                height: 100%;
+            }
+            .block {
+                padding: 0;
+                width: 80%;
+                height: auto;
+                border-radius: 1.5vw;
+                box-shadow: var(--shadow);
+            }
+            .userPhoto {
+                height: 120px;
+                width: 120px;
+                border-radius: 50%;
+            }
+            .userH {
+                height: 50px;
+                padding: 0;
+            }
+            form {
+                width: 100%;
+                padding: 20px 300px;
+            }
+            #dirTable {
+                box-shadow: var(--dangerShadow);
+            }
+            #userInfo td {
+                font-size: 0.8vw;
+            }
+            #userInfo {
+                padding: 0;
+                background-color: transparent;
+            }
+        </style>
+    </head>
+        <a href="/dsb" class="nav" style="position: absolute; right: 10px; top: 10px;">
+            <i class="fas fa-times"></i>
+            Close
+        </a>
+        <div class="main">
+            <div class="block col" id="trayCard" style="position: relative;">
+                <div class="card col tray" style="padding: 20px;">
+                    <div class="section left" style="align-items: end;">
+                        <img src="<%= user.photo ? user.photo : '/images/profile.jpg' %>" alt="Profile Image" class="userPhoto">
+                    </div>
+                    <div class="head userH">
+                        <div class="ctrl left">
+                            <p class="p20 str500"><%= user.firstName %> <%= user.middleName %> <%= user.lastName %> <%= user.extName %></p>
+                        </div>
+                    </div>
+                    <div class="head userH" style="position: absolute; right: 10px; top: 20px;">
+                        <div class="ctrl right">
+                            <a href="" class="nav">
+                                <i class="fa fa-edit"></i>
+                                Update Info
+                            </a>
+                            <a href="" class="nav" id="openResetCard">
+                                <i class="fas fa-key"></i>
+                                Reset
+                            </a>
+                            <a href="" class="nav">
+                                <i class="fas fa-camera"></i>
+                                Photo
+                            </a>
+                        </div>
+                    </div>
+                    <div class="section" style="align-items: start;">
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td>Position</td>
+                                    <td class="str"><%= user.position %></td>
+                                </tr>
+                                <tr>
+                                    <td>Address</td>
+                                    <td class="str"><%= user.houseNo %> <%= user.purok %>, Valdefuente</td>
+                                </tr>
+                                <tr>
+                                    <td>Birthday</td>
+                                    <td class="str"><%= user.bMonth %> <%= user.bDay %>, <%= user.bYear %></td>
+                                </tr>
+                                <tr>
+                                    <td>Birth Place</td>
+                                    <td class="str"><%= user.birthPlace %></td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 30%;">Gender</td>
+                                    <td class="str"><%= user.gender %></td>
+                                </tr>
+                                <tr>
+                                    <td>Civil Status</td>
+                                    <td class="str"><%= user.civilStatus %></td>
+                                </tr>
+                                <tr>
+                                    <td>Priority</td>
+                                    <td class="str"><%= user.priority %> <%= user.priorityType %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table id="userInfo">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30%;">Family Role</td>
+                                    <td class="str"><%= user.role %></td>
+                                </tr>
+                                <tr>
+                                    <td>Precinct</td>
+                                    <td class="str"><%= user.precinct %></td>
+                                </tr>
+                                <tr>
+                                    <td>Contact</td>
+                                    <td class="str"><%= user.phone %></td>
+                                </tr>
+                                <tr>
+                                    <td>Email</td>
+                                    <td class="str"><%= user.email %></td>
+                                </tr>
+                                <tr>
+                                    <td>CTC No.</td>
+                                    <td class="str"><%= user.ctcNo %></td>
+                                </tr>
+                                <tr>
+                                    <td>Issued Date</td>
+                                    <td class="str"><%= user.ctcDate %></td>
+                                </tr>
+                                <tr>
+                                    <td>Issued At</td>
+                                    <td class="str"><%= user.ctcLoc %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>  
+        </div>
+    <script>
+        const openResetCard = document.getElementById('openResetCard');
+        const resetPassCard = document.getElementById('resetPassCard');
+        const closeResetCard = document.getElementById('closeResetCard');
+    
+        openResetCard.addEventListener('click', function(e) {
+            e.preventDefault();
+            resetPassCard.style.display = 'flex';
+        });
+    
+        closeResetCard.addEventListener('click', function(e) {
+            e.preventDefault();
+            resetPassCard.style.display = 'none';
+        });
+    </script>

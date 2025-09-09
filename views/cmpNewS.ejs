@@ -1,0 +1,302 @@
+<% layout('layout') %>
+<div class="height100 width100 abstractBG borderRadius15">
+    <div class="height0 padding30 borderRadius10 height100 alignStart blockX overflow-y1 width70">
+        <form action="/cmpNew" method="POST" class="height0 width100 col alignStart gap0 alignStart">
+            <a href="/cmp" class="nav width0 widthMax0" style="max-width: auto; width: fit-content"><i class="fas fa-chevron-left"></i>Previous</a>
+            <br>
+            <div class="height0 padding5 title textLeft width0">
+                ADD NEW CASE
+            </div>
+            <br>
+            <div class="gap10 alignStart">
+                <div class="height0 col alignStart padding20 borderRadius20 borderPrimary">
+                    <div id="complainants" class="height0 col gap5 justifyStart">
+                        <input type="text" name="complainants[]" required placeholder="Enter complainant's name" class="45px">
+                        <div class="complainant-group" style="height: auto !important;">
+                        </div>
+                    </div>
+                    <br>
+                    <button type="button" onclick="addComplainant()"  class="nav"><i class="fas fa-plus"></i> Complainant</button>
+                </div>
+                <div class="height0 col alignStart padding20 borderRadius20 borderPrimary">
+                    <div id="complainees" class="height0 gap5 justifyStart width100 col justifyStart">
+                        <div class="complainee-group selectBar justifyStart height0 width100" style="max-width: 100% !important; width: 100% !important; min-width: 100% !important;">
+                            <select class="complainee-select" required>
+                                <option value="">Select Complainee</option>
+                                <% residents.forEach(resident => { %>
+                                    <option value="<%= resident._id %>"><%= resident.firstName %> <%= resident.lastName %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+                
+                    <br>
+                    <button type="button" onclick="addComplainee()" class="nav"><i class="fas fa-plus"></i> Complainee</button>
+                
+                    <!-- Hidden input for storing selected complainees -->
+                    <input type="hidden" name="complainees" id="complaineesInput">
+            </div>
+        
+                </div>
+        <br>
+            <div class="height0 gap10">
+                <div class="height0 col gap5 alignStart">
+                    <label for="">Type of Case</label>
+                    <div class="selectBar" style="max-width: none;">
+                        <select name="type" required>
+                            <option value="">Select a Case Type</option>
+                            <option value="Simple Physical Injuries">Simple Physical Injuries</option>
+                            <option value="Oral Defamation (Slander)">Oral Defamation (Slander)</option>
+                            <option value="Slander by Deed">Slander by Deed</option>
+                            <option value="Simple Threats">Simple Threats</option>
+                            <option value="Grave Coercion">Grave Coercion</option>
+                            <option value="Unjust Vexation">Unjust Vexation</option>
+                            <option value="Malicious Mischief">Malicious Mischief</option>
+                            <option value="Trespassing">Trespassing</option>
+                            <option value="Theft (Petty Theft only)">Theft (Petty Theft only)</option>
+                            <option value="Estafa (Swindling)">Estafa (Swindling)</option>
+                            <option value="Breach of Contract">Breach of Contract</option>
+                            <option value="Collection of Debts">Collection of Debts</option>
+                            <option value="Neighborhood Disputes">Neighborhood Disputes</option>
+                            <option value="Public Disturbance">Public Disturbance</option>
+                            <option value="Others">Others</option>
+                        </select>                            
+                    </div>
+                </div>
+                <div class="height0 col gap5 alignStart">
+                    <label for="">Case No.</label>
+                    <input type="text" name="caseNo">
+                </div>
+            </div>
+        <br>
+        <div class="height0 gap10">
+            <div class="field width60 bgSoft padding10 borderRadius10">
+                <label>Date Filed</label>
+                <div class="height0 gap5">
+                    <div class="selectBar">
+                        <select name="month" id="bMonth" required>
+                            <option value="" selected disabled>Month</option>
+                        </select>
+                    </div>
+                    
+                    <div class="selectBar">
+                        <select name="day" id="bDay" required>
+                            <option value="" selected disabled>Day</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option>
+                            <option value="26">26</option>
+                            <option value="27">27</option>
+                            <option value="28">28</option>
+                            <option value="29">29</option>
+                            <option value="30">30</option>
+                            <option value="31">31</option>
+                        </select>                                        
+                    </div>
+                    <div class="selectBar">
+                        <select name="year" id="bYear" required>
+                            <option value="" selected disabled>Year</option>
+                        </select>
+                    </div>
+                    
+                    
+                    <script>
+                        // Populate Months (January to December)
+                        const bMonthSelect = document.getElementById('bMonth');
+                        const months = [
+                            "January", "February", "March", "April", "May", "June", 
+                            "July", "August", "September", "October", "November", "December"
+                        ];
+                        
+                        months.forEach(month => {
+                            let option = new Option(month, month);
+                            bMonthSelect.appendChild(option);
+                        });
+                    
+                        // Populate Years (From Current Year down to 2018)
+                        const bYearSelect = document.getElementById('bYear');
+                        const currentYear = new Date().getFullYear();
+                    
+                        for (let i = currentYear; i >= 2018; i--) {
+                            let option = new Option(i, i);
+                            bYearSelect.appendChild(option);
+                        }
+                    
+                        // Populate Hours (1 - 12)
+                        const bHourSelect = document.getElementById('bHour');
+                        for (let i = 1; i <= 12; i++) {
+                            let option = new Option(i, i);
+                            bHourSelect.appendChild(option);
+                        }
+                    
+                        // Populate Minutes (00, 01, 02, ..., 59)
+                        const bMinuteSelect = document.getElementById('bMinute');
+                        for (let i = 0; i < 60; i++) {
+                            let option = new Option(i.toString().padStart(2, "0"), i);
+                            bMinuteSelect.appendChild(option);
+                        }
+                    </script>
+                    
+                    
+                    
+                    
+                </div>
+                </div>
+                <div class="field width40 bgSoft padding10 borderRadius10">
+                    <label for="">Time</label>
+                    <div class="height0 gap5">
+                        <div class="selectBar">
+                            <select name="hour" id="bHour" required>
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>  
+                        </div>                      
+                        
+                        <div class="selectBar">
+                            <select name="minute" id="bMinute" required>
+                                <option value="" selected disabled>00</option>
+                                <!-- Generate options from 01 to 59 -->
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                                <option value="29">29</option>
+                                <option value="30">30</option>
+                                <option value="31">31</option>
+                                <option value="32">32</option>
+                                <option value="33">33</option>
+                                <option value="34">34</option>
+                                <option value="35">35</option>
+                                <option value="36">36</option>
+                                <option value="37">37</option>
+                                <option value="38">38</option>
+                                <option value="39">39</option>
+                                <option value="40">40</option>
+                                <option value="41">41</option>
+                                <option value="42">42</option>
+                                <option value="43">43</option>
+                                <option value="44">44</option>
+                                <option value="45">45</option>
+                                <option value="46">46</option>
+                                <option value="47">47</option>
+                                <option value="48">48</option>
+                                <option value="49">49</option>
+                                <option value="50">50</option>
+                                <option value="51">51</option>
+                                <option value="52">52</option>
+                                <option value="53">53</option>
+                                <option value="54">54</option>
+                                <option value="55">55</option>
+                                <option value="56">56</option>
+                                <option value="57">57</option>
+                                <option value="58">58</option>
+                                <option value="59">59</option>
+                            </select>
+                            
+                        </div>
+                        
+                        <div class="selectBar">
+                            <select name="zone" id="bZone" required>
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <br>
+            <button type="submit" class="nav pnav"><i class="fas fa-plus"></i>Add Record</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function addComplainant() {
+        const container = document.getElementById('complainants');
+        const newInput = document.createElement('div');
+        newInput.classList.add('complainant-group');
+        newInput.innerHTML = '<input type="text" name="complainants[]" required placeholder="Enter complainant\'s name">';
+        container.appendChild(newInput);
+    }
+
+    function addComplainee() {
+        const container = document.getElementById('complainees');
+        const newSelect = document.createElement('div');
+        newSelect.classList.add('complainee-group');
+        newSelect.innerHTML = `
+        <div class="selectBar"  style="max-width: 100% !important; width: 100% !important; min-width: 100% !important;">
+            <select class="complainee-select" required>
+                <option value="">Select Complainee</option>
+                <% residents.forEach(resident => { %>
+                    <option value="<%= resident._id %>"><%= resident.firstName %> <%= resident.lastName %></option>
+                <% }); %>
+            </select>
+        </div>
+        `;
+        container.appendChild(newSelect);
+    }
+
+    document.querySelector("form").addEventListener("submit", function (event) {
+        const selectedComplainees = Array.from(document.querySelectorAll('.complainee-select'))
+            .map(select => select.value)
+            .filter(id => id); 
+
+        document.getElementById("complaineesInput").value = JSON.stringify(selectedComplainees);
+    });
+</script>

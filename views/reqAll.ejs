@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRAR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/logo.png">
+    <style>
+
+        #reqBtn:hover {
+            transform: scale(1.01);
+            transition: transform 0.4s ease-in-out;
+            box-shadow: 0 4px 4px rgba(114, 114, 114, 0.773);
+        }
+        .hidden {
+            display: none;
+        }
+
+        @media screen and (max-width: 1025px) {
+            #reqBtn {
+                width: 100%;
+                flex-direction: column;
+                padding: 5px;
+                margin-bottom: 3px;
+            }
+            #reqCrd {
+                flex-direction: column;
+                padding: 10px;
+            }
+            #reqDtl {
+                flex-direction: column;
+                justify-content: start;
+                align-items: start;
+                width: 100% !important;
+                p {
+                    width: 100%;
+                }
+            }
+            #reqDtl2 {
+                flex-direction: column;
+                justify-content: start;
+                align-items: start;
+                width: 100% !important;
+                p {
+                    width: 100%;
+                }
+            }
+            #reqDtl3 {
+                width: 100%;
+            }
+            #status {
+                width: fit-content !important;
+                max-width: auto;
+                padding: 8px;
+                position: initial;
+                border-radius: 10px !important;
+            }
+            body {
+                padding: 0;
+                padding-inline: 0 !important;
+            }
+            .abstractBG {
+                border-radius: 0;
+            }
+            .responsive {
+                display: none;
+            }
+            .unresponsive {
+                display: flex;
+            }
+            #headCard {
+                flex-direction: column;
+                justify-content: space-between;
+                height: 20%;
+                padding: 15px;
+            }
+            .headPlate {
+                justify-content: start;
+                span {
+                    width: 100%;
+                }
+                input {
+                    width: 100%;
+                }
+            }
+            #headX {
+                width: 100%;
+            }
+            #date {
+                margin-left: 0;
+                width: 100%;
+                text-align: left;
+                margin-top: 0 !important;
+            }
+            #mainTab {
+                width: 100%;
+            }
+            .br3 {
+                display: none;
+            }
+        }
+    </style>
+<body class="bgWhite relative gap10 rowReverse">
+    <div class="block padding20 borderRadius10 borderPrimary width40 responsive overflow-y1">
+        <div class="height0 paddingInline10 justifyStart"><p class="size28 str500 colorPrimary">Request Form</p></div>
+        <form action="/reqDocument" method="POST" enctype="application/x-www-form-urlencoded" class="bgWhite height0 padding10 darkShadow borderRadius20 relative">
+
+                    <div class="fieldsetContainer height0 padding5 width0 col" id="fieldsetContainer">
+                        <fieldset class="marginBottom20 abstractBG border0 darkShadow padding5">
+                            <div class="justifyBetween marginBottom5" id="removeBtnContainer2">
+                                <p class="size20 str400 white width0 padding5"><i class="fas fa-file-alt size16"></i> Document</p>
+                                <button type="button" class="remove-btn nav fnav width0 border0 size12 dnav">Remove</button>
+                            </div>
+                            
+                            <div class="row gap10 bgWhite borderRadius10 padding10">
+                                <div class="field width40">
+                                    <label>Type</label>
+                                    <div class="selectBar">
+                                        <select name="type[]" required class="docType">
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="Barangay Clearance">Barangay Clearance</option>
+                                            <option value="Barangay Indigency">Barangay Indigency</option>
+                                            <option value="Good Moral">Good Moral</option>
+                                            <option value="Certificate of Residency">Certificate of Residency</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width40">
+                                    <label>Purpose</label>
+                                    <div class="selectBar">
+                                        <select name="purpose[]" required>
+                                            <option value="ANY LEGAL">ANY LEGAL</option>
+                                            <option value="BURIAL ASSISTANCE">BURIAL ASSISTANCE</option>
+                                            <option value="EDUCATIONAL ASSISTANCE">EDUCATIONAL ASSISTANCE</option>
+                                            <option value="FINANCIAL ASSISTANCE">FINANCIAL ASSISTANCE</option>
+                                            <option value="MEDICAL ASSISTANCE">MEDICAL ASSISTANCE</option>
+                                            <option value="BANK TRANSACTION">BANK TRANSACTION</option>
+                                            <option value="BOARD EXAM">BOARD EXAM</option>
+                                            <option value="CELCOR/ELECTRIC METER">CELCOR/ELECTRIC METER</option>
+                                            <option value="LCR">LCR</option>
+                                            <option value="LEGALIZATION">LEGALIZATION</option>
+                                            <option value="LOCAL EMPLOYMENT">LOCAL EMPLOYMENT</option>
+                                            <option value="PHILHEALTH">PHILHEALTH</option>
+                                            <option value="POLICE CLEARANCE">POLICE CLEARANCE</option>
+                                            <option value="PRIME WATER">PRIME WATER</option>
+                                            <option value="SCHOOL REQUIREMENT">SCHOOL REQUIREMENT</option>
+                                            <option value="SENIOR CITIZEN">SENIOR CITIZEN</option>
+                                            <option value="SOLO PARENT PWD">SOLO PARENT PWD</option>
+                                            <option value="TRAVEL ABROAD">TRAVEL ABROAD</option>
+                                            <option value="XXX">XXX</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="field width20">
+                                    <label>No. Copies</label>
+                                    <div class="selectBar">
+                                        <select name="qty[]" required>
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <script>
+                                    document.addEventListener("DOMContentLoaded", function () {
+    const docTypeSelect = document.querySelector(".docType");
+    const purposeSelect = document.querySelector("select[name='purpose[]']");
+
+    const defaultPurposes = [
+        "ANY LEGAL", "BURIAL ASSISTANCE", "EDUCATIONAL ASSISTANCE", "FINANCIAL ASSISTANCE",
+        "MEDICAL ASSISTANCE", "BANK TRANSACTION", "BOARD EXAM", "CELCOR/ELECTRIC METER",
+        "LCR", "LEGALIZATION", "LOCAL EMPLOYMENT", "PHILHEALTH", "POLICE CLEARANCE",
+        "PRIME WATER", "SCHOOL REQUIREMENT", "SENIOR CITIZEN", "SOLO PARENT PWD",
+        "TRAVEL ABROAD", "XXX"
+    ];
+
+    const indigencyPurposes = [
+        "Burial Assistance",
+        "Educational Assistance",
+        "Financial Assistance",
+        "Medical Assistance",
+        "PhilHealth",
+        "Senior Citizen",
+        "Solo Parent / PWD",
+        "School Requirement"
+    ];
+
+    function updatePurposeOptions() {
+        const selectedType = docTypeSelect.value;
+        purposeSelect.innerHTML = ""; // Clear existing options
+
+        let purposes = defaultPurposes; // Default list
+
+        if (selectedType === "Good Moral" || selectedType === "Certification") {
+            purposes = ["ANY LEGAL"];
+        } else if (selectedType === "Barangay Indigency") {
+            purposes = indigencyPurposes;
+        }
+
+        // Add options to select element
+        let defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        purposeSelect.appendChild(defaultOption);
+
+        purposes.forEach(purpose => {
+            let option = document.createElement("option");
+            option.value = purpose;
+            option.textContent = purpose;
+            purposeSelect.appendChild(option);
+        });
+    }
+
+    // Event listener for document type change
+    docTypeSelect.addEventListener("change", updatePurposeOptions);
+
+    // Initialize options on page load
+    updatePurposeOptions();
+});
+
+                                </script>
+                            </div>
+                            <div class="height0 col alignStart hidden" id="purposeCard">
+                                <label for="">Remarks: Indicate here the content (Optional)</label>
+                                <textarea placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarks[]"></textarea>
+                            </div>                        
+                        </fieldset>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addBtn = document.getElementById("addBtn");
+    const fieldsetContainer = document.getElementById("fieldsetContainer");
+
+    // Function to handle "Certification (Customizable)" selection
+    function togglePurposeCard(selectElement) {
+        const fieldset = selectElement.closest("fieldset");
+        const purposeCard = fieldset.querySelector(".purposeCard");
+        const remarksField = fieldset.querySelector(".remarks");
+
+        if (selectElement.value === "Certification") {
+            purposeCard.classList.remove("unseen");
+            purposeCard.classList.add("seen2");
+        } else {
+            purposeCard.classList.remove("seen2");
+            purposeCard.classList.add("unseen");
+        }
+
+        // Ensure remarks field is always visible
+        if (remarksField) {
+            remarksField.parentElement.classList.remove("unseen");
+        }
+    }
+
+// Function to check fieldset count and toggle Add button
+function checkFieldsetCount() {
+    const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+    const limitMessageDiv = document.getElementById("limitM"); // Get the existing div
+
+    if (fieldsets.length >= 5) {
+        addBtn.style.display = "none"; // Hide the Add button
+        if (limitMessageDiv) { // Ensure the div exists before trying to show it
+            limitMessageDiv.classList.remove("hidden"); // Show the limit message
+        }
+    } else {
+        addBtn.style.display = "inline-block"; // Show the Add button (adjust display type as needed)
+        if (limitMessageDiv) { // Ensure the div exists before trying to hide it
+            limitMessageDiv.classList.add("hidden"); // Hide the limit message
+        }
+    }
+}
+
+    // Function to check if required fields have data
+    function isFieldsetValid(fieldset) {
+        const requiredFields = fieldset.querySelectorAll("select[required], input[required], textarea[required]");
+        return Array.from(requiredFields).every(field => field.value.trim() !== "");
+    }
+
+    function checkLastFieldsetBeforeAdding() {
+        const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1]; // Get the last fieldset
+        const messageDiv = document.getElementById("formMessage");
+
+        if (isFieldsetValid(lastFieldset)) {
+            addBtn.removeAttribute("disabled");
+            messageDiv.style.display = "none";
+        } else {
+            addBtn.setAttribute("disabled", "true");
+        }
+    }
+
+    // Add event listener to "Add" button
+    addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const fieldsets = fieldsetContainer.querySelectorAll("fieldset");
+        const lastFieldset = fieldsets[fieldsets.length - 1];
+
+        // Prevent adding new fieldset if last one is empty
+        const messageDiv = document.getElementById("formMessage");
+
+        // Hide the message initially
+        messageDiv.style.display = "none";
+
+        if (!isFieldsetValid(lastFieldset)) {
+            messageDiv.innerHTML = `<i class="fas fa-exclamation-circle marginLeft5"></i> &nbsp; Please fill in all required fields before adding a new document!`;
+            messageDiv.style.display = "flex";
+            messageDiv.style.padding = "10px";
+            messageDiv.style.marginBottom = "10px";
+            messageDiv.style.border = "0.5px solid red";
+            return;
+        }
+
+        // If valid, make sure the message is hidden
+        messageDiv.style.display = "none";
+
+        // Clone the first fieldset as a template
+        const firstFieldset = document.querySelector("fieldset");
+        if (!firstFieldset) return;
+
+        const newFieldset = firstFieldset.cloneNode(true);
+
+        // Clear values in the cloned fieldset
+        newFieldset.querySelectorAll("select, input, textarea").forEach((el) => {
+            if (el.tagName === "SELECT") {
+                el.selectedIndex = 0;
+            } else {
+                el.value = "";
+            }
+        });
+
+        // Ensure remarks field is always visible and cleared
+        const remarksField = newFieldset.querySelector(".remarks");
+        if (remarksField) {
+            remarksField.value = "";
+            remarksField.parentElement.classList.remove("unseen");
+        }
+
+        // Add remove button event listener
+        const removeBtn = newFieldset.querySelector(".remove-btn");
+        if (removeBtn) {
+            removeBtn.style.display = "flex";
+            removeBtn.addEventListener("click", function () {
+                newFieldset.remove();
+                checkFieldsetCount();
+                checkLastFieldsetBeforeAdding();
+            });
+        }
+
+        // Add event listener for document type
+        const newDocType = newFieldset.querySelector(".docType");
+        if (newDocType) {
+            newDocType.addEventListener("change", function () {
+                togglePurposeCard(this);
+            });
+        }
+
+        // Append new fieldset
+        fieldsetContainer.appendChild(newFieldset);
+
+        // Check fieldset count and button state
+        checkFieldsetCount();
+        checkLastFieldsetBeforeAdding();
+    });
+
+    // Ensure the first fieldset can't be removed
+    const firstRemoveBtn = document.querySelector(".remove-btn");
+    if (firstRemoveBtn) {
+        firstRemoveBtn.style.display = "none";
+    }
+
+    // Add event listener for document type in the first fieldset
+    const firstDocType = document.querySelector(".docType");
+    if (firstDocType) {
+        firstDocType.addEventListener("change", function () {
+            togglePurposeCard(this);
+        });
+    }
+
+    // Ensure remarks fields are shown on load
+    document.querySelectorAll(".remarks").forEach((el) => {
+        el.parentElement.classList.remove("unseen");
+    });
+
+    // Monitor inputs for validation
+    fieldsetContainer.addEventListener("input", checkLastFieldsetBeforeAdding);
+
+    // Initial check on load
+    checkFieldsetCount();
+    checkLastFieldsetBeforeAdding();
+});
+
+                            </script>
+                                                    
+                                    
+                    </div>
+
+                    <div id="formMessage" class="form-message height0 size12 colorPrimary justifyCenter borderRadius10" style="background-color: rgb(255, 228, 228); color: rgb(80, 0, 0);"></div>
+
+                    <div id="limitM" class="limitM height0 size12 colorPrimary justifyCenter borderRadius10 borderPrimary" style="background-color: rgba(246, 255, 247, 0.87);">
+                        <div class="height0 padding10 size14 str500"> You can only request not more than a five (5) items</div>
+                    </div>
+                        
+                    <div class="paddingInline5 height0">
+                        <div class="height0 justifyBetween padding10 borderRadius10 borderPrimary">
+                            <p class="size14 str500">Need More Document?</p>
+                            <a href="#" class="nav pnav tnav" id="addBtn"><i class="fas fa-plus inline"></i> Add Additional Document</a>
+                        </div>
+                    </div>
+                            
+                    <div class="height0 col alignStart hidden" id="">
+                        <label for="">Remarks (Optional)</label>
+                        <textarea class="height0 overflow-y1" placeholder="e.g. This is to certify that Juan dela Cruz is a solo parent." name="remarkMain"></textarea>
+                    </div> 
+                    <br>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I confirm that I am still a resident of Barangay Valdefuente</p>
+                    </div>
+                    <div class="height0 justifyStart">
+                        <input type="checkbox" class="width0 gap10" required> &nbsp;
+                        <p class="size14">I hereby agree to the <a href="javascript:void()" class="inline height0 width0 green str500" id="tcBtn">terms and conditions</a></p>
+                    </div>
+<script>
+document.getElementById('tcBtn').addEventListener('click', () => {
+    const tcDiv = document.getElementById('tc');
+    tcDiv.classList.toggle('hidden');
+});
+</script>
+                <div class="h150 padding20 col borderPrimary borderRadius10 bgWhite block overflow-y1 marginTop10 hidden" id="tc">
+                    <p class="size14 str600 textCenter">Terms and Conditions for Document Request</p>
+                    <br>
+                    <p class="size14 textJustify">
+                        By submitting a document request through this system, you agree to the following terms and conditions:
+                        <br><br>
+                        1. Eligibility
+                        <br>
+                        You must be a registered resident of Barangay Valdefuente to request documents.
+                        All information provided must be accurate and up to date.
+                        Residents with pending case involvement are not eligible to request Barangay Clearance and Barangay Indigency.
+                        <br><br>
+                        2. Document Request Process
+                        <br>
+                        Only the document type, purpose, and number of copies are required when submitting a request.
+                        All requests are subject to approval by the Barangay Secretary and Punong Barangay.
+                        Requests that do not meet the barangay’s requirements may be denied.
+                        Residents can request up to five (5) documents per transaction, regardless of their purpose, with a limit of three (3) copies per document.
+                        <br><br>
+                        3. Request Approval & Status
+                        <br>
+                        All submitted requests will be initially marked as "Pending."
+                        Requests will be reviewed and processed, then either approved or denied based on eligibility and barangay policies.
+                        Applicants will be notified once the request has been approved, denied, or requires additional information.
+                        <br><br>
+                        4. No Payment Required
+                        <br>
+                        There are no fees for requesting documents.
+                        This system does not involve any payment processing.
+                        <br><br>
+                        5. Data Privacy
+                        <br>
+                        Personal information provided in this system will be used only for processing document requests.
+                        The barangay will not share any personal data with third parties unless required by law.
+                        <br>
+                        6. Changes to Terms
+                        These terms and conditions may be updated at any time.
+                        Continued use of the system after updates implies your acceptance of the revised terms.
+                        <br><br>
+                        7. Agreement
+                        <br>
+                        By checking the box and submitting your request, you confirm that you have read, understood, and agreed to the terms and conditions outlined above.
+                    </p>
+                </div>
+                    <br>
+                    <div class="noteCard textCenter bgSoft">
+                        TAKE NOTE: Please review all the details carefully before submitting your request. Ensure that all selections and information are correct, as changes may not be allowed after submission.
+                    </div>
+
+                    <div class="field height0 marginTop15 width100 alignEnd">
+                        <button type="submit" class="nav tnav pnav"><i class="fas fa-check-circle"></i>Submit</button>
+                    </div>
+                </form>
+
+    </div>
+
+
+    <div class="col gap5 relative bgWhite width60" id="mainTab">
+    <div class="height10 justifyStart gap10 abstractBG padding10 borderRadius10" id="headCard">
+        <div class="height0 justifyStart gap15 headPlate">
+            <a href="/hom" class="nav headf responsive" id=""><i class="fas fa-chevron-left"></i>Go Back</a>
+            <a href="/hom" class="nav cnav unresponsive hidden" id=""><i class="fas fa-chevron-left"></i></a>
+            <a href="/hom" class="userPhoto transition h50 bgWhite padding0 borderRadius500 hidden"><img src="/images/logo.jpg" alt="" class="height60 borderRadius500"></a>
+            <p class="size24 str400 upperCase colorPrimary hidden">BVRSRS</p>
+            <p class="size20 colorPrimary str500 white">Request History</p>  
+        </div>  
+        <div class="height0 justifyEnd gap15 headPlate">                  
+            <span class="flex justifyStart alignCenter gap0 snav paddingInline20 paddingBlock0 borderRadius10">
+                <i class="fas fa-search" style="font-size: 12px;"></i>
+                <input type="search" id="searchRequest" class="border0 width0" placeholder="Search news here ..">
+            </span>
+        </div>
+    </div>
+    
+    <div class="height90 gap20">
+        <div class="col gap0">
+            <div class="block col justifyStart borderRadius10 padding15 bgSoft alignStart justifyBetween  overflow-y1">
+                    <div id="noFound" class="noFound size20 height0 width0 padding30 borderRadius10 str500  shadowNone hidden bgSoft col">
+                        <div class="h85 w88 relative borderRadius500 borderBlack">
+                            <i class="fas fa-frown size60 gray h65 w65 absolute right10 bottom10"  style="transform: rotate(-10deg);"></i>
+                            <i class="fas fa-frown size28 black h35 w35 absolute left20 bottom5" style="transform: rotate(-10deg);"></i>
+                        </div>
+                        Sorry, No record Found!
+                    </div>
+                <div class="height0 justifyStart alignStart gap10 borderRadius15 padding10 col" id="reqSec">
+                    <% if (requests.length > 0) { %>
+                        <% requests.forEach(request => { %>
+                            
+                        <a href="/reqView2/<%= request._id %>" class="height0 justifyStart width100 heightMax0 marginBottom5 padding10 borderRadius10 relative
+                                <% if (["Declined", "Claimed", "Cancelled"].includes(request.status)) { %>
+                                    bgSoft borderGray
+                                <% } else if (["", "Approved", "For Pickup"].includes(request.status)) { %>
+                                    bgWhite shadowNone
+                                <% } else { %>
+                                    bgWhite borderGreen green
+                                <% } %>" id="reqBtn">
+                            <div class="cnav height0 absolute right15 h45 w45 borderGray" style="top: 50%; transform: translateY(-50%);"><i class="fas fa-arrow-right"></i></div>
+                            <div class="height0 padding15 borderRadius10 alignCenter height100" id="reqCrd">
+                                <div class="col width18 alignStart justifyEnd height0 gap5" id="headX">
+                                    <div class="height0 size14 str500 padding10 absolute top0 left18 width15
+                                        <% if ( request.status == "Pending") { %>
+                                        bgShade1 white abstractBG
+                                        <% } else if ( request.status == "Claimed") { %>
+                                        bgDarkGray white abstractBG
+                                        <% } else if ( request.status == "Declined") { %>
+                                        bgRed white abstractBG
+                                        <% } else if ( request.status == "Cancelled") { %>
+                                        bgRed white abstractBG
+                                        <% } else if ( request.status == "For Pickup") { %>
+                                        witch white abstractBG
+                                        <% } else { %>
+                                        witch white abstractBG
+                                        <% } %>
+                                        " style="border-radius:0 0 10px 10px;" id="status"><%= request.status %>
+                                    </div>
+                                    <p class="size12 textCenter" id="date" style="margin-top: 12%;">
+                                        <%= new Date(request.createdAt).toLocaleString('en-US', { month: 'short', day: '2-digit' }) %>
+                                        <%= new Date(request.createdAt).getFullYear() %>
+                                        <br class="br3 hidden"> <%= new Date(request.createdAt).toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) %>
+                                    </p>
+                                </div>
+                                <div class="height0 width82 alignStart paddingInline20 gap0 col" id="reqDtl">
+                                    <p class="size22 str500" id="TR">TR#<%= request.tr %></p>
+                                    <div class="height0 justifyStart gap5" id="reqDtl2">
+                                        <%
+                                        // Step 1: Merge documents with the same type and count occurrences
+                                        let mergedDocuments = {};
+                                    
+                                        request.documents.forEach(doc => { if (mergedDocuments[doc.type]) { mergedDocuments[doc.type]++;
+                                            } else { mergedDocuments[doc.type] = 1; } });
+                                    
+                                        // Step 2: Convert to an array for easy iteration
+                                        let mergedArray = Object.keys(mergedDocuments).map(type => ({ type: type, count: mergedDocuments[type] }));
+                                    
+                                        // Step 3: Define how many items to show before "+X more"
+                                        let visibleItems = 2; // Show only first 2 items
+                                        let hiddenCount = mergedArray.length - visibleItems; // Count remaining hidden items
+                                        %>
+                                    
+                                        <% if (mergedArray.length > visibleItems) { %>
+                                            <% for (let i = 0; i < visibleItems; i++) { %>
+                                                <p class="size12 colorPrimary str400 <% if (["Pending", "Approves"].includes(request.status)) { %>
+                                                    green
+                                                <% } %>
+                                                "><%= mergedArray[i].count %> <%= mergedArray[i].type %>,</p>
+                                            <% } %>
+                                            <% if (hiddenCount > 0) { %> 
+                                                <p class="size12 colorPrimary str400 green">+<%= hiddenCount %> more items,</p>
+                                            <% } %>
+                                        <% } else { %>
+                                            <% mergedArray.forEach(document => { %>
+                                                <p class="size12 colorPrimary str400 <% if (["Pending", "Approves"].includes(request.status)) { %>
+                                                    green
+                                                <% } %>"><%= document.count %> <%= document.type %>,</p>
+                                            <% }) %>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <% }) %>
+                    <% } else { %>
+                        <p class="size14 str400 textCenter">No Recent or Active Requests as of Now</p>
+                    <% } %>   
+
+                </div>
+            </div>
+            <div class="height10 justifyBetween">
+                <div class="height0 width0 gap10">
+                    <p class="size14">Display Per Page</p>
+                    <div class="selectBar width0">
+                        <select id="rowsPerPage" class="width0">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="100">100</option>
+                            <option value="100000">All</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="pagination" class="height0 width0"></div>
+            </div>
+
+        </div>
+     
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const requestContainer = document.getElementById("reqSec");
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const searchInput = document.getElementById("searchRequest");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRequests = Array.from(requestContainer.children);
+    let filteredRequests = allRequests;
+
+    function renderRequests() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        // Hide all first
+        allRequests.forEach(req => (req.style.display = "none"));
+        
+        // Show filtered requests based on pagination
+        filteredRequests.slice(start, end).forEach(req => (req.style.display = "flex"));
+
+        renderPagination(filteredRequests.length);
+    }
+
+    function renderPagination(totalRequests) {
+        paginationContainer.innerHTML = "";
+
+        if (searchInput.value.trim()) return;
+
+        const totalPages = Math.ceil(totalRequests / rowsPerPage);
+        if (totalPages <= 1) return;
+
+        const prevButton = document.createElement("button");
+        prevButton.innerHTML = "« Previous";
+        prevButton.disabled = currentPage === 1;
+        prevButton.onclick = () => {
+            currentPage--;
+            renderRequests();
+        };
+        paginationContainer.appendChild(prevButton);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderRequests();
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+
+        const nextButton = document.createElement("button");
+        nextButton.innerHTML = "Next »";
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.onclick = () => {
+            currentPage++;
+            renderRequests();
+        };
+        paginationContainer.appendChild(nextButton);
+    }
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderRequests();
+    }
+
+function searchRequests() {
+    const query = searchInput.value.toLowerCase().trim();
+    filteredRequests = allRequests.filter(req => req.innerText.toLowerCase().includes(query));
+    currentPage = 1;
+    rowsPerPageSelect.style.display = query ? "none" : "flex";
+
+    const noFoundDiv = document.querySelector(".noFound");
+    if (noFoundDiv) {
+        if (filteredRequests.length === 0) {
+            noFoundDiv.classList.remove("hidden");
+        } else {
+            noFoundDiv.classList.add("hidden");
+        }
+    }
+
+    renderRequests();
+}
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchRequests);
+    renderRequests();
+});
+
+</script>
+</body>
+</html>

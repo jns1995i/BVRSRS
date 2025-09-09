@@ -1,0 +1,66 @@
+<% layout('layout') %>
+
+
+<div class="height10 gap5 justifyBetween">    
+    <a href="/fml" class="nav">
+        <i class="fas fa-arrow-left"></i> Back to Households
+    </a>
+    <p class="size24 str500">
+        FAMILY DETAILS
+    </p>
+</div>
+<hr>
+<br>
+
+<p class="size20 str500 marginBottom10 marginLeft10">Family Head</p>
+<table class="width30">
+    <tr>
+        <td class="width30">Name</td>
+        <td><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></td>
+    </tr>
+    <tr>
+        <td>Position</td>
+        <td><%= resident.position %></td>
+    </tr>
+    <tr>
+        <td>House No.</td>
+        <td><%= resident.houseNo %>, <%= resident.purok %></td>
+    </tr>
+    <tr>
+        <td>Phone</td>
+        <td><%= resident.phone ? resident.phone : "N/A" %></td>
+    </tr>
+    <tr>
+        <td>Email</td>
+        <td><%= resident.email ? resident.email : "N/A" %></td>
+    </tr>
+</table>
+
+<br>
+<br>
+<p class="size20 str500 marginBottom10 marginLeft10">Family Members</p>
+
+<% if (familyMembers.length > 0) { %>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Civil Status</th>
+            <th>Role</th>
+            <th>Phone</th>
+        </tr>
+        <% familyMembers.forEach(member => { %>
+            <tr>
+                <td><%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %></td>
+                <td><%= member.gender %></td>
+                <td><%= member.civilStatus %></td>
+                <td><%= member.role %></td>
+                <td><%= member.phone ? member.phone : "N/A" %></td>
+            </tr>
+        <% }) %>
+    </table>
+<% } else { %>
+    <p>No family members found.</p>
+<% } %>
+
+<br>

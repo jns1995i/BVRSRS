@@ -1,0 +1,321 @@
+<% layout('layout') %>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!sessionStorage.getItem("shown")) {
+            document.getElementById("messageBox").style.display = "flex";
+            sessionStorage.setItem("shown", "true"); // Set flag so it doesn't show again
+        }
+
+        document.getElementById("closeBtn").addEventListener("click", function() {
+            document.getElementById("messageBox").style.display = "none";
+        });
+    });
+</script>
+
+    <div class="head">
+        <div class="ctrl left">
+            <p class="title">Pending Case Records</p>
+            <div class="selectBar hidden">
+                <select name="" id="">
+                    <option value="">Filter by Purok</option>
+                    <option value="">Dike Street</option>
+                    <option value="">Cantarilla</option>
+                    <option value="">Bagong Daan</option>
+                    <option value="">Shortcut</option>
+                    <option value="">Highway</option>
+                    <option value="">Perigola</option>
+                </select>
+            </div>
+        </div>
+        <div class="ctrl right">
+            <div class="searchBar">
+                <input type="search" id="univ">
+                <i class="fas fa-search"></i>
+            </div>
+            <a href="/export-business" class="nav hidden">
+                <i class="fa-solid fa-download"></i>
+                Export Report
+            </a>
+            <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+            <a href="/cmpNew" class="nav pnav" id="newBtn">
+                <i class="fa fa-plus"></i>
+                Add Record
+            </a>
+            <% } %>
+        </div>
+    </div>
+
+
+<div class="section tableCard">
+    <p class="p14" id="noRecords" style="display: none;">No Records</p>
+    <table class="darkShadow" id="dirTable">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Case No</th>
+                <th>Complainant(s)</th>
+                <th>Respondent(s)</th>
+                <th style="width: 10%;">Case Type</th>
+                <th style="width: 10%;">Status</th>
+                <th>Recorded At</th>
+                <th class="thCtrl">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% cases.forEach(caseItem => { %>
+                <tr>
+                    <td><%= caseItem.caseNo %></td>
+    
+                    <!-- Complainants -->
+                    <td>
+                        <% if (complainantsByCase[caseItem._id]) { %>
+                            <ul>
+                                <% complainantsByCase[caseItem._id].forEach(complainant => { %>
+                                    <li><%= complainant %></li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <span>Unknown</span>
+                        <% } %>
+                    </td>
+    
+                    <!-- Respondents -->
+                    <td>
+                        <% if (respondentsByCase[caseItem._id]) { %>
+                            <ul>
+                                <% respondentsByCase[caseItem._id].forEach(respondent => { %>
+                                    <li><%= respondent %></li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <span>Unknown</span>
+                        <% } %>
+                    </td>
+    
+                    <!-- Case Type -->
+                    <td>
+                        <% if (Array.isArray(caseItem.type)) { %>
+                            <ul>
+                                <% caseItem.type.forEach(type => { %>
+                                    <li><%= type %></li>
+                                <% }); %>
+                            </ul>
+                        <% } else { %>
+                            <%= caseItem.type %>
+                        <% } %>
+                    </td>
+    
+                    <!-- Status -->
+                    <td><%= caseItem.status %></td>
+    
+                    <!-- Created At (Formatted Date) -->
+                    <td>
+                        <%= new Date(caseItem.createdAt).toLocaleString("en-US", {
+                            weekday: "short", year: "numeric", month: "short", 
+                            day: "numeric", hour: "2-digit", minute: "2-digit", 
+                            hour12: true 
+                        }) %>
+                    </td>
+    
+                    <!-- Action Buttons -->
+                    <td class="tdCtrl alignCenter justifyCenter">
+                        <form action="/arcCase/<%= caseItem._id %>" method="POST" onsubmit="return confirmArchive();">
+                            <button type="submit" class="nav dnav-fill"><i class="fas fa-minus-square"></i> Close</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    
+    <script>
+        function confirmArchive() {
+            return confirm("Are you sure you want to close this case?");
+        }
+    </script>
+    
+</div>
+
+<div class="sub height0 row flex">
+<div class="ctrl left height0 width50">
+    <span id="totalRecords" class="totalRecords green"></span>
+</div>
+<div class="ctrl right height0 width50">
+    <p>
+        Display Per Page:
+    </p>
+    <div class="selectBar" style="width: 70px;"> 
+        <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="1000000000000">All</option>
+        </select>
+    </div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<script>document.addEventListener("DOMContentLoaded", function() {
+    const dirTable = document.getElementById("dirTable");
+    const tableBody = dirTable.getElementsByTagName("tbody")[0];
+    const paginationContainer = document.getElementById("pagination");
+    const rowsPerPageSelect = document.getElementById("rowsPerPage");
+    const totalRecordsLabel = document.getElementById("totalRecords");
+    const searchInput = document.getElementById("univ");
+    const noRecordsMessage = document.getElementById("noRecords");
+    const subDiv = document.querySelector(".sub");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+    let allRows = Array.from(tableBody.rows);
+    let filteredRows = allRows;
+
+    function renderTable() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+
+        if (filteredRows.length === 0) {
+            dirTable.style.display = "none";
+            noRecordsMessage.style.display = "block";
+        } else {
+            dirTable.style.display = "table";
+            noRecordsMessage.style.display = "none";
+        }
+
+        if (filteredRows.length <= 5) {
+            subDiv.style.display = "none";
+        } else {
+            subDiv.style.display = "flex";
+        }
+
+        allRows.forEach(row => (row.style.display = "none"));
+        filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+        totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+        renderPagination(filteredRows.length);
+    }
+ 
+function renderPagination(totalRows) {
+    paginationContainer.innerHTML = "";
+
+    if (searchInput.value.trim()) return;
+
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    if (totalPages <= 1) return;
+
+    // Previous Button
+    const prevButton = document.createElement("button");
+    prevButton.innerHTML = "« Previous";
+    prevButton.disabled = currentPage === 1;
+    prevButton.onclick = () => {
+        currentPage--;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(prevButton);
+
+    // --- New Logic for displaying a limited number of page buttons ---
+
+    // Display all buttons if total pages are 7 or less
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerHTML = i;
+            pageButton.className = i === currentPage ? "active" : "";
+            pageButton.onclick = () => {
+                currentPage = i;
+                renderTable();
+                renderPagination(totalRows);
+            };
+            paginationContainer.appendChild(pageButton);
+        }
+    } else { // Display condensed pagination for more than 7 pages
+        const startPages = [1, 2, 3];
+        const endPages = [totalPages - 2, totalPages - 1, totalPages];
+        const middlePages = [currentPage - 1, currentPage, currentPage + 1];
+
+        // Function to create a page button
+        const createPageButton = (page, isEllipsis = false) => {
+            const btn = document.createElement("button");
+            btn.innerHTML = isEllipsis ? "..." : page;
+            btn.disabled = isEllipsis;
+            if (!isEllipsis) {
+                btn.className = page === currentPage ? "active" : "";
+                btn.onclick = () => {
+                    currentPage = page;
+                    renderTable();
+                    renderPagination(totalRows);
+                };
+            }
+            return btn;
+        };
+
+        // Add first pages
+        for (const page of startPages) {
+            if (page <= totalPages) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+        
+        // Add ellipsis if current page is not near the start
+        if (currentPage > 4) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add middle pages (current page and its neighbors)
+        if (currentPage > 3 && currentPage < totalPages - 2) {
+            for (const page of middlePages) {
+                if (page > 0 && page <= totalPages) {
+                    paginationContainer.appendChild(createPageButton(page));
+                }
+            }
+        }
+
+        // Add ellipsis if current page is not near the end
+        if (currentPage < totalPages - 3) {
+            paginationContainer.appendChild(createPageButton("...", true));
+        }
+
+        // Add last pages
+        for (const page of endPages) {
+            if (page > 3) {
+                paginationContainer.appendChild(createPageButton(page));
+            }
+        }
+    }
+
+    // Next Button
+    const nextButton = document.createElement("button");
+    nextButton.innerHTML = "Next »";
+    nextButton.disabled = currentPage === totalPages;
+    nextButton.onclick = () => {
+        currentPage++;
+        renderTable();
+        renderPagination(totalRows); // Re-render pagination after page change
+    };
+    paginationContainer.appendChild(nextButton);
+}
+
+    function updateRowsPerPage() {
+        rowsPerPage = parseInt(rowsPerPageSelect.value);
+        currentPage = 1;
+        renderTable();
+    }
+
+    function searchTable() {
+        const query = searchInput.value.toLowerCase().trim();
+        filteredRows = allRows.filter(row =>
+            Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+        );
+
+        currentPage = 1;
+        //rowsPerPageSelect.style.display = query ? "none" : "block";
+        renderTable();
+    }
+
+    rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+    searchInput.addEventListener("input", searchTable);
+    renderTable();
+});
+</script>

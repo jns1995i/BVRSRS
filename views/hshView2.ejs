@@ -1,0 +1,67 @@
+
+<% layout('layout') %>
+<div class="main gap10 height100">
+    <div class="height10 gap5 justifyBetween">    
+        <a href="/hsh" class="nav">
+            <i class="fas fa-arrow-left"></i> Back to Households
+        </a>
+        <p class="size24 str500">
+            Residents of <%= houseNo %> <%= purok %>
+        </p>
+    </div>
+    <br>
+
+    <% if (residents && residents.length > 0) { %>
+        <% let groupedFamilies = {}; %>
+        <% let familyIndex = 1; %> <!-- Initialize family counter -->
+    
+        <!-- Group residents by family head -->
+        <% residents.forEach(resident => { %>
+            <% if (resident.role === "Head") { %>
+                <% groupedFamilies[resident._id] = [resident]; %>
+            <% } else { %>
+                <% if (!resident.headId || !groupedFamilies[resident.headId]) { %>
+                    <!-- If resident has no headId or the head doesn't exist, create a separate entry -->
+                    <% groupedFamilies[resident._id] = [resident]; %>
+                <% } else { %>
+                    <% groupedFamilies[resident.headId].push(resident); %>
+                <% } %>
+            <% } %>
+        <% }); %>
+    
+        <!-- Render each family as a separate table with an index -->
+        <% Object.keys(groupedFamilies).forEach((headId, index) => { %>
+            <p class="size20 str500 marginLeft10 marginBottom10">Family <%= familyIndex++ %></p> <!-- Display the family index -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Resident Name</th>
+                        <th>Role</th>
+                        <th>Birthdate</th>
+                        <th>Voter</th>
+                        <th class="thCtrl">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% groupedFamilies[headId].forEach(member => { %>
+                        <tr>
+                            <td><%= member.firstName %> <%= member.middleName || '' %> <%= member.lastName %> <%= member.extName || '' %></td>
+                            <td><%= member.role %></td>
+                            <td><%= member.bMonth %> <%= member.bDay %>, <%= member.bYear %></td>
+                            <td><%= member.precinct ? member.precinct : '' %></td>
+                            <td class="tdCtrl">
+                                <a href="/rsdView/<%= member._id %>" class="nav"><i class="fas fa-eye"></i> &nbsp; Details</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <br>
+        <% }); %>
+    <% } else { %>
+        <p>No residents found.</p>
+    <% } %>
+    
+    </table>
+
+</div>

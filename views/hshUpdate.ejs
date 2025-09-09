@@ -1,0 +1,172 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .f {
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: start;
+        }
+        .selectBar {
+            min-width: 100%;
+        }
+    </style>
+</head>
+
+<a href="/hshView/<%= household._id %>" class="nav absolute top10 left10"><i class="fas fa-chevron-left"></i>Go Back</a>
+
+    <div class="col">
+        <form action="/update-household" method="POST" class="width50 height0">
+            <div class="height100 col alignStart gap20">
+                <p class="size34 str500 colorPrimary">UPDATE HOUSEHOLD</p>
+                <input type="hidden" value="<%= household._id %>" name="householdId">
+
+                <div class="height0 col gap5">
+                    <div class="height0 gap10">
+                        <div class="f">
+                            <label for="">House No.</label>
+                            <input type="text" id="houseNo" name="houseNo" value="<%= household.houseNo %>" required>
+                        </div>
+                        <div class="f">
+                            <label for="">Purok</label>
+                            <div class="selectBar">
+                                <select id="purok" name="purok" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                    <option value="">Select Purok</option>
+                                    <option value="Dike" <%= household.purok === 'Dike' ? 'selected' : '' %>>Dike</option>
+                                    <option value="Shortcut" <%= household.purok === 'Shortcut' ? 'selected' : '' %>>Shortcut</option>
+                                    <option value="Highway" <%= household.purok === 'Highway' ? 'selected' : '' %>>Highway</option>
+                                    <option value="Perigola" <%= household.purok === 'Perigola' ? 'selected' : '' %>>Perigola</option>
+                                    <option value="Cantarilla" <%= household.purok === 'Cantarilla' ? 'selected' : '' %>>Cantarilla</option>
+                                    <option value="Bagong Daan" <%= household.purok === 'Bagong Daan' ? 'selected' : '' %>>Bagong Daan</option>
+                                </select>
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="ownership">Ownership</label>
+                        <div class="selectBar">
+                            <select name="ownership" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="owned" <%= household.ownership === 'Owned' ? 'selected' : '' %>>Owned</option>
+                                <option value="rented" <%= household.ownership === 'Rented' ? 'selected' : '' %>>Rented</option>
+                                <option value="informal_settler" <%= household.ownership === 'Informal Settler' ? 'selected' : '' %>>Informal Settler/Squatter</option>
+                                <option value="govt_housing" <%= household.ownership === 'Government Housing' ? 'selected' : '' %>>Government Housing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="houseType">House Type</label>
+                        <div class="selectBar">
+                            <select name="houseType" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="makeshift" <%= household.houseType === 'Makeshift' ? 'selected' : '' %>>Makeshift</option>
+                                <option value="nipa_hut" <%= household.houseType === 'Nipa Hut' ? 'selected' : '' %>>Nipa Hut</option>
+                                <option value="semi_concrete" <%= household.houseType === 'Semi Concrete' ? 'selected' : '' %>>Semi Concrete</option>
+                                <option value="concrete" <%= household.houseType === 'Concrete' ? 'selected' : '' %>>Fully Concrete</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="height0 gap10 padding10 borderRadius10 bgSoft">
+                    <div class="f">
+                        <label for="wallMaterial">Wall Material</label>
+                        <div class="selectBar">
+                            <select name="wallMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="bamboo" <%= household.wallMaterial === 'Bamboo' ? 'selected' : '' %>>Bamboo</option>
+                                <option value="wood" <%= household.wallMaterial === 'Wood' ? 'selected' : '' %>>Wood</option>
+                                <option value="hollow_blocks" <%= household.wallMaterial === 'Hollow Blocks' ? 'selected' : '' %>>Hollow Blocks</option>
+                                <option value="light_materials" <%= household.wallMaterial === 'Light Materials' ? 'selected' : '' %>>Light Materials</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="roofMaterial">Roof Material</label>
+                        <div class="selectBar">
+                            <select name="roofMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="galvanized_iron" <%= household.roofMaterial === 'Galvanized Iron' ? 'selected' : '' %>>Galvanized Iron</option>
+                                <option value="nipa" <%= household.roofMaterial === 'Nipa' ? 'selected' : '' %>>Nipa</option>
+                                <option value="wood" <%= household.roofMaterial === 'Wood' ? 'selected' : '' %>>Wood</option>
+                                <option value="light_materials" <%= household.roofMaterial === 'Light Materials' ? 'selected' : '' %>>Light Materials</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="flooringMaterial">Flooring Material</label>
+                        <div class="selectBar">
+                            <select name="flooringMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="cemented" <%= household.flooringMaterial === 'Cemented' ? 'selected' : '' %>>Cemented</option>
+                                <option value="wood" <%= household.flooringMaterial === 'Wood' ? 'selected' : '' %>>Wood</option>
+                                <option value="bamboo" <%= household.flooringMaterial === 'Bamboo' ? 'selected' : '' %>>Bamboo</option>
+                                <option value="tiles" <%= household.flooringMaterial === 'Tiles' ? 'selected' : '' %>>Tiles</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="toiletType">Toilet Type</label>
+                        <div class="selectBar">
+                            <select name="toiletType" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="open_pit" <%= household.toiletType === 'Open Pit' ? 'selected' : '' %>>Open Pit</option>
+                                <option value="shared" <%= household.toiletType === 'Shared' ? 'selected' : '' %>>Shared</option>
+                                <option value="private_flush" <%= household.toiletType === 'Private with Flush' ? 'selected' : '' %>>Private with Flush</option>
+                                <option value="none" <%= household.toiletType === 'None' ? 'selected' : '' %>>None</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="waterSource">Water Source</label>
+                        <div class="selectBar">
+                            <select name="waterSource" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="deep_well" <%= household.waterSource === 'Deep Well' ? 'selected' : '' %>>Deep Well</option>
+                                <option value="pump" <%= household.waterSource === 'Pump' ? 'selected' : '' %>>Pump</option>
+                                <option value="faucet" <%= household.waterSource === 'Faucet' ? 'selected' : '' %>>Faucet</option>
+                                <option value="bottled_water" <%= household.waterSource === 'Bottled Water' ? 'selected' : '' %>>Bottled Water</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="">Number of Rooms</label>
+                        <input type="number" name="numRooms"  value="<%= household.numRooms %>" min="1" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                    </div>
+                    <div class="f">
+                        <label for="electricity">Power Source</label>
+                        <div class="selectBar">
+                            <select name="electricity" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                    <option value="" disabled <%= !household.electricity ? 'selected' : '' %>>Select</option>
+                                    <option value="Electricity" <%= household.electricity === 'Electricity' ? 'selected' : '' %>>Electricity</option>
+                                    <option value="Solar" <%= household.electricity === 'Solar' ? 'selected' : '' %>>Solar</option>
+                                    <option value="Caserole Lamp" <%= household.electricity === 'Caserole Lamp' ? 'selected' : '' %>>Caserole Lamp</option>
+                                    <option value="Candle" <%= household.electricity === 'Candle' ? 'selected' : '' %>>Candle</option>
+                                    <option value="Generator" <%= household.electricity === 'Generator' ? 'selected' : '' %>>Generator</option>
+                            </select>
+                        </div>
+                    </div>                    
+                </div>
+    
+                <div class="height0 justifyEnd">
+                    <button type="submit" class="nav pnav borderRadius10">
+                        <i class="fas fa-check-square"></i>Update
+                    </button>
+                </div>
+    
+            </div>
+            
+        </form>
+    </div>

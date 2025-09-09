@@ -1,0 +1,392 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .residentItem {
+            border: 0.5px solid lightgray;
+            padding: 8px 12px;
+            border-radius: 10px;
+            width: fit-content !important;
+        }
+        .residentItem:hover {
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<div class="abstractBG borderRadius10 blockX overflow-y1 hidden" id="createCard">
+    <div class="height0 padding40">
+        <form action="" method="POST" class="height0 gap10 relative borderRadius20">
+            <a href="" class="nav cnav absolute right15 top15" id="closeBtn"><i class="fas fa-times"></i></a>
+            <div class="height0 justifyStart">
+                <p class="title colorPrimary">Customize Document</p>
+            </div>
+            <br>
+            <div class="height0 col alignStart gap5">
+                <label for="residentSearch">Select Resident</label>
+                <input type="text" id="residentSearch" class="selectBar widthMin100" placeholder="Search resident..." autocomplete="off">
+                
+                <!-- Dynamic List for Matching Residents -->
+                <div id="residentList" class="dropdownList padding10 hidden gap10"></div>
+            
+                <!-- Display Selected Resident -->
+                <div id="RequestBy" class="selectedResident"></div>
+            
+                <!-- Hidden Input for Selected Resident ID -->
+                <input type="hidden" id="requestBy" name="requestBy">
+            </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const searchInput = document.getElementById("residentSearch");
+        const residentList = document.getElementById("residentList");
+        const requestByInput = document.getElementById("requestBy");
+        const requestByDiv = document.getElementById("RequestBy");
+    
+        let residents = [];
+    
+        // Fetch residents from backend
+        async function fetchResidents() {
+            try {
+                const response = await fetch("/api/residents"); // Adjust route as needed
+                residents = await response.json();
+            } catch (error) {
+                console.error("Error fetching residents:", error);
+            }
+        }
+    
+        // Call function to fetch residents on load
+        fetchResidents();
+    
+        // Function to display search results
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase().trim();
+            residentList.innerHTML = ""; // Clear previous results
+    
+            if (query.length === 0) {
+                residentList.classList.add("hidden");
+                return;
+            }
+    
+            // Check if any word in query matches firstName, middleName, lastName, or extName
+            const matchedResidents = residents.filter(resident => {
+                const fullName = `${resident.firstName} ${resident.middleName || ''} ${resident.lastName} ${resident.extName || ''}`.trim().toLowerCase();
+                return query.split(" ").some(word => fullName.includes(word));
+            });
+    
+            if (matchedResidents.length === 0) {
+                residentList.classList.add("hidden");
+                return;
+            }
+    
+            residentList.classList.remove("hidden");
+    
+            matchedResidents.forEach(resident => {
+                const btn = document.createElement("button");
+                btn.textContent = `${resident.firstName} ${resident.middleName || ''} ${resident.lastName} ${resident.extName || ''}`.trim();
+                btn.classList.add("residentItem");
+                btn.onclick = function () {
+                    requestByDiv.textContent = btn.textContent;
+                    requestByInput.value = resident._id;
+                    residentList.classList.add("hidden"); // Hide dropdown
+                    searchInput.value = ""; // Clear input field
+    
+                    // Add the specified class when a resident is selected
+                    requestByDiv.classList.add("paddingBlock10", "paddingInline15", "bgSoft", "borderRadius15", "str500", "size14", "width0");
+                };
+                residentList.appendChild(btn);
+            });
+        });
+    
+        // Hide list when clicking outside
+        document.addEventListener("click", function (e) {
+            if (!searchInput.contains(e.target) && !residentList.contains(e.target)) {
+                residentList.classList.add("hidden");
+            }
+        });
+    });
+    
+    </script>        
+            <div class="height0 gap10">
+                <div class="height0 col alignStart gap5">
+                    <label for="">Select Purpose</label>
+                    <div class="selectBar widthMin100">
+                        <select name="purpose" id="" required>
+                            <option value="Any Legal">Any Legal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="height0 col alignStart gap5">
+                    <label for="">Title</label>
+                    <input type="text" name="title">
+                </div>
+            </div>
+            <div class="height0 col alignStart gap5">
+                <label for="">Main Content</label>
+                <textarea name="content" id="autoResizeTextarea" style="height: fit-content; min-height: 80px; overflow-y: hidden;" required></textarea>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const textarea = document.getElementById("autoResizeTextarea");
+    
+            // Function to adjust height
+            function adjustHeight() {
+                textarea.style.height = "auto"; // Reset height
+                textarea.style.height = `${textarea.scrollHeight}px`; // Set new height based on content
+            }
+    
+            // Trigger adjustment on input
+            textarea.addEventListener("input", adjustHeight);
+    
+            // Adjust height on load if there's prefilled content
+            adjustHeight();
+        });
+    </script>
+    
+            </div>
+            <br>
+            <div class="h50 justifyEnd paddingInline5">
+                <button class="nav pnav">Generate</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="head">
+    <div class="height0 justifyStart">
+        <p class="title">Customized Certifications</p>
+    </div>
+    <div class="height0 justifyEnd">
+        <a href="javascript: void()" class="nav" id="createBtn"><i class="fas fa-plus"></i>Create New</a>
+    </div>
+</div>
+
+<div class="main bgSoft borderRadius10 height70">
+
+
+    <div class="section tableCard hidden">
+        <p class="p14" id="noRecords" style="display: none;">No Records</p>
+        <table id="dirTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(4)" style="width: 15%;">Request At</th>
+                    <th onclick="sortTable(1)" style="width: 25%;">Requested By</th>
+                    <th onclick="sortTable(2)">Qty</th>
+                    <th onclick="sortTable(3)" style="width: 15%;">Transaction Status</th>
+                    <th onclick="sortTable(5)" class="thCtrl">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            <% if (requests && requests.length > 0) { %>
+                <% requests.forEach(request => { %>
+                    <% 
+                        // Check if the request has at least one document with type 'Barangay Clearance'
+                        const hasBarangayClearance = request.documents && request.documents.some(doc => doc.type === 'Certification');
+                    %>
+            
+                    <% if (hasBarangayClearance) { %>
+                        <tr>
+                            <td>
+                                <%= new Date(request.createdAt).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: '2-digit' 
+                                }) + ' • ' + new Date(request.createdAt).toLocaleTimeString('en-US', { 
+                                    hour: 'numeric', 
+                                    minute: '2-digit', 
+                                    hour12: true 
+                                }) %>
+                            </td>                           
+                            <td>
+                                <div class="height0 width0 justifyStart gap5">
+                                    <img src="<%= request.resident && request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" 
+                                         alt="" class="h25 w25 borderRadius500 borderPrimary">
+                                    <%= request.resident ? `${request.resident.firstName} ${request.resident.middleName || ''} ${request.resident.lastName} ${request.resident.extName || ''}` : 'Unknown' %>
+                                </div>
+                            </td>
+                            <td>
+                                <% 
+                                    let totalQty = 0;
+                                    request.documents.forEach(doc => {
+                                        if (doc.type === "Certification") {
+                                            totalQty += doc.qty;
+                                        }
+                                    });
+                                %>
+                            
+                                <% if (totalQty > 0) { %>
+                                    <p><%= totalQty %> Copies</p>
+                                <% } else { %>
+                                    <p>No Certification requested</p>
+                                <% } %>
+                            </td>
+                                                                                  
+                            <td><%= request.status %></td>
+                            <td class="tdCtrl">
+                                <a href="/srvView/<%= request._id %>" class="nav"><i class="fas fa-eye"></i> &nbsp; Details</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                <% }); %>
+            <% } %>
+            
+            <% 
+                // If no requests with Barangay Clearance were found, show a message
+                const filteredRequests = requests.filter(request => request.documents.some(doc => doc.type === 'Certification'));
+                if (filteredRequests.length === 0) { 
+            %>
+                <tr>
+                    <td colspan="5">No requests found with Requested Barangay Certification.</td>
+                </tr>
+            <% } %>
+            
+            </tbody>
+        </table>
+
+    
+</div>
+
+<script>
+function enforceNumericInput(event) {
+    event.target.value = event.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const phoneInputs = document.querySelectorAll('.phone');
+    phoneInputs.forEach(input => {
+        input.addEventListener('input', enforceNumericInput);
+    });
+});
+</script>
+
+<script>document.addEventListener("DOMContentLoaded", function() {
+const dirTable = document.getElementById("dirTable");
+const tableBody = dirTable.getElementsByTagName("tbody")[0];
+const paginationContainer = document.getElementById("pagination");
+const rowsPerPageSelect = document.getElementById("rowsPerPage");
+const totalRecordsLabel = document.getElementById("totalRecords");
+const searchInput = document.getElementById("univ");
+const noRecordsMessage = document.getElementById("noRecords");
+const subDiv = document.querySelector(".sub");
+
+let currentPage = 1;
+let rowsPerPage = parseInt(rowsPerPageSelect.value);
+let allRows = Array.from(tableBody.rows);
+let filteredRows = allRows;
+
+function renderTable() {
+const start = (currentPage - 1) * rowsPerPage;
+const end = start + rowsPerPage;
+
+if (filteredRows.length === 0) {
+    dirTable.style.display = "none";
+    noRecordsMessage.style.display = "block";
+} else {
+    dirTable.style.display = "table";
+    noRecordsMessage.style.display = "none";
+}
+
+if (filteredRows.length <= 5) {
+    subDiv.style.display = "none";
+} else {
+    subDiv.style.display = "flex";
+}
+
+allRows.forEach(row => (row.style.display = "none"));
+filteredRows.slice(start, end).forEach(row => (row.style.display = ""));
+
+totalRecordsLabel.innerText = `Total Records: ${filteredRows.length}`;
+renderPagination(filteredRows.length);
+}
+
+function renderPagination(totalRows) {
+paginationContainer.innerHTML = "";
+
+if (searchInput.value.trim()) return;
+
+const totalPages = Math.ceil(totalRows / rowsPerPage);
+if (totalPages <= 1) return;
+
+const prevButton = document.createElement("button");
+prevButton.innerHTML = "« Previous";
+prevButton.disabled = currentPage === 1;
+prevButton.onclick = () => {
+    currentPage--;
+    renderTable();
+};
+paginationContainer.appendChild(prevButton);
+
+for (let i = 1; i <= totalPages; i++) {
+    const pageButton = document.createElement("button");
+    pageButton.innerHTML = i;
+    pageButton.className = i === currentPage ? "active" : "";
+    pageButton.onclick = () => {
+        currentPage = i;
+        renderTable();
+    };
+    paginationContainer.appendChild(pageButton);
+}
+
+const nextButton = document.createElement("button");
+nextButton.innerHTML = "Next »";
+nextButton.disabled = currentPage === totalPages;
+nextButton.onclick = () => {
+    currentPage++;
+    renderTable();
+};
+paginationContainer.appendChild(nextButton);
+}
+
+function updateRowsPerPage() {
+rowsPerPage = parseInt(rowsPerPageSelect.value);
+currentPage = 1;
+renderTable();
+}
+
+function searchTable() {
+const query = searchInput.value.toLowerCase().trim();
+filteredRows = allRows.filter(row =>
+    Array.from(row.cells).some(cell => cell.textContent.toLowerCase().includes(query))
+);
+
+currentPage = 1;
+rowsPerPageSelect.style.display = query ? "none" : "block";
+renderTable();
+}
+
+rowsPerPageSelect.addEventListener("change", updateRowsPerPage);
+searchInput.addEventListener("input", searchTable);
+renderTable();
+});
+</script>
+</div>
+<div class="sub row flex hidden">
+    <div class="ctrl left height0 width50">
+        <span id="totalRecords" class="totalRecords green"></span>
+    </div>
+    <div class="ctrl right height0 width50">
+        <p>
+            Display Per Page:
+        </p>
+        <div class="selectBar" style="width: 70px;"> 
+            <select id="rowsPerPage" onchange="updateRowsPerPage()" style="width: 100px">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="1000000000000">All</option>
+            </select>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("createBtn").addEventListener("click", function () {
+    document.getElementById("createCard").classList.remove("hidden");
+});
+
+document.getElementById("closeBtn").addEventListener("click", function () {
+    document.getElementById("createCard").classList.add("hidden");
+});
+
+</script>

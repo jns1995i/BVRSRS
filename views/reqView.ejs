@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTRAR</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/color.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/user.css">
+    <link rel="icon" href="/images/clogo.png">
+    <style>
+        @media screen and (max-width: 1025px) {
+            body { padding: 0; background-color: white !important;}
+            #mainFrame {
+                padding-inline: 0 !important;
+                padding: 0;
+                background-color: white !important;
+                background: white !important;
+            }
+            #backBtn {
+                position: initial;
+                left: initial;
+                top: initial;
+                margin: 20px 0 0 20px;
+            }
+            #feedback, .floatCard {
+                width: 100%;
+                position: initial;
+                left: initial;
+                bottom: initial;
+                padding: 15px;
+                box-shadow: none;
+                height: auto;
+            }
+            #feedback {
+                padding: 50px;
+            }
+            .responsive {
+                display: none !important;
+            }
+            #x2 {
+                padding: 15px;
+            }
+            #hero {
+                flex-direction: column;
+            }
+            #hero .width65 {
+                width: 100%;
+            }
+            
+        }
+    </style>
+<body class="block abstractBG padding0 overflow-y1 relative">
+    <div class="block height0 overflow-y1 relative col paddingBlock30" style="padding-inline: 22%;" id="mainFrame"> 
+                <a href="" class="nav cnav disabled marginBottom15 responsive absolute hidden" style="opacity: 0.2; transform: scale(20); z-index: 0; left: 150px; top: 50px"><i class="fas fa-file-alt"></i></a>
+        <div class="height40 absolute top0 bgWhite left0 responsive index0 hidden"></div>
+        <a href="/hom" class="nav absolute left20 top20" id="backBtn"><i class="fas fa-chevron-left"></i>Go Back</a>
+
+
+        <div class="height0 bgWhite relative borderRadius10 col justifyStart paddingInline70 paddingBlock50 gap20 darkShadow" id="x2">
+            <div class="h120 abstractBG padding20 white col borderRadius10 justifyBetween alignStart relative" id="x3">
+                <a href="" class="nav tnav absolute right15 top15 index50 str600">Status: <%= request.status %></a>
+                <a href="" class="nav cnav absolute right15 top15 index50 hidden">
+                    <% if (request.status === "For Pickup") { %>
+                        <i class="fas fa-check-circle"></i>
+                    <% } else if (request.status === "Claimed") { %>
+                        <i class="fas fa-check-circle"></i>
+                    <% } else if (request.status === "Pending") { %>
+                        <i class="fas fa-hourglass"></i>
+                    <% } else if (request.status === "Approved") { %>
+                        <i class="fas fa-check-circle"></i>
+                    <% } else if (request.status === "Declined") { %>
+                        <i class="fas fa-exclamation-circle"></i>
+                    <% } %>
+                </a>
+                <a href="" class="nav cnav disabled marginBottom15 absolute right35 bottom0" style="opacity: 0.1; transform: scale(3); z-index: 0;"><i class="fas fa-receipt"></i></a>
+                <p class="size14 str400">
+                <% 
+                const createdDate = new Date(request.createdAt);
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+
+                const isToday = createdDate.toDateString() === today.toDateString();
+                const isYesterday = createdDate.toDateString() === yesterday.toDateString();
+
+                // Format parts
+                const monthDayYear = createdDate.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const time = createdDate.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+                let formattedDate;
+                if (isToday) {
+                    formattedDate = `Today - ${monthDayYear} at ${time}`;
+                } else if (isYesterday) {
+                    formattedDate = `Yesterday - ${monthDayYear} at ${time}`;
+                } else {
+                    const weekday = createdDate.toLocaleString('en-US', { weekday: 'long' });
+                    formattedDate = `${weekday} - ${monthDayYear} at ${time}`;
+                }
+                %>
+
+                <%= formattedDate %>
+                </p>
+                <p class="size28 str400">TR# <%= request.tr %></p>
+            </div>
+
+<% if (request.status === 'Pending') { %>
+    <form id="cancelForm-<%= request._id %>" class="height0 justifyBetween paddingInline5 flex width100 justifyCenter alignCenter">
+        <p class="size12 str400">You can only cancel your request if it is still pending.</p>
+        <button type="button" class="nav tnav index50 str600 dnav" onclick="openCancelModal('<%= request._id %>')">Cancel Request</button>
+    </form>
+
+    <!-- Modal -->
+    <div id="cancelModal-<%= request._id %>" class="bgWhite col borderRadius15 darkShadow padding30 width0">
+        <div class="col">
+            <p class="size30 str500">Cancel Request?</p>
+            <p class="text-sm mb-6">Action can't be undone</p>
+            <br>
+            <div class="flex justify-between gap10">
+                <button onclick="closeCancelModal('<%= request._id %>')" class="nav tnav w100">No</button>
+                <button onclick="confirmCancel('<%= request._id %>')" class="nav dnav tnav w100">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCancelModal(id) {
+            document.getElementById("cancelModal-" + id).classList.remove("hidden");
+            document.getElementById("cancelModal-" + id).classList.add("flex");
+        }
+
+        function closeCancelModal(id) {
+            document.getElementById("cancelModal-" + id).classList.add("hidden");
+            document.getElementById("cancelModal-" + id).classList.remove("flex");
+        }
+
+        async function confirmCancel(id) {
+            try {
+                const res = await fetch("/cancel/" + id, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    location.reload(); // just reload page
+                }
+            } catch (err) {
+                console.error("Cancel error:", err);
+            }
+        }
+    </script>
+<% } %>
+
+            <div class="height0 gap10 bgSoft padding10 borderRadius10" id="hero">
+                <div class="bgWhite borderRadius10 padding20 height0 col width65">
+
+                    <% if (!['Declined'].includes(request.status) && request.status !== "For Pickup") { %>   
+                        <% if (documents.some(doc => doc.status === "Declined")) { %>
+                            <div class="height0 borderRadius10 width80 padding10 textCenter size12 col">
+                                <div class="h75 w78 relative borderRadius500 borderGray">
+                                    <i class="fas fa-smile size44 green h55 w55 absolute right0 bottom0"  style="transform: rotate(-8deg);"></i>
+                                    <i class="fas fa-frown size22 yellow h25 w25 absolute left0 bottom0" style="transform: rotate(10deg);"></i>
+                                    <i class="fas fa-frown size16 yellow h20 w20 absolute left0 bottom25" style="transform: rotate(-15deg);"></i>
+                                </div>
+                                <p class="size22 str500 green">Hello <%= user.firstName %>!</p>
+                                We regret to inform you that you are not eligible to request for the following declined document. 
+                                For further details, please visit the Barangay Hall.
+                                <br>You may claim the approved document once the status indicates For Pickup.
+                            </div>
+                        <% } %>
+                    <% } %>
+                    <% if (!['For Pickup','Claimed'].includes(request.status)) { %>
+                        <% if (documents.every(doc => doc.status === "Approved")) { %>
+                            <div class="height0 borderRadius10 width80 padding10 textCenter size16 col">
+                                <p class="size22 str500 green">Awesome <%= user.firstName %>! <i class="fas fa-check-circle size20"></i></p>
+                                Your requested document(s) have been approved. You may claim them once the status indicates For Pickup.
+                            </div>
+                        <% } %>
+                    <% } %>
+                    <% if (request.status === "For Pickup") { %>
+                        <div class="height0 borderRadius10 width80 padding10 textCenter size14 col">
+                            <div class="h75 w78 relative borderRadius500 borderGray">
+                                <i class="fas fa-thumbs-up size44 green h55 w55 absolute right0 bottom0"  style="transform: rotate(-8deg);"></i>
+                                <i class="fas fa-star size22 yellow h25 w25 absolute left0 bottom0" style="transform: rotate(10deg);"></i>
+                                <i class="fas fa-star size16 yellow h20 w20 absolute left0 bottom25" style="transform: rotate(-15deg);"></i>
+                            </div>
+                            <p class="size18 str500 green">Great News <%= user.firstName %>!</p>
+                            Your documents are ready for pickup at the Barangay Hall.
+                        </div>
+                    <% } %>
+                    <% if (request.status === "Claimed") { %>
+                        <div class="height0 borderRadius10 padding10 textCenter size14 str500 col">
+                            <div class="h75 w78 relative borderRadius500 borderGray">
+                                <i class="fas fa-thumbs-up size44 green h55 w55 absolute right0 bottom0"  style="transform: rotate(-8deg);"></i>
+                                <i class="fas fa-star size22 yellow h25 w25 absolute left0 bottom0" style="transform: rotate(10deg);"></i>
+                                <i class="fas fa-star size16 yellow h20 w20 absolute left0 bottom25" style="transform: rotate(-15deg);"></i>
+                            </div>
+                            <p class="size22 str500 green"></p>
+                            <%
+                                const date = new Date(request.successAt);
+
+                                // Format parts
+                                const options = { year: 'numeric', month: 'short', day: '2-digit' };
+                                const formattedDate = date.toLocaleDateString('en-US', options); // Aug 08, 2025
+
+                                const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                                const formattedTime = date.toLocaleTimeString('en-US', timeOptions); // 2:00 PM
+
+                                // Figure out Today, Yesterday, or weekday
+                                const today = new Date();
+                                today.setHours(0,0,0,0);
+
+                                const yesterday = new Date(today);
+                                yesterday.setDate(yesterday.getDate() - 1);
+
+                                let prefix = date >= today ? "Today"
+                                        : date >= yesterday ? "Yesterday"
+                                        : date.toLocaleDateString('en-US', { weekday: 'long' }); // Monday, Tuesday...
+
+                                const finalText = `${formattedDate} at ${formattedTime} (${prefix})`;
+                            %>
+
+                            Thank you for your trust. Your document request was claimed on <%= finalText %>.
+
+                            <br><br>
+                        </div>
+                    <% } %>
+                    <% if (request.status === "Declined") { %>
+                            <div class="height0 borderRadius10 padding10 textCenter size12 col">
+                                    <i class="fas fa-frown size44 colorPrimary h55 w55"></i>
+                                <p class="size22 str500 colorPrimary">Request Declined</p>
+                                We regret to inform you that you are not eligible to request for the following declined document. 
+                                For further details, please visit the Barangay Hall.
+                            </div>
+                    <% } %>
+                    <% if (request.status === "Cancelled") { %>
+                            <div class="height0 borderRadius10 padding10 textCenter size14 col borderRed">
+                                    <i class="fas fa-frown size44 red h55 w55"></i>
+                                <p class="size30 str500 red">OH NO!</p>
+                                You have cancelled your request!
+                            </div>
+                    <% } %>
+                    <% if (request.status === "Pending") { %>
+                        <div class="height0 borderRadius10 padding10 textCenter size14 col">
+                            <div class="h75 w78 relative borderRadius500 borderGray">
+                                <i class="fas fa-hourglass size44 green h55 w55 absolute right0 bottom0"  style="transform: rotate(-8deg);"></i>
+                                <i class="fas fa-random size22 yellow h25 w25 absolute left0 bottom0" style="transform: rotate(10deg);"></i>
+                                <i class="fas fa-clock size16 yellow h20 w20 absolute left0 bottom25" style="transform: rotate(-15deg);"></i>
+                            </div>
+                            <p class="size22 str500 green">Processing ..</p>
+                            Your requested document is pending approval. Kindly check back later for status updates. Thank you for your patience!
+                        </div>
+                    <% } %>
+                </div>
+                <div class="padding20 borderRadius5 relative h250 width35 responsive">
+                    <div class="absolute borderRadius10 bgWhite h200 w150 darkShadow" style="transform: rotate(15deg);"></div>
+                    <div class="absolute borderRadius10 h200 w150 darkShadow"
+                        style="transform: rotate(5deg); 
+                                background-image: url('/images/doc.png'); 
+                                background-size: cover; 
+                                background-position: center; 
+                                background-repeat: no-repeat;
+                                filter: blur(0.5px);">
+                    </div>
+                    <% if (request.status !== 'Declined') { %>
+                        <a href="javascript:void(0)" id="togglePreview" class="nav" style="z-index: 500;"><i class="fas fa-eye"></i> Document Preview </a>
+                    <% } %>
+                </div>
+            </div>
+
+
+            <% if (request.status === 'Processed' || request.status === 'Approved' || request.status === 'For Pickup') { %>
+                <div class="height0 noteCard abstractBG textCenter size14 col gap10 darkShadow padding60 hidden">
+                    <p class="size24 str500 white">Download Authorization Letter</p>
+                    <p class="size12 str400 bgSoft borderRadius10 padding15 colorPrimary">
+                        If someone else will claim the document on your behalf, they must present an authorization letter along with a valid ID of both the requester and the authorized person.
+                        <br><br>🔗 <a href="/downloadAuthLetter" class="inline str600">Download Here</a>
+                    </p>
+                </div>
+            <% } %>
+
+            <div class="height0 padding10 abstractBG justifyStart white borderRadius10">Requested Documents:</div>
+                <div class="height0 gap20 justifyStart alignCenter padding5 borderRadius10 wrap">
+                    <% if (documents.length > 0) { %>
+                        <% documents.forEach(doc => { %>
+                            <div class="card padding15 relative borderGray justifyStart alignStart col height0
+                                <% if ( doc.status == "Declined") { %>
+                                    border0 shadowNone bgSoft
+                                <% } else { %>
+                                <% } %>"
+                            style="min-width: 48%; flex: 1 1 48%;" id="cardX">
+                                <div class="height0 padding5 abstractBG size14 width30 absolute left0 top12
+                                <% if ( doc.status == "Declined") { %>
+                                    bgDarkGray white str400 borderGray
+                                <% } else if ( request.status == "Cancelled") { %>
+                                    bgDarkGray white str400 borderGray
+                                <% } else { %>
+                                    bgShade8 white
+                                <% } %>
+                                " style="border-top-right-radius: 15px; border-bottom-right-radius: 3px;">
+                                    <% if (request.status === "Cancelled") { %>
+                                        Cancelled
+                                    <% } else { %>
+                                    <%= doc.status %>
+                                    <% } %>
+                                </div>
+                                <div class="height0 padding5 size16 colorPrimary str500 width0 absolute top12" style="border-top-right-radius: 15px; border-bottom-right-radius: 3px; left: 32%;"><%= doc.type %>
+                                </div>
+                                <br>
+                                <p class="size14 str400 marginTop15"><%= doc.qty %> <%= doc.qty > 1 ? 'Copies' : 'Copy' %> for <br><%= doc.purpose %> Purpose</p>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p>No documents found.</p>
+                    <% } %>
+                </div>
+
+                
+        <% if (request.status == 'Claimed') { %>
+            <hr>
+            <div class="height0 padding30 borderRadius10 bgWhite col gap10 borderPrimary size12 textCenter width80 bgSoft hidden" id="feedback">
+                <div class="height0 col">
+                    <p class="size28 str500 colorPrimary">FEEDBACK FORM</p>
+                    <p class="size14 str400">Help us improve our services by sharing your feedback.</p>
+                </div>
+                <form action="" class="height0 width100 alignCenter col flex gap10">
+                    <textarea name="" id="" class="bgWhite" placeholder="Comment here your feedback or any concern"></textarea>
+                    <button class="nav pnav tnav width100"><i class="fas fa-paper-plane"></i> Submit</button>
+                </form>
+            </div>
+        <% } %>
+
+
+        </div>
+        
+                
+            <div class="absolute right20 top20 bgWhite borderRadius10 padding20 width22 height0 floatCard col textCenter gap10 hidden">
+                <img src="/images/brgyhall.jpg" alt="" class="width100 height0 borderRadius10">
+  <iframe
+    width="100%"
+    height="250"
+    frameborder="0"
+    scrolling="no"
+    marginheight="0"
+    marginwidth="0"
+    style="border-radius:10px;"
+    src="https://www.openstreetmap.org/export/embed.html?bbox=120.960,15.506,120.972,15.514&layer=mapnik&marker=15.5102695,120.966439">
+  </iframe>
+                <p class="size12 str400">Office Hours: 8am to 5pm Everyday</p>
+            </div>
+    </div>
+<iframe src="/docView/<%= request._id %>" frameborder="0" id="myFrame" class="borderRadius10 padding20 width100 responsive hidden">
+</iframe>
+<script>
+  const iframe = document.getElementById('myFrame');
+  const btn = document.getElementById('togglePreview');
+  let isVisible = false;
+
+  // Resize iframe to fit content
+  function resizeIframe(scrollAfter = false) {
+    try {
+      const iframeDoc = iframe.contentWindow.document;
+      const newHeight = iframeDoc.documentElement.scrollHeight;
+      iframe.style.height = newHeight + "px";
+
+      // ✅ Only scroll after we know it has height
+      if (scrollAfter && newHeight > 0) {
+        iframe.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } catch (e) {
+      console.warn("Cannot access iframe content:", e);
+    }
+  }
+
+  iframe.onload = function() {
+    resizeIframe();
+    setInterval(resizeIframe, 500); // keep adjusting
+  };
+
+  // Toggle button
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    if (!isVisible) {
+      iframe.classList.remove('hidden');
+      btn.innerHTML = '<i class="fas fa-times"></i> Close Preview';
+      isVisible = true;
+
+      // ✅ Now scroll only after we resize
+      setTimeout(() => resizeIframe(true), 100);
+
+    } else {
+      iframe.classList.add('hidden');
+      btn.innerHTML = '<i class="fas fa-eye"></i> Document Preview';
+      isVisible = false;
+    }
+  });
+</script>
+                    
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const statLabel = document.getElementById("statLabel");
+                            const status = statLabel.textContent.trim(); // Get the status text
+                    
+                            if (status === "Processing") {
+                                statLabel.style.backgroundColor = "var(--tint8)";
+                                statLabel.style.color = "green";
+                            } else if (["Approved", "Success", "Processed"].includes(status)) {
+                                statLabel.style.backgroundColor = "green";
+                                statLabel.style.color = "white";
+                            } else if (status === "Declined") {
+                                statLabel.style.backgroundColor = "var(--tint8)"; // Light red
+                                statLabel.style.color = "black";
+                            } else if (["Pending", "Anything"].includes(status)) {
+                                statLabel.style.backgroundColor = "lightgray";
+                                statLabel.style.color = "black";
+                            }
+                        });
+                    </script>
+
+
+
+</body>
+</html>

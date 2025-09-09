@@ -1,0 +1,36 @@
+<head>
+    <title>Downloading...</title>
+    <script>
+        window.onload = function () {
+            const link = document.createElement("a");
+            link.href = "/download-residents"; // Your file download route
+            link.download = "residents.xlsx";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Ensure all elements remain interactive
+            setTimeout(() => {
+                window.location.href = "/rsd"; // Redirect after 3 seconds
+            }, 1000);
+        };
+    </script>
+    <style>
+    </style>
+</head>
+<% layout('layout') %>
+<body class="aqua abstractBG">
+    <div class="/">
+        <div class="height0 width35 padding25 borderRadius25 bgBlack white col" style="background-color: rgba(255, 255, 255, 0.1); border: 1px solid white;">
+                            <div class="h75 w78 relative borderRadius500 borderGray">
+                                <i class="fas fa-thumbs-up size44 white h55 w55 absolute right0 bottom0"  style="transform: rotate(-8deg);"></i>
+                                <i class="fas fa-star size22 white h25 w25 absolute left0 bottom0" style="transform: rotate(10deg);"></i>
+                                <i class="fas fa-star size16 white h20 w20 absolute left0 bottom25" style="transform: rotate(-15deg);"></i>
+                            </div>
+            <p class="size30 str500 textCenter">Downloading your file!</p>
+            <p class="size14 str400 textCenter">You file will be saved on your downloads folder</p>
+        </div>
+    </div>
+</body>
+
+</html>

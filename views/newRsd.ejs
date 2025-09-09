@@ -1,0 +1,208 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .f {
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            justify-content: start;
+        }
+        .selectBar {
+            min-width: 100%;
+        }
+    </style>
+</head>
+
+<a href="/hsh" class="nav absolute top10 left10"><i class="fas fa-chevron-left"></i>Go Back</a>
+
+    <div class="col">
+        <form action="/add-household" method="POST" class="width50 height0">
+            <div class="height100 col alignStart gap20">
+                <p class="size34 str500 colorPrimary">ADD NEW HOUSEHOLD</p>
+
+                <div class="height0 col gap5">
+                    <div class="height0 gap10">
+                        <div class="f">
+                            <label for="">House No.</label>
+                            <input type="text" id="houseNo" name="houseNo" required>
+                        </div>
+                        <div class="f">
+                            <label for="">Purok</label>
+                            <div class="selectBar">
+                                <select id="purok" name="purok" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                    <option value="">Select Purok</option>
+                                    <option value="Dike">Dike</option>
+                                    <option value="Shortcut">Shortcut</option>
+                                    <option value="Highway">Highway</option>
+                                    <option value="Perigola">Perigola</option>
+                                    <option value="Cantarilla">Cantarilla</option>
+                                    <option value="Bagong Daan">Bagong Daan</option>
+                                </select>
+                            </div>
+    
+                        </div>
+                    </div>
+    
+                    <div class="width0 height0 bgSoft padding10 borderRadius5 hidden str500 red size14" id="exist"></div>
+                </div>
+    
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const houseNoInput = document.querySelector('input[name="houseNo"]');
+                        const purokSelect = document.querySelector('select[name="purok"]');
+                        const existMessage = document.getElementById("exist"); // Target existing element
+                
+                        async function checkResident() {
+                            const houseNo = houseNoInput.value.trim();
+                            const purok = purokSelect.value;
+                
+                            if (!houseNo || !purok) {
+                                existMessage.classList.add("hidden");
+                                return;
+                            }
+                
+                            try {
+                                const response = await fetch(`/check-resident?houseNo=${encodeURIComponent(houseNo)}&purok=${encodeURIComponent(purok)}`);
+                                const data = await response.json();
+                
+                                if (data.exists) {
+                                    existMessage.textContent = "Household Already Exist!";
+                                    existMessage.classList.remove("hidden");
+                                } else {
+                                    existMessage.classList.add("hidden");
+                                }
+                            } catch (error) {
+                                console.error("Error checking resident:", error);
+                            }
+                        }
+                
+                        houseNoInput.addEventListener("input", checkResident);
+                        purokSelect.addEventListener("change", checkResident);
+                    });
+                </script>
+                
+
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="">Ownership</label>
+                        <div class="selectBar">
+                            <select name="ownership" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Owned">Owned</option>
+                                <option value="Rented">Rented</option>
+                                <option value="Informal Settler">Informal Settler/Squatter</option>
+                                <option value="Government Housing">Government Housing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="">House Type</label>
+                        <div class="selectBar">
+                            <select name="houseType" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Makeshift">Makeshift</option>
+                                <option value="Nipa Hut">Nipa Hut</option>
+                                <option value="Semi Concrete">Semi-Concrete</option>
+                                <option value="Fully Concrete">Fully Concrete</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="height0 gap10 padding10 borderRadius10 bgSoft">
+                    <div class="f">
+                        <label for="">Wall Material</label>
+                        <div class="selectBar">
+                            <select name="wallMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Bamboo">Bamboo</option>
+                                <option value="Wood">Wood</option>
+                                <option value="Hollow Blocks">Hollow Blocks</option>
+                                <option value="Light Materials">Light Materials</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="">Roof Material</label>
+                        <div class="selectBar">
+                            <select name="roofMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Galvanized Iron">Galvanized Iron</option>
+                                <option value="Nipa">Nipa</option>
+                                <option value="Wood">Wood</option>
+                                <option value="Light Materials">Light Materials</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="">Flooring Material</label>
+                        <div class="selectBar">
+                            <select name="flooringMaterial" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Cemented">Cemented</option>
+                                <option value="Wood">Wood</option>
+                                <option value="Bamboo">Bamboo</option>
+                                <option value="Tiles">Tiles</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="">Toilet Type</label>
+                        <div class="selectBar">
+                            <select name="toiletType" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Open Pit">Open Pit</option>
+                                <option value="Shared">Shared</option>
+                                <option value="Private with Flush">Private with Flush</option>
+                                <option value="None">None</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="f">
+                        <label for="">Water Source</label>
+                        <div class="selectBar">
+                            <select name="waterSource" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="">Select</option>
+                                <option value="Deep Well">Deep Well</option>
+                                <option value="Pump">Pump</option>
+                                <option value="Faucet">Faucet</option>
+                                <option value="Bottled Water">Bottled Water</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="height0 gap10">
+                    <div class="f">
+                        <label for="">Number of Rooms</label>
+                        <input type="number" name="numRooms" min="1" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                    </div>
+                    <div class="f">
+                        <label for="">Power Source</label>
+                        <div class="selectBar">
+                            <select name="electricity" required class="mt-1 block w-full p-2 border rounded-md focus:ring focus:ring-green-300">
+                                <option value="" selected disabled>Select</option>
+                                <option value="Yes">Electricity</option>
+                                <option value="Solar">Solar</option>
+                                <option value="Caserole Lamp">Caserole Lamp</option>
+                                <option value="Candle">Candle</option>
+                                <option value="Generator">Generator</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="height0 justifyEnd">
+                    <button type="submit" class="nav pnav borderRadius10">
+                        <i class="fas fa-check-square"></i>Submit
+                    </button>
+                </div>
+    
+            </div>
+            
+        </form>
+    </div>

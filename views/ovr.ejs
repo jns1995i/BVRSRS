@@ -1,0 +1,735 @@
+<% layout('layout') %><% layout('layout') %>
+<head>
+    <style>
+        .abstractBG {
+            color: white;
+        }
+        canvas {
+          max-height: 250px;
+        }
+        .keyC {
+          height: auto;
+          border-radius: 15px;
+          padding: 20px;
+          position: relative;
+          flex-direction: column;
+          align-items: start;
+          justify-self: space-between;
+          gap: 5px;
+        }
+        p.value {
+          font-size: 22px;
+          font-weight: 500 !important;
+        }
+        p.lab {
+          font-size: 14px;
+          font-weight: 300 !important;
+        }
+        .keyC:nth-child(1) { background-color: var(--witch); }
+        .keyC:nth-child(2) { background-color: var(--shade10); }
+        .keyC:nth-child(3) { background-color: var(--shade8); }
+        .keyC:nth-child(4) { background-color: var(--shade5); }
+        .keyC:nth-child(5) { background-color: var(--shade7); }
+        .keyC:nth-child(6) { background-color: var(--shade5); }
+        .keyC:nth-child(7) { background-color: var(--shade8); }
+    </style>
+</head>
+
+<div class="main bgSoft borderRadius15 padding20 height100">
+
+  
+    <div class="height0 gap10 padding5">
+      <div class="keyC abstractBG">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-clock"></i></a>
+          <p class="lab">Average Approval Time</p>
+          <p class="value"><%= formatDuration(avgTurnaroundHours) %></p>
+      </div>
+      <div class="keyC abstractBG">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+          <p class="lab">Average Claim Time</p>
+          <p class="value"><%= formatDuration(avgApprovalToClaimHours) %></p>
+      </div>
+      <div class="keyC abstractBG">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+          <p class="lab">Approved vs Declined</p>
+          <p class="value"><%= (statusCounts["Claimed"] || 0) + (statusCounts["For Pickup"] || 0) %> / <%= statusCounts["Declined"] %></p>
+      </div>
+      <div class="keyC abstractBG">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+          <p class="lab">Indigent Families</p>
+          <p class="value"><%= (povertyCounts.find(x=>x._id==='Indigent')?.count)||0 %></p>
+      </div>
+      <div class="keyC abstractBG hidden">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+          <p class="lab">Total Requests</p>
+          <p class="value"><%= totalCount %></p>
+      </div>
+      <div class="keyC abstractBG hidden">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-home"></i></a>
+          <p class="lab">Average Approval Time</p>
+          <p class="value"><%= requestApprovalTime %> hrs</p>
+      </div>
+    </div>
+    <br>
+
+<% function formatDuration(hours) { 
+  if (hours == null) return "0 hrs";
+
+  if (hours < 24) { 
+    const h = Math.floor(hours); 
+    return `${h} hr${h === 1 ? "" : "s"}`; 
+  }
+
+  const days = Math.floor(hours / 24); 
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"}`;
+
+  const months = Math.floor(days / 30); 
+  return `${months} month${months === 1 ? "" : "s"}`;
+}
+
+  const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]; 
+  
+  let maxDay = "Today";
+
+  if (peakDaysOfWeek && peakDaysOfWeek.length > 0) {
+    const maxDayObj = peakDaysOfWeek.reduce((prev, curr) => 
+      curr.count > prev.count ? curr : prev
+    );
+    maxDay = days[maxDayObj._id - 1];
+  }
+%>
+<%
+
+  // fallback text if no peak hour data
+  let maxHour = "No data";
+
+  if (peakHours && peakHours.length > 0) {
+    const maxHourObj = peakHours.reduce((prev, curr) => 
+      curr.count > prev.count ? curr : prev
+    );
+    // format like "2:00 PM" instead of just "14"
+    const hour = maxHourObj._id;
+    const suffix = hour >= 12 ? "PM" : "AM";
+    const formattedHour = ((hour % 12) || 12) + ":00 " + suffix;
+
+    maxHour = formattedHour;
+  }
+%>
+<%
+  let highest = null;
+  if (docTypes && docTypes.length > 0) {
+    highest = docTypes.reduce((max, item) => item.totalQty > max.totalQty ? item : max, docTypes[0]);
+  }
+%>
+
+  <div class="h160 padding10 bgWhite borderRadius15 col">
+    <div class="h180 justifyStart alignStart paddingInline15 paddingBlock10 col relative">
+      <p class="size36 str400"><%= totalCount %> Total Request</p>
+      <p class="size16 str500 hidden"><%= (povertyCounts.find(x=>x._id==='Indigent')?.count)||0 %> requests from Indigent Residents</p>
+      <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
+      <a href="/srv" class="nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= statusCounts["Pending"] %></span></a>
+      <div class="absolute translateY right0 width30 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
+          <p class="size14 str400">
+            <% if (currentFilter === 'today') { %>
+                Awesome! Today Is
+            <% } else if (currentFilter === 'specificDate' && specificDate) { %>
+                Awesome! Today Is
+            <% } else { %>
+                Day of Week with Highest Request
+            <% } %>
+          </p>
+          <p class="size34 str500 upperCase colorPrimary"><%= maxDay %></p>
+          <div class="height0 bottom15 right15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14 str500">
+            <%= maxHour %> is the Peak Hour</p>
+          </div>
+      </div>
+      <img src="/images/calendar.png" alt="" class="absolute bottom0 h150" style="right: 240px; transform: rotate(-10deg);">
+      <div class="height0 bottom5 left15 width0 absolute col alignStart bgTint8 colorPrimary padding5 borderRadius5 str500 size14">
+        <%= highest ? highest._id : "No Data" %> is the Most Requested document!</p>
+      </div>
+    </div>
+  </div>
+
+  <br> 
+  
+  
+  <div class="borderRadius10 abstractBG witch padding20 h300 col justifyAround gap10 relative">
+    <form method="GET" action="/ovr" style="width: auto; height: fit-content; padding: 0; background-color: transparent; border-radius: 0; flex-direction: row; box-shadow: none; position: absolute; right: 10px; top: 10px;">
+                <div class="selectBar">
+                  <i class="fas fa-filter w15 colorPrimary"></i>
+                    <select name="filter" onchange="this.form.submit()">
+                      <option value="all" <%= currentFilter === 'all' ? 'selected' : '' %>>All</option>
+                      <option value="today" <%= currentFilter === 'today' ? 'selected' : '' %>>Today</option>
+                      <option value="thisMonth" <%= currentFilter === 'thisMonth' ? 'selected' : '' %>>This Month</option>
+                      <option value="lastMonth" <%= currentFilter === 'lastMonth' ? 'selected' : '' %>>Last Month</option>
+                      <option value="thisYear" <%= currentFilter === 'thisYear' ? 'selected' : '' %>>This Year</option>
+                      <option value="lastYear" <%= currentFilter === 'lastYear' ? 'selected' : '' %>>Last Year</option>
+                      <option value="specificDate" <%= currentFilter === 'specificDate' ? 'selected' : '' %>>Specific Date</option>
+                      <option value="customRange" <%= currentFilter === 'customRange' ? 'selected' : '' %>>Custom Range</option>
+                    </select>
+                </div>
+
+                <% if (currentFilter === 'specificDate') { %>
+                <div class="selectBar" style="width: auto;"><input type="date" class="width0 border0 marginInline15" name="specificDate" value="<%= specificDate || '' %>" onchange="this.form.submit()"></div>
+                <% } %>
+
+                <% if (currentFilter === 'customRange') { %>
+                <div class="selectBar" style="width: auto;"><input type="date" class="width0 border0" name="start" value="<%= start || '' %>" onchange="this.form.submit()"></div>
+                <div class="selectBar" style="width: auto;"><input type="date" class="width0 border0" name="end" value="<%= end || '' %>" onchange="this.form.submit()"></div>
+                <button type="submit" class="nav borderRadius10 padding13 hidden" style="max-width: none; width: 200px;"><i class="fas fa-filter"></i> Apply Filter</button>
+                <% } %>
+        </form>
+      <p class="size20 str500 absolute top20 left20">Transaction Trend</p>
+    <canvas id="trendMonth"></canvas>
+  </div>
+
+  <br><hr><br>
+
+  <div class="height0 gap10 alignStart">
+    <div class="card padding30 shadowNone alignStart col gap15 h320 justifyStart">
+      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Top Requester</p>
+      <hr>
+      <% requestsPerResident.forEach((r,index) => { %>
+      <div class="height0 justifyBetween size16 str500">
+        <div class="height0 gap5 justifyStart">
+          <p class="gray textCenter w20"><%= index + 1 %> &nbsp;</p>
+          <img src="<%= r.photo ? r.photo : '/images/default.png' %>" alt="<%= r.fullName %>" class="h25 w25 inline borderRadius500">
+          <p><%= r.fullName %></p>
+        </div>
+        <p class="green str500"><%= r.count %></p>
+      </div>
+      <% }) %>
+    </div>
+    <div class="card padding30 shadowNone alignStart col gap15 h320 justifyStart">
+      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Weekly Quick Repeats</p>
+      <hr>
+      <% repeatShortInterval.forEach((r,index) => { %>
+      <div class="height0 justifyBetween size16 str500">
+        <div class="height0 gap5 justifyStart">
+          <p class="gray textCenter w20"><%= index + 1 %></p>
+          <img src="<%= r.photo ? r.photo : '/images/default.png' %>" alt="<%= r.fullName %>" class="h25 w25 inline borderRadius500">
+          <p><%= r.fullName %></p>
+        </div>
+        <p class="green str500"><%= r.repeats %></p>
+      </div>
+      <% }) %>
+    </div>   
+    <div class="borderRadius10 bgWhite padding20 col justifyAround h320">
+      <p class="size16 str500 hidden"><i class="fas fa-hourglass inline w15"></i> Request per Status</p>
+      <canvas id="reqStatusChart"></canvas>
+    </div>
+  </div>
+
+  <br><br><hr><br><br>
+  <div class="height0 justifyEnd paddingInline20">
+    <div class="selectBar filter index50 widthMax0 width0 borderNone" style="max-width: none;">
+      <i class="fas fa-filter w15"></i>
+      <select>
+        <option value="all">Show All</option>
+        <option value="docTypes" selected>Document Type & Total Qty</option>
+        <option value="reqApprovalByStatusChart">Average Approval Time per Request Status</option>
+        <option value="approvalTime">Average Approval Time per Documents</option>
+        <option value="civilBar">Request By Civil Status</option>
+        <option value="peakDow">Per Day of Week</option>
+        <option value="purokBar">Requests per Purok</option>
+        <option value="peakHours">Peak Hours Trend</option>
+        <option value="ageDistributionChart">Requests by Age Distribution</option>
+      </select>
+    </div> 
+  </div>
+  <br>
+
+  <div class="height0 gap10 alignStart wrap relative">  
+
+    <div class="height0 col width30 padding5 h320 bgWhite borderRadius10">
+      <p class="size24 str500">Top Household</p>
+      <table class="table shadowNone">
+        <thead><tr><th class="textCenter width10">#</th><th class="">Address</th><th class="textCenter">Requests</th></tr></thead>
+        <tbody>
+          <% topHouseholds.forEach((h,i) => { %>
+            <tr>
+              <td class="textCenter"><%= i+1 %></td>
+              <td class=""><%= h.houseNo || '-' %> <%= h.purok || '-' %></td>
+              <td class="textCenter"><%= h.count %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-clock inline w15"></i> Average Turn Around Time by Status</p>
+        <canvas id="reqApprovalByStatusChart"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col  justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-clock inline w15"></i> Average Approval Time per Documents</p>
+      <canvas id="approvalTime"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-clock inline w15"></i> By Civil Status</p>
+        <canvas id="civilBar"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col  justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-clock inline w15"></i> Per Day of Week</p>
+      <canvas id="peakDow"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col  justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-hourglass inline w15"></i> Requests per Purok</p>
+      <canvas id="purokBar"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-clock inline w15"></i> Peak Hours</p>
+        <canvas id="peakHours"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch padding20 h320 col justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-file w16 size14 inline"></i> Total Qty per Document Type</p>
+        <canvas id="docTypes"></canvas>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col widthMin justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
+        <p class="size16 str500"><i class="fas fa-hourglass inline w15"></i> Requests by Age Distribution</p>
+      <canvas id="ageDistributionChart"></canvas>
+    </div>  
+  </div>
+
+  <br><br>
+
+  <div class="height0 alignStart justifyBetween relative gap20 bgWhite padding10 borderRadius15">
+
+    <div class="card padding30 shadowNone alignStart col gap15 h300 justifyStart width35  abstractBG witch">
+          <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(4); bottom: -10px;"><i class="fas fa-file-alt"></i></a>
+      <p class="size24 str500">Average Qty per Document Type</p>
+      <hr>
+           <% docTypes.forEach((d, index) => { %>
+          <div class="height0 justifyBetween size16 str500">
+            <div class="height0 gap5 justifyStart">
+              <p class="white textCenter w20  size16"><%= index + 1 %> &nbsp;</p>
+              <p><%= d._id %></p>
+            </div>
+            <p class="white str500 width10  size16"><%= (d.avgQty || 0).toFixed ? d.avgQty.toFixed(0) : d.avgQty %></p>
+          </div>
+        <% }) %>
+    </div>  
+    <div class="card padding30 shadowNone alignStart col gap15 h300 justifyStart width35">
+      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Top Request Purpose</p>
+      <hr>
+        <% purposes.slice(0,5).forEach((p,index) => { %>
+          <div class="height0 justifyBetween size16 str500">
+            <div class="height0 gap5 justifyStart">
+              <p class="gray textCenter w20"><%= index + 1 %> &nbsp;</p>
+              <p><%= p._id %></p>
+            </div>
+            <p class="green str500"><%= p.count %></p>
+          </div>
+        <% }) %>
+    </div>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h300 col  justifyAround alignStart paddingTop30 width25">
+        <p class="size16 str500"><i class="fas fa-hourglass inline w15"></i> By Gender</p>
+      <canvas id="genderBar"></canvas>
+    </div>
+  </div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.querySelector(".selectBar.filter"); // fixed: point to the <select>
+  const containers = document.querySelectorAll(".chartC");
+
+  // Function to hide all and show selected
+  const showContainer = (id) => {
+    if (id === "all") {
+      containers.forEach(c => c.classList.remove("hidden")); // show everything
+    } else {
+      containers.forEach(c => {
+        c.classList.add("hidden"); // hide all
+        if (c.querySelector(`#${id}`)) {
+          c.classList.remove("hidden"); // show the one that matches
+        }
+      });
+    }
+  };
+
+  // Force show docTypes on first load
+  showContainer("docTypes");
+
+  // On select change
+  select.addEventListener("change", (e) => {
+    showContainer(e.target.value);
+  });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Helpers
+  const toLabels = (arr, key = "_id") => arr.map(x => x[key]);
+  const toCounts = arr => arr.map(x => x.count);
+
+  const trendData = <%- JSON.stringify(trend) %>;
+  const trendUnit = "<%- trendUnit %>";
+  const counts = trendData.map(x => x.count);
+
+const labels = trendData.map(x => {
+  const d = new Date(x._id);
+  switch (trendUnit) {
+    case "hour": 
+      return `${d.getHours()}:00`;
+    case "day": 
+      return `${d.getDate()}/${d.getMonth() + 1}`;
+    case "month": 
+      // Show month name (Jan, Feb, Mar...) instead of 1/2025
+      return d.toLocaleString("default", { month: "long" });
+      // Or include year if needed:
+      // return `${d.toLocaleString("default", { month: "short" })} ${d.getFullYear()}`;
+    case "week": 
+      return `${d.getDate()}/${d.getMonth() + 1}`;
+    default: 
+      return d.toLocaleDateString();
+  }
+});
+
+  function drawRoundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  Chart.register({
+    id: 'glowBars',
+    beforeDatasetsDraw(chart) {
+      const ctx = chart.ctx;
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((bar) => {
+          ctx.save();
+          ctx.fillStyle = 'rgba(255,255,255,0.4)'; 
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.8)'; 
+          ctx.shadowBlur = 20; 
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.fillRect(bar.x - bar.width/2, bar.y, bar.width, bar.base - bar.y);
+          ctx.restore();
+        });
+      });
+    }
+  });
+
+  // --- LINE CHART (trend) ---
+  const maxValue = counts.length ? Math.max(...counts) : 1;
+  new Chart(document.getElementById('trendMonth').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Requests',
+        data: counts,
+        borderColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: (ctx) => {
+          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.ctx.canvas.height);
+          gradient.addColorStop(0, "rgba(255,255,255,0.4)");
+          gradient.addColorStop(1, "rgba(255,255,255,0)");
+          return gradient;
+        },
+        fill: true,
+        tension: 0.3,
+        pointRadius: 1.5,
+        pointHoverRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: "white" } },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false },
+      scales: {
+        x: {
+          ticks: { color: "white" },
+          grid: { color: "rgba(255,255,255,0.2)", borderColor: "white" }
+        },
+        y: {
+          beginAtZero: true,
+          max: Math.ceil(maxValue * 1.2),
+          ticks: { display: false, color: "white" },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // --- Common BAR options ---
+  const barOptions = {
+    plugins: { legend: { labels: { color: "white" } } },
+    scales: {
+      x: {
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.2)", borderColor: "rgba(255,255,255,0.6)" }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { display: false, color: "white" },
+        grid: { display: false }
+      }
+    }
+  };
+
+  // Function to create bar chart dataset with default styles
+  const makeBarDataset = (label, data) => ({
+    label,
+    data,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    borderColor: "rgba(255,255,255,0.6)",
+    barThickness: 45,
+    borderRadius: 6 // ✅ applied to all bar charts
+  });
+
+  // Doc Types
+  new Chart(document.getElementById('docTypes').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: toLabels(<%- JSON.stringify(docTypes) %>),
+      datasets: [makeBarDataset("Total Qty", <%- JSON.stringify(docTypes.map(x => x.totalQty)) %>)]
+    },
+    options: barOptions
+  });
+
+  // Purok
+  new Chart(document.getElementById('purokBar').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: toLabels(<%- JSON.stringify(byPurok) %>),
+      datasets: [makeBarDataset("Requests", toCounts(<%- JSON.stringify(byPurok) %>))]
+    },
+    options: barOptions
+  });
+
+  // Gender
+  new Chart(document.getElementById('genderBar').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: toLabels(<%- JSON.stringify(byGender) %>),
+      datasets: [makeBarDataset("Requests", toCounts(<%- JSON.stringify(byGender) %>))]
+    },
+    options: barOptions
+  });
+
+  // Civil Status
+  new Chart(document.getElementById('civilBar').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: toLabels(<%- JSON.stringify(byCivilStatus) %>),
+      datasets: [makeBarDataset("Requests", toCounts(<%- JSON.stringify(byCivilStatus) %>))]
+    },
+    options: barOptions
+  });
+
+  // Approval time by doc type
+  new Chart(document.getElementById('approvalTime').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: <%- JSON.stringify(approvalTimeByDocType.map(x => x._id.replace("Barangay ", "").replace("Certificate of ", ""))) %>,
+      datasets: [makeBarDataset("Avg Hours", <%- JSON.stringify(approvalTimeByDocType.map(x => Number(x.avgHours.toFixed ? x.avgHours.toFixed(2) : x.avgHours))) %>)]
+    },
+    options: barOptions
+  });
+
+  // --- LINE (keep as is) ---
+  const peakLabels = <%- JSON.stringify(peakHours.map(x => x._id)) %>;
+const peakCounts = toCounts(<%- JSON.stringify(peakHours) %>);
+const peakMax = peakCounts.length ? Math.max(...peakCounts) : 1;
+
+new Chart(document.getElementById('peakHours').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: peakLabels,
+    datasets: [{
+      label: 'Requests',
+      data: peakCounts,
+      borderColor: 'rgba(255,255,255,0.5)',
+      backgroundColor: (ctx) => {
+        const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.ctx.canvas.height);
+        gradient.addColorStop(0, "rgba(255,255,255,0.4)");
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        return gradient;
+      },
+      fill: true,
+      tension: 0.3,
+      pointRadius: 0,
+      pointHoverRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { color: "white" } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+    scales: {
+      x: {
+        ticks: { color: "white" },
+        grid: { color: "rgba(255,255,255,0.2)", borderColor: "white" }
+      },
+      y: {
+        beginAtZero: true,
+        max: Math.ceil(peakMax * 1.2),
+        ticks: { display: false, color: "white" },
+        grid: { display: false }
+      }
+    }
+  }
+});
+
+  // Day of Week
+  const dowMap = {1:"Mon",2:"Tue",3:"Wed",4:"Thu",5:"Fri",6:"Sat",7:"Sun"};
+  const peakDow = <%- JSON.stringify(peakDaysOfWeek) %>;
+  new Chart(document.getElementById('peakDow').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: peakDow.map(x => dowMap[x._id] || x._id),
+      datasets: [makeBarDataset("Requests", toCounts(peakDow))]
+    },
+    options: barOptions
+  });
+
+ // --- DOUGHNUT (keep as is) ---
+const fixedReqStatuses = ["Processing", "For Pickup", "Claimed", "Declined", "Cancelled"];
+const reqStatusMap = {};
+fixedReqStatuses.forEach(s => reqStatusMap[s] = 0);
+<% requestStatusCounts.forEach(s => { %>
+  if ("<%= s._id %>" in reqStatusMap) reqStatusMap["<%= s._id %>"] = <%= s.count %>;
+<% }); %>
+
+new Chart(document.getElementById('reqStatusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: fixedReqStatuses,
+    datasets: [{
+      data: fixedReqStatuses.map(s => reqStatusMap[s]),
+      backgroundColor: ['#2E7D32', '#4A148C', '#00695C', '#8E024F','orangered', '#6A1B9A']
+    }]
+  },
+  options: {
+    plugins: {
+      legend: {
+        labels: {
+          color: 'colorPrimary'
+        },  // ✅ change legend text color to white
+          position: 'bottom'
+      }
+    }
+  }
+});
+
+  // Req Approval by Status (bar)
+  const reqApprovalMap = {};
+  fixedReqStatuses.forEach(s => reqApprovalMap[s] = 0);
+  <% turnaroundPerStatus.forEach(r => { %>
+    if ("<%= r._id %>" in reqApprovalMap) reqApprovalMap["<%= r._id %>"] = Number(<%= r.avgHours.toFixed(2) %>);
+  <% }); %>
+  new Chart(document.getElementById('reqApprovalByStatusChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: fixedReqStatuses,
+      datasets: [makeBarDataset("Avg Hours", fixedReqStatuses.map(s => reqApprovalMap[s]))]
+    },
+    options: barOptions
+  });
+</script>
+
+
+<script>
+  // Pass ageDistribution from EJS to JS
+  const ageDistribution = <%- JSON.stringify(ageDistribution || {}) %>;
+</script>
+<script>
+  // ================== Age Distribution Chart ==================
+  if (typeof ageDistribution !== 'undefined' && Object.keys(ageDistribution).length > 0) {
+    const ageLabels = Object.keys(ageDistribution);
+    const ageValues = Object.values(ageDistribution);
+    const maxCount = Math.max(...ageValues);
+
+    const canvas = document.getElementById('ageDistributionChart');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+
+      // --- Rounded Glow Plugin ---
+      Chart.register({
+        id: 'glowBars',
+        beforeDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            meta.data.forEach((bar) => {
+              ctx.save();
+              ctx.fillStyle = 'rgba(255,255,255,0.2)';
+              ctx.shadowColor = 'rgba(255,255,255,0.7)';
+              ctx.shadowBlur = 15;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
+              // Draw glowing rect behind
+              ctx.fillRect(bar.x - bar.width / 2, bar.y, bar.width, bar.base - bar.y);
+              ctx.restore();
+            });
+          });
+        }
+      });
+
+      // --- Create gradient for main bars ---
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, "rgba(255,255,255,0.9)");
+      gradient.addColorStop(1, "rgba(255,255,255,0.3)");
+
+      // --- Chart ---
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ageLabels,
+          datasets: [{
+            label: 'Requests by Age Group',
+            data: ageValues,
+            backgroundColor: gradient,
+            borderRadius: 12,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: "white", font: { size: 14 } }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              bodyColor: '#fff',
+              titleColor: '#fff',
+              padding: 10,
+              cornerRadius: 5
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "white", font: { size: 12 } },
+              grid: { color: "rgba(255,255,255,0.2)", borderColor: "rgba(255,255,255,0.6)" }
+            },
+            y: {
+              beginAtZero: true,
+              max: Math.ceil(maxCount * 1.1),
+              ticks: { display: false, color: "white" },
+              grid: { display: false }
+            }
+          }
+        },
+        plugins: ['glowBars']
+      });
+    }
+  }
+</script>

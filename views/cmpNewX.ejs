@@ -1,0 +1,265 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .personCard {
+            color: rgb(0, 28, 0);
+        }
+        .personCard:nth-child(1) { background-color: var(--tint7)}
+        .personCard:nth-child(2) { background-color: var(--tint6)}
+        .personCard:nth-child(3) { background-color: var(--tint5)}
+        .personCard:nth-child(4) { background-color: var(--tint8)}
+        .personCard:nth-child(5) { background-color: var(--tint8)}
+        .personCard:nth-child(6) { background-color: var(--tint8)}
+        .personCard:nth-child(7) { background-color: var(--tint8)}
+    </style>
+</head>
+
+<div class="gap15">
+    <div class="bgSoft borderRadius10 padding20 gap10 blockX overflow-y1">
+        <form action="/add-case" method="POST" class="width100 alignStart relative" id="prime">
+            <a href="/cmp" class="nav cnav absolute right20 top20"><i class="fas fa-times"></i></a>
+            <p class="size30 str500">RECORD NEW COMPLAINT</p>
+            <br>
+            
+            <!-- Complainant Section -->
+            <div class="borderPrimary borderRadius10 padding10 col gap5 alignStart">
+                <div class="height0 justifyBetween">
+                    <a href="" class="nav fnav width0" id="btnComplainant"><i class="fas fa-plus"></i>Complainant</a>
+                </div>
+                <hr>
+                <div class="height0 padding0 wrap gap10 justifyStart" id="complainantList" style="min-height: 120px;"></div>
+            </div>
+            <br>
+            
+            <!-- Complainee Section -->
+            <div class="borderPrimary borderRadius10 padding10 col gap5 alignStart">
+                <div class="height0 justifyBetween">
+                    <a href="" class="nav fnav width0" id="btnComplainee"><i class="fas fa-plus"></i>Complainee</a>
+                </div>
+                <hr>
+                <div class="height0 padding0 wrap gap10 justifyStart" id="complaineeList" style="min-height: 120px;"></div>
+            </div>
+            <br>
+            
+            <!-- Complaint Details -->
+            <div class="height0 justifyBetween">
+                <div class="height0 gap10 justifyStart">
+                    <div class="height0 col gap5 alignStart width0">
+                        <label for="">Type of Case</label>
+                        <div class="selectBar">
+                            <select name="type" required>
+                                <option value="">Select a Case Type</option>
+                                <option value="Simple Physical Injuries">Simple Physical Injuries</option>
+                                <option value="Oral Defamation (Slander)">Oral Defamation (Slander)</option>
+                                <option value="Slander by Deed">Slander by Deed</option>
+                                <option value="Simple Threats">Simple Threats</option>
+                                <option value="Grave Coercion">Grave Coercion</option>
+                                <option value="Unjust Vexation">Unjust Vexation</option>
+                                <option value="Malicious Mischief">Malicious Mischief</option>
+                                <option value="Trespassing">Trespassing</option>
+                                <option value="Theft (Petty Theft only)">Theft (Petty Theft only)</option>
+                                <option value="Estafa (Swindling)">Estafa (Swindling)</option>
+                                <option value="Breach of Contract">Breach of Contract</option>
+                                <option value="Collection of Debts">Collection of Debts</option>
+                                <option value="Neighborhood Disputes">Neighborhood Disputes</option>
+                                <option value="Public Disturbance">Public Disturbance</option>
+                                <option value="Others">Others</option>
+                            </select>                            
+                        </div>
+                    </div>
+                    <div class="height0 col gap5 alignStart width0">
+                        <label for="">Date Filed</label>
+                        <input type="datetime-local" name="createdAt" required>
+                    </div>
+                </div>
+                <div class="height0 justifyEnd gap10">
+                    <button type="submit" class="nav pnav"><i class="fas fa-plus"></i>Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<!-- Complainant Modal -->
+<div class="absolute hidden modal" id="modalComplainant" style="background-color: rgba(0, 0, 0, 0.5); border-radius: 0;">
+    <form action="" class="height0 alignStart relative">
+        <a href="" class="nav cnav absolute right20 top20 closeModal" data-target="modalComplainant">
+            <i class="fas fa-times"></i>
+        </a>
+        <p class="size30 str500">COMPLAINANT</p>
+        <br>
+        <p class="size14">Select a person if a Bonified Resident</p>
+
+        <!-- Dropdown -->
+         <div class="selectBar widthMax100">
+            <select id="selectComplainant">
+                <option value="" selected disabled>Select Resident</option>
+                <% residents.forEach(resident => { %>
+                    <option value="<%= resident._id %>" data-name="<%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>"
+                            data-address="<%= resident.houseNo %> <%= resident.purok %>"
+                            data-phone="<%= resident.phone %>">
+                        <%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+
+        <br>
+        <p class="size14">Or input manually if the person is a Non-Resident</p>
+
+        <!-- Input Fields (For Manual Entry) -->
+         <div class="height0 borderPrimary borderRadius10 padding10 col alignStart gap10">
+            <label>Complete Name</label>
+            <input type="text" id="ComplainantName" placeholder="Enter Name">
+    
+            <label>Address</label>
+            <input type="text" id="ComplainantAddress" placeholder="Enter Address">
+    
+            <label>Phone</label>
+            <input type="text" id="ComplainantPhone" placeholder="Enter Phone Number">
+        </div>
+
+        <br>
+
+        <button type="button" class="nav pnav addPerson" data-list="complainantList" data-modal="modalComplainant">
+            Add Person
+        </button>
+    </form>
+</div>
+
+<!-- Complainee Modal -->
+<div class="absolute hidden modal" id="modalComplainee" style="background-color: rgba(0, 0, 0, 0.5); border-radius: 0;">
+    <form action="" class="height0 alignStart relative">
+        <a href="" class="nav cnav absolute right20 top20 closeModal" data-target="modalComplainee">
+            <i class="fas fa-times"></i>
+        </a>
+        <p class="size30 str500">COMPLAINEE</p>
+        <br>
+        <p class="size14">Select a person if a Bonified Resident</p>
+
+        <!-- Dropdown -->
+         <div class="selectBar widthMax100">
+            <select id="selectComplainee">
+                <option value="" selected disabled>Select Resident</option>
+                <% residents.forEach(resident => { %>
+                    <option value="<%= resident._id %>" data-name="<%= resident._id %>">
+                        <%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+
+        <br>
+        <p class="size14">Or input manually if the person is a Non-Resident</p>
+
+        <!-- Input Fields (For Manual Entry) -->
+         <div class="height0 borderPrimary borderRadius10 padding10 col alignStart gap10 hidden">
+            <label>Complete Name</label>
+            <input type="text" id="ComplaineeName" placeholder="Enter Name">
+        </div>
+
+        <br>
+
+        <button type="button" class="nav pnav addPerson" data-list="complaineeList" data-modal="modalComplainee">
+            Add Person
+        </button>
+    </form>
+</div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleModal = (buttonId, modalId) => {
+        document.getElementById(buttonId)?.addEventListener("click", (e) => {
+            e.preventDefault();
+            document.getElementById(modalId)?.classList.remove("hidden");
+        });
+    };
+
+    // Event delegation for closing modals
+    document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("closeModal")) {
+            e.preventDefault();
+            const targetModal = e.target.dataset.target;
+            if (targetModal) {
+                document.getElementById(targetModal)?.classList.add("hidden");
+            }
+        }
+    });
+
+    toggleModal("btnComplainant", "modalComplainant");
+    toggleModal("btnComplainee", "modalComplainee");
+
+    // Auto-fill inputs when selecting from dropdown
+    const enableAutoFill = (selectId, nameInputId, addressInputId, phoneInputId) => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        select.addEventListener("change", () => {
+            const selectedOption = select.options[select.selectedIndex];
+
+            document.getElementById(nameInputId).value = selectedOption.dataset.name || "";
+            document.getElementById(addressInputId).value = selectedOption.dataset.address || "";
+            document.getElementById(phoneInputId).value = selectedOption.dataset.phone || "";
+        });
+    };
+
+    enableAutoFill("selectComplainant", "ComplainantName", "ComplainantAddress", "ComplainantPhone");
+    enableAutoFill("selectComplainee", "ComplaineeName", "ComplaineeAddress", "ComplaineePhone");
+
+    // Adding selected or manually entered person
+    document.querySelectorAll(".addPerson").forEach(button => {
+        button.addEventListener("click", (e) => {
+            e.preventDefault();
+            const modalId = button.dataset.modal;
+            const listId = button.dataset.list;
+
+            if (!modalId || !listId) return;
+
+            // Get input values
+            const nameInput = document.querySelector(`#${modalId} input[id$="Name"]`).value.trim();
+            const addressInput = document.querySelector(`#${modalId} input[id$="Address"]`).value.trim();
+            const phoneInput = document.querySelector(`#${modalId} input[id$="Phone"]`).value.trim();
+
+            // Ensure at least a name is provided
+            if (nameInput !== "") {
+                const personDiv = document.createElement("div");
+                personDiv.className = "height0 col gap5 alignStart padding20 bgSoft borderRadius10 marginBottom10 width23 personCard";
+                personDiv.innerHTML = `
+                    <div class="height0 justifyEnd">
+                        <a href="#" class="width0 removePerson"><i class="fas fa-times"></i></a>
+                    </div>
+                    <p class="size14 str500">${nameInput}</p>
+                    <p class="size14 str400">${addressInput || "No Address Provided"}</p>
+                    <p class="size14 str400">${phoneInput || "No Phone Provided"}</p>
+                    <input type="hidden" name="${listId === 'complainantList' ? 'complainants[]' : 'complainees[]'}" value='${JSON.stringify({
+                        name: nameInput,
+                        address: addressInput,
+                        phone: phoneInput
+                    })}'>
+                `;
+
+                document.getElementById(listId).appendChild(personDiv);
+
+                // Close modal after adding
+                document.getElementById(modalId)?.classList.add("hidden");
+
+                // Clear input fields
+                document.querySelector(`#${modalId} input[id$="Name"]`).value = "";
+                document.querySelector(`#${modalId} input[id$="Address"]`).value = "";
+                document.querySelector(`#${modalId} input[id$="Phone"]`).value = "";
+            } else {
+                alert("Please enter a name.");
+            }
+        });
+    });
+
+    // Event delegation for removing a person
+    document.addEventListener("click", (e) => {
+        if (e.target.closest(".removePerson")) {
+            e.preventDefault();
+            e.target.closest(".personCard").remove();
+        }
+    });
+});
+
+</script>

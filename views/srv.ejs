@@ -1,0 +1,229 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .mainf {
+            gap: 10px;
+            display: flex;
+        }
+    </style>
+</head>
+
+            
+<div class="height0 abstractBG padding20 borderRadius10 absolute right50 top100 width25 index50 col justifyStart alignCenter gap5">
+    <p class="size16 white str400"></p>
+    <BR>
+        <div class="height0 paddingBlock10 col">
+            <p class="size20 white str500">NEED HELP?</p>
+            <p class="size14 white str400 textCenter">Watch the video to learn about the document approval process.</p>
+        </div>
+    <video autoplay muted controls loop class="width100 borderRadius10 padding10 borderPrimary">
+        <source src="/images/mv1.mp4" type="video/mp4">
+        <source src="/images/mv1.webm" type="video/webm">
+        Your browser does not support the video tag.
+    </video>
+    <br>
+</div>
+        <div class="height10">
+            <div class="height0 width100">
+                <div class="ctrl left">
+                    <p class="size30 str500">Document Services</p>
+                </div>
+                <div class="ctrl">
+                    <div class="searchBar">
+                        <input type="search" id="univ">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+                <div class="ctrl right">
+                    <a href="/ovv" class="nav">
+                        <i class="fas fa-bar-chart"></i>
+                        All transactions
+                    </a>
+                    <a href="/mainReq" class="nav pnav">
+                        <i class="fas fa-plus"></i>
+                        Request Document
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="height90 overflow-y1 padding20 col justifyStart blockX bgSoft borderRadius15 relative">
+            <div class="height0 width70 hidden size18" id="noRecord">No Records Found!
+            </div>
+            <% 
+    // Get current date values
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+
+    // Categorize requests
+    const todayRequests = [];
+    const yesterdayRequests = [];
+    const thisWeekRequests = [];
+    const otherRequests = [];
+
+    requests.forEach(request => {
+        const reqDate = new Date(request.createdAt);
+        const reqDay = new Date(reqDate.getFullYear(), reqDate.getMonth(), reqDate.getDate());
+
+        if (reqDay.getTime() === today.getTime()) {
+            todayRequests.push(request);
+        } else if (reqDay.getTime() === yesterday.getTime()) {
+            yesterdayRequests.push(request);
+        } else if (reqDay >= startOfWeek) {
+            thisWeekRequests.push(request);
+        } else {
+            otherRequests.push(request);
+        }
+    });
+
+    const categorizedRequests = [
+        { title: "TODAY", data: todayRequests },
+        { title: "YESTERDAY", data: yesterdayRequests },
+        { title: "THIS WEEK", data: thisWeekRequests },
+        { title: "OTHERS", data: otherRequests }
+    ];
+%>
+
+<% if (requests.length > 0) { %>
+    <% categorizedRequests.forEach(category => { %>
+        <% if (category.data.length > 0) { %>
+            <div class="height0 padding0 marginBottom5 titleCard justifyStart">
+                <p class="size16 str500 gray width65 textLeft"><%= category.title %></p>
+            </div>
+            <% category.data.forEach(request => { %>
+                <div class="height0 padding5 srvCard justifyStart" id="srvCard">
+                    <div class="width70 height0 bgWhite borderRadius15 paddingInline25 paddingBlock25 gap10 marginBottom20 justifyBetween darkShadow 
+                    <% if (['Processed', 'Approved', 'Declined', 'For Pickup', 'Claimed', 'Cancelled'].includes(request.status)) { %>
+                        bgSoft paddingBlock15 shadowNone
+                    <% } %>
+                    " id="srvCard">
+                    <% if (request.resident) { %>
+                        <div class="height0 width30 gap10 justifyStart">
+                            <div class="width0 h50">
+                                <img src="<%= request.resident.photo || '/images/profile.jpg' %>" alt="" class="h35 w35 borderRadius500 borderPrimary">
+                            </div>
+                            <div class="height0 width0 col alignStart">
+                                <p class="size18 str500"><%= request.resident.firstName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
+                                <p class="size12 str400 gray"><%= request.household ? request.household.houseNo : 'N/A' %> <%= request.household ? request.household.purok : 'N/A' %>, Valdefuente</p>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        No resident data available
+                    <% } %>
+                        <div class="width0 height0 col gap0 marginLeft10 alignStart">
+                            <p class="size12 str500 gray">
+                                <%= new Date(request.createdAt).toLocaleString('en-US', { weekday: 'long' }) %> -
+                                <%= new Date(request.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase() %>
+                                 <%= ("0" + new Date(request.createdAt).getDate()).slice(-2) %>
+                                  <%= new Date(request.createdAt).getFullYear() %>
+                            </p>
+                            <p class="size16 str500">
+                                TR#<%= request.tr %>
+                                </p>
+                        </div>
+                        <div class="height0 col alignStart" style="width: 12%;">
+                            <p class="size12 gray hidden">Status</p>
+                            <% if (request.status === 'Approved') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Processed') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Claimed') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Processing') { %>
+                            <height0 class="size12 upperCase str500 bgSoft  padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Declined') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Cancelled') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'For Pickup') { %>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                            <% if (request.status === 'Pending') { %>
+                            <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><%= request.status %></height0>
+                            <% } %>
+                        </div>
+                        <a href="/srvView/<%= request._id %>" class="nav cnav"><i class="fas fa-chevron-right"></i></a>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+    <% }) %>
+<% } else { %>
+    <p class="size14 str400 textCenter">No Recent or Active Requests as of Now</p>
+<% } %>
+
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById("univ");
+                const srvCards = document.querySelectorAll("#srvCard");
+                const titleCards = document.querySelectorAll(".titleCard");
+                const noRecordMsg = document.getElementById("noRecord");
+        
+                searchInput.addEventListener("input", function () {
+                    const query = searchInput.value.toLowerCase().trim();
+                    let hasMatch = false;
+        
+                    // Map to check which titleCard has at least one matching srvCard
+                    const visibleTitleCards = new Map();
+        
+                    srvCards.forEach(card => {
+                        const text = card.textContent.toLowerCase();
+                        const parentTitle = card.closest(".titleWrapper")?.querySelector(".titleCard");
+        
+                        if (text.includes(query)) {
+                            card.style.display = "flex"; // Show matching card
+                            hasMatch = true;
+        
+                            // Mark titleCard as visible if its child srvCard is matched
+                            if (parentTitle) {
+                                visibleTitleCards.set(parentTitle, true);
+                            }
+                        } else {
+                            card.style.display = "none"; // Hide non-matching card
+                        }
+                    });
+        
+                    // Show/hide the #noRecord message
+                    noRecordMsg.classList.toggle("hidden", hasMatch);
+        
+                    // Hide all titleCards first
+                    titleCards.forEach(title => {
+                        title.style.display = "none";
+                    });
+        
+                    // Show only titleCards that have visible srvCards
+                    visibleTitleCards.forEach((_, title) => {
+                        title.style.display = "block";
+                    });
+                });
+            });
+        </script>
+        
+        <script>
+            let lastRequestCount = <%= requests.length %>; // Store the initial count
+        
+            function checkForNewRequests() {
+                fetch('/getRequestCount') // Fetch request count from backend
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.count > lastRequestCount) {
+                            location.reload(); // Reload page if new requests exist
+                        }
+                    })
+                    .catch(error => console.error("Error checking new requests:", error));
+            }
+        
+            setInterval(checkForNewRequests, 5000); // Check every 5 seconds
+        </script>
+        

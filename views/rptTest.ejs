@@ -1,0 +1,310 @@
+<% layout('layout') %>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+
+    <style>
+        select, button, input {
+            margin: 5px;
+            padding: 5px;
+        }
+        .height0.col {
+            align-items: start;
+        }
+        input {
+            border: none;
+        }
+        input:focus {
+            outline: none;
+            border: none;
+        }
+        .mainf {
+            display: block;
+            overflow-y: auto !important;
+        }
+        #residentTable {
+            table-layout: auto;
+            width: auto;
+            min-width: max-content; 
+        }
+        #residentTable td, #residentTable th {
+            width: fit-content !important;
+            padding: 15px;
+        }
+        .selectBar {
+            width: 100%;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<div class="padding10 alignStart gap10">
+<br>
+<div class="height60 overflow-x1 padding20 inline borderGray borderRadius10 width70" style="overflow-x: auto !important; white-space: nowrap;">
+            
+        <div class="height0 justifyBetween gap10">
+            <a href="/dsb" class="nav hidden"><i class="fas fa-chevron-left"></i>Go Back</a>
+            <p class="title">GENERATE REPORT</p>
+            <div class="height0 justifyEnd width0">
+                <button class="nav" onclick="exportPDF()"><i class="fas fa-download"></i>Export PDF</button>
+                <button class="nav" onclick="exportExcel()"><i class="fas fa-download"></i>Export Excel</button>
+            </div>
+        </div>
+        <br>
+    <table id="residentTable">
+        <thead>
+            <tr>
+                <th class="">#</th>
+                <th class="">Complete Name</th>
+                <th>Username</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Precinct</th>
+                <th>Senior</th>
+                <th>SK Voter</th>
+                <th>PWD</th>
+                <th>Solo Parent</th>
+                <th>Role</th>
+                <th>House   </th>
+                <th>Purok</th>
+                <th>Indigency</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% residents.forEach((resident, index) => { %>
+                <tr>
+                    <td class="textCenter"><%= index + 1 %></td>
+                    <td><%= resident.fullName %></td>
+                    <td><%= resident.username || "--NO ACCOUNT--" %></td>
+                    <td><%= resident.age %></td>
+                    <td><%= resident.gender %></td>
+                    <td><%= resident.precinct %></td>
+                    <td><%= resident.isSenior %></td>
+                    <td><%= resident.isSKVoter %></td>
+                    <td><%= resident.isPWD %></td>
+                    <td><%= resident.soloP %></td>
+                    <td><%= resident.role %></td>
+                    <td><%= resident.household ? resident.household.houseNo : "No Record" %></td>
+                    <td><%= resident.household ? resident.household.purok : "No Record" %></td>
+                    <td><%= resident.family ? resident.family.poverty : "No Record" %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+    <div class="width30 col padding20 overflow-y1 blockX darkShadow borderRadius10 witch abstractBG relative">
+                <a href="" class="nav cnav disabled absolute right15" style="opacity: 0.1; transform: scale(4); bottom: 10px; z-index: 0;"><i class="fas fa-filter"></i></a>
+
+        <div class="height0 justifyStart">
+            <p class="size26 str400 white marginBottom10">Filter Controls</p>
+        </div>
+        <div class="height0 gap10 bgWhite padding30 borderRadius10 col marginBottom10">  
+            <!-- Filters -->
+            <div class="height0 col">
+                <label for="ageFilter">Age Distribution:</label>
+                <div class="selectBar">
+                    <select id="ageFilter">
+                        <option value="">All</option>
+                        <option value="1-5">1-5 years old</option>
+                        <option value="6-12">6-12 years old</option>
+                        <option value="13-17">13-17 years old</option>
+                        <option value="18-59">18-59 years old</option>
+                        <option value="sk">SK Voter (16-29)</option>
+                        <option value="senior">Senior Citizen (60+)</option>
+                    </select>            
+                </div>
+            
+            </div>
+            <div class="height0 col">    <label for="genderFilter">Gender:</label>
+                <div class="selectBar">
+                    <select id="genderFilter">
+                        <option value="">All</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+            </div>
+            <div class="height0 col">
+                <label for="voterFilter">Precinct:</label>
+                <div class="selectBar">
+                    <select id="voterFilter">
+                        <option value="">All</option>
+                        <option value="Registered">Registered</option>
+                        <option value="Not Registered">Not Registered</option>
+                    </select>
+                </div>
+            </div>
+            <div class="height0 col">
+                <label for="pwdFilter">PWD:</label>
+                <div class="selectBar">
+                    <select id="pwdFilter">
+                        <option value="">All</option>
+                        <option value="Yes">YES</option>
+                        <option value="-">NO</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="height0 col">
+                <label for="soloParentFilter">Solo Parent:</label>
+                <div class="selectBar">
+                    <select id="soloParentFilter">
+                        <option value="">All</option>
+                        <option value="Yes">YES</option>
+                        <option value="-">NO</option>
+                    </select>
+                </div>
+            
+            </div>
+            <div class="height0 col">
+                <label for="roleFilter">Role:</label>
+                <div class="selectBar">
+                    <select id="roleFilter">
+                        <option value="">All</option>
+                        <option value="Head">Head</option>
+                        <option value="Member">Member</option>
+                    </select>
+                </div>
+            </div>
+            <div class="height0 col">
+                <label for="purokFilter">Purok:</label>
+                <div class="selectBar">
+                    <select name=""  id="purokFilter">
+                        <option value="">All</option>
+                        <option value="Dike">Dike</option>
+                        <option value="Bagong Daan">Bagong Daan</option>
+                        <option value="Cantarilla">Cantarilla</option>
+                        <option value="Maharlika Highway">Highway</option>
+                        <option value="Perigola">Perigola</option>
+                        <option value="Shorcut">Shortcut</option>
+
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="height0 justifyBetween gap0 index50" style="z-index: 10 !important;">
+            <button class="nav" onclick="filterTable()"><i class="fas fa-arrows-rotate"></i>Reset</button>
+            <button class="nav" onclick="filterTable()" style="z-index: 100;"><i class="fas fa-filter"></i>Apply Filter</button>
+        </div>
+    </div>
+
+    <script>
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+    orientation: "landscape",
+    unit: "mm",
+    format: [330, 216]
+    });
+
+    doc.text("Residents Report", 10, 10);
+
+    // Get only visible rows
+    let table = document.getElementById("residentTable");
+    let rows = Array.from(table.querySelectorAll("tbody tr")).filter(row => row.style.display !== "none");
+
+    if (rows.length === 0) {
+        alert("No data to export!");
+        return;
+    }
+
+    // Prepare data for autoTable
+    let headers = Array.from(table.querySelectorAll("thead th")).map(th => th.innerText);
+    let data = rows.map(row => Array.from(row.children).map(td => td.innerText));
+
+    doc.autoTable({
+        head: [headers], 
+        body: data
+    });
+
+    doc.save("Filtered_Residents_Report.pdf");
+}
+
+    
+        function filterTable() {
+            let ageFilter = document.getElementById("ageFilter").value;
+            let genderFilter = document.getElementById("genderFilter").value;
+            let voterFilter = document.getElementById("voterFilter").value.trim().toLowerCase();
+            let pwdFilter = document.getElementById("pwdFilter").value;
+            let soloParentFilter = document.getElementById("soloParentFilter").value;
+            let roleFilter = document.getElementById("roleFilter").value;
+            let purokFilter = document.getElementById("purokFilter").value; // Get selected purok
+    
+            let rows = document.querySelectorAll("#residentTable tbody tr");
+            rows.forEach(row => {
+            let age = parseInt(row.children[3].innerText);
+            let gender = row.children[4].innerText.toLowerCase(); // Convert to lowercase for comparison
+            let precinct = row.children[5].innerText.toLowerCase();
+            let senior = row.children[6].innerText;
+            let sk = row.children[7].innerText;
+            let pwd = row.children[8].innerText;
+            let soloParent = row.children[9].innerText;
+            let role = row.children[10].innerText;
+            let purok = row.children[12].innerText;
+    
+                let show = true;
+                
+        if (ageFilter === "1-5" && !(age >= 1 && age <= 5)) show = false;
+        if (ageFilter === "6-12" && !(age >= 6 && age <= 12)) show = false;
+        if (ageFilter === "13-17" && !(age >= 13 && age <= 17)) show = false;
+        if (ageFilter === "18-59" && !(age >= 18 && age <= 59)) show = false;
+        if (ageFilter === "sk" && !(age >= 16 && age <= 29)) show = false; // SK voter is 16-29
+        if (ageFilter === "senior" && age < 60) show = false;
+                if (genderFilter && gender !== genderFilter) show = false;
+                if (voterFilter && !precinct.includes(voterFilter)) show = false;
+                if (pwdFilter && pwd !== pwdFilter) show = false;
+                if (soloParentFilter && soloParent !== soloParentFilter) show = false;
+                if (roleFilter && role !== roleFilter) show = false;
+                if (purokFilter && purok !== purokFilter) show = false; // Compare purok correctly
+    
+                row.style.display = show ? "" : "none";
+            });
+        }
+    </script>
+<script>
+function exportExcel() {
+    let table = document.getElementById("residentTable");
+    let rows = Array.from(table.querySelectorAll("tbody tr"))
+        .filter(row => row.style.display !== "none"); // only visible rows
+
+    if (rows.length === 0) {
+        alert("No data to export!");
+        return;
+    }
+
+    // Extract headers
+    let headers = Array.from(table.querySelectorAll("thead th"))
+        .map(th => th.innerText);
+
+    // Extract data
+    let data = rows.map(row => Array.from(row.children).map(td => td.innerText));
+
+    // Combine headers + data
+    let worksheetData = [headers, ...data];
+
+    // Create worksheet and workbook
+    let worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // 🔹 Auto column width based on longest value
+    let colWidths = headers.map((h, i) => {
+        let maxLength = Math.max(
+            h.length,
+            ...data.map(row => row[i] ? row[i].toString().length : 0)
+        );
+        return { wch: maxLength + 2 }; // +2 for padding
+    });
+
+    worksheet['!cols'] = colWidths;
+
+    let workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Residents Report");
+
+    // Export file
+    XLSX.writeFile(workbook, "Filtered_Residents_Report.xlsx");
+}
+</script>
+    
+    </div>

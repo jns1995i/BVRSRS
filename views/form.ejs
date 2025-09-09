@@ -1,0 +1,288 @@
+<% layout('layout') %>
+<head>
+    <style>
+        .card.keyPlain {
+            position: relative;
+            align-items: start;
+            padding: 20px;
+            justify-content: space-between;
+        }
+        .graphIcon {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            color: var(--shade1);
+        }
+        .card.key p {
+            line-height: 1.3em;
+        }
+        .keyT {
+            font-size: 1.4vw;
+            font-weight: 500;
+            color: var(--shade5)
+        }
+        .keyL {
+            font-size: 0.9vw;
+            font-weight: 400;
+            line-height: 1.5vw;
+        }
+        .clrd {
+            color: white;
+            position: relative;
+            height: 100%;
+            max-width: 24%;
+        }
+        .clrd .keyT {
+            font-size: 24px;
+        }
+        .clrd p {
+            color: white;
+            font-size: 16px;
+        }
+        label {
+            margin-top: 10px;
+        }
+        .clrd:nth-child(1) { background-color: var(--shade1); }
+        .clrd:nth-child(2) { background-color: var(--shade5); }
+        .clrd:nth-child(3) { background-color: var(--shade7); }
+        .clrd:nth-child(4) { background-color: var(--shade9); }
+        .clrd:nth-child(5) { background-color: var(--shade1); }
+        .clrd:nth-child(6) { background-color: var(--shade5); }
+        .clrd:nth-child(7) { background-color: var(--shade8); }
+
+        /* Hide manual input initially */
+        .hidden { display: none; }
+
+        form {
+    max-width: 600px; /* Adjust width as needed */
+    margin: auto; /* Centering */
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Input Fields */
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* List Container */
+.list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background: #f9f9f9;
+}
+
+/* Selected Complainees (Now in Row Layout) */
+#selectedComplaineesList, #selectedComplainantsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    margin-top: 10px;
+}
+
+/* Selected Item (Chip Style) */
+.selected-item {
+    display: flex;
+    align-items: center;
+    background: #e1f5fe;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 14px;
+}
+
+/* Remove Button */
+.remove-btn {
+    cursor: pointer;
+    color: red;
+    font-weight: bold;
+    margin-left: 8px;
+}
+    </style>
+</head>
+
+<div class="abstractBG borderRadius15 seen" id="newCard">
+    <iframe src="/form" width="600" height="400" style="border: none;" class="hidden"></iframe>
+    <form action="" class="h650 gap20">
+        <!-- Complainee Selection -->
+        <label>Complainee(s)</label>
+        <input type="text" id="searchComplainee" placeholder="Search resident..." class="form-control">
+        <div id="complaineeList" class="list-container">
+            <% residents.forEach(resident => { %>
+                <div class="resident-item" onclick="selectComplainee('<%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %>')">
+                    <%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %>
+                </div>
+            <% }); %>
+        </div>
+        <div id="selectedComplaineesContainer">
+            <label>Selected Complainees:</label>
+            <div id="selectedComplaineesList"></div>
+        </div>
+        <input type="hidden" id="selectedComplainees" name="selectedComplainees">
+    
+        <!-- Complainant Selection -->
+        <label>Complainant(s)</label>
+        <input type="text" id="searchComplainant" placeholder="Search resident..." class="form-control">
+        <div id="complainantList" class="list-container">
+            <% residents.forEach(resident => { %>
+                <div class="resident-item" onclick="selectComplainant('<%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %>')">
+                    <%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %>
+                </div>
+            <% }); %>
+        </div>
+        <input type="text" id="manualComplainant" placeholder="Enter complainant name..." class="form-control">
+        <button type="button" onclick="addManualComplainant()">Add Name</button>
+        
+        <div id="selectedComplainantsContainer">
+            <label>Selected Complainants:</label>
+            <div id="selectedComplainantsList"></div>
+        </div>
+        <input type="hidden" id="selectedComplainants" name="selectedComplainants">
+    </form>
+</div>
+<script>
+    let selectedComplainees = [];
+    let selectedComplainants = [];
+
+    function selectComplainee(name) {
+        if (!selectedComplainees.includes(name)) {
+            selectedComplainees.push(name);
+            updateSelectedComplainees();
+        }
+    }
+
+    function selectComplainant(name) {
+        if (!selectedComplainants.includes(name)) {
+            selectedComplainants.push(name);
+            updateSelectedComplainants();
+        }
+    }
+
+    function addManualComplainant() {
+        const input = document.getElementById("manualComplainant");
+        const name = input.value.trim();
+        if (name && !selectedComplainants.includes(name)) {
+            selectedComplainants.push(name);
+            input.value = "";
+            updateSelectedComplainants();
+        }
+    }
+
+    function removeComplainee(name) {
+        selectedComplainees = selectedComplainees.filter(item => item !== name);
+        updateSelectedComplainees();
+    }
+
+    function removeComplainant(name) {
+        selectedComplainants = selectedComplainants.filter(item => item !== name);
+        updateSelectedComplainants();
+    }
+
+    function updateSelectedComplainees() {
+        const list = document.getElementById("selectedComplaineesList");
+        list.innerHTML = "";
+        selectedComplainees.forEach(name => {
+            const div = document.createElement("div");
+            div.classList.add("selected-item");
+            div.innerHTML = `${name} <span class="remove-btn" onclick="removeComplainee('${name}')">✖</span>`;
+            list.appendChild(div);
+        });
+        document.getElementById("selectedComplainees").value = selectedComplainees.join(",");
+    }
+
+    function updateSelectedComplainants() {
+        const list = document.getElementById("selectedComplainantsList");
+        list.innerHTML = "";
+        selectedComplainants.forEach(name => {
+            const div = document.createElement("div");
+            div.classList.add("selected-item");
+            div.innerHTML = `${name} <span class="remove-btn" onclick="removeComplainant('${name}')">✖</span>`;
+            list.appendChild(div);
+        });
+        document.getElementById("selectedComplainants").value = selectedComplainants.join(",");
+    }
+
+    document.getElementById("searchComplainee").addEventListener("input", function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll("#complaineeList .resident-item").forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(query) ? "block" : "none";
+        });
+    });
+
+    document.getElementById("searchComplainant").addEventListener("input", function() {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll("#complainantList .resident-item").forEach(item => {
+            item.style.display = item.textContent.toLowerCase().includes(query) ? "block" : "none";
+        });
+    });
+</script>
+
+<div class="height0">
+    <div class="ctrl left">
+        <div class="searchBar">
+            <input type="search" id="univ">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+    <div class="ctrl">
+        <p class="title">Record of Complaints</p>
+    </div>
+    <div class="ctrl right">
+        <a href="/export-residents" class="nav">
+            <i class="fa-solid fa-download"></i>
+            Export Copy
+        </a>
+        <a href="javascript:void(0);" class="nav pnav newBtn" id="newBtn">
+            <i class="fa fa-plus"></i>
+            New Record
+        </a>
+    </div>
+</div>
+
+<div class="height60 bgSoft borderRadius10 padding20 gap10"></div>
+
+<div class="height0 justifyBetween paddingInline15 paddingTop20">
+    <p class="size20 str500">Upcoming Hearing</p>
+    <a href="" class="nav"><i class="fas fa-calendar"></i> Set Schedule</a>
+</div>
+
+<div class="height20 gap10 paddingBlock10 justifyStart">
+    <div class="card keyPlain clrd abstractBG">
+        <a href="../views/dsbCases.html" class="nav cnav graphIcon disabled">
+            <i class="fas fa-home"></i>
+        </a>
+        <p class="keyT">4,965</p>
+        <p class="keyL" style="display: flex;">Total Household</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Get button and card elements
+    const newBtn = document.getElementById("newBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const newCard = document.getElementById("newCard");
+
+    // Show the newCard when newBtn is clicked
+    newBtn.addEventListener("click", function () {
+        newCard.classList.remove("unseen");
+        newCard.classList.add("seen");
+    });
+
+    // Hide the newCard when closeBtn is clicked
+    closeBtn.addEventListener("click", function () {
+        newCard.classList.remove("seen");
+        newCard.classList.add("unseen");
+    });
+});
+
+</script>

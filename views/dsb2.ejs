@@ -1,0 +1,160 @@
+<% layout('layout') %>
+<div class="height0 col overflow-y1">
+    <div class="container col overflow-y1 height0">
+    <h1 class="mb-4"><%= title %></h1>
+
+    <!-- Purok Filter -->
+<form method="GET" action="/dsb">
+  <label for="purokSelect">Filter by Purok:</label>
+  <select name="purok" id="purokSelect" onchange="this.form.submit()">
+    <option value="">-- All Puroks --</option>
+    <% puroks.forEach(purok => { %>
+      <option value="<%= purok %>" <%= filterPurok === purok ? 'selected' : '' %>><%= purok %></option>
+    <% }) %>
+  </select>
+</form>
+
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card p-3 bg-primary text-white">
+          <div>Total Households</div>
+          <div class="stat-value"><%= totalHouseholds %></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3 bg-success text-white">
+          <div>Total Families</div>
+          <div class="stat-value"><%= totalFamilies %></div>
+          <small>Avg. members: <%= avgFamilyMembers %></small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3 bg-info text-white">
+          <div>Total Residents</div>
+          <div class="stat-value"><%= totalResidents %></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card p-3 bg-warning text-dark">
+          <div>Avg. Families per Household</div>
+          <div class="stat-value"><%= avgFamilyPerHousehold %></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poverty Status -->
+    <h3>Poverty Status</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% Object.keys(povertyCounts).forEach(key => { %>
+          <tr>
+            <td><%= key %></td>
+            <td><%= povertyCounts[key] %></td>
+            <td><%= povertyPercentages[key] %> %</td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Employment Status -->
+    <h3>Employment Status</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% Object.keys(empCounts).forEach(key => { %>
+          <tr>
+            <td><%= key %></td>
+            <td><%= empCounts[key] %></td>
+            <td><%= empPercentages[key] %> %</td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Special Groups -->
+    <h3>Special Groups</h3>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h5>PWD</h5>
+          <p class="stat-value"><%= pwdCount %></p>
+          <p class="percentage"><%= pwdPercent %> % of residents</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h5>Solo Parents</h5>
+          <p class="stat-value"><%= soloParentCount %></p>
+          <p class="percentage"><%= soloParentPercent %> % of residents</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h5>Pregnant</h5>
+          <p class="stat-value"><%= pregnantCount %></p>
+          <p class="percentage"><%= pregnantPercent %> % of residents</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Senior Citizens -->
+    <h3 class="mt-4">Senior Citizens (60+ years)</h3>
+    <p><strong><%= seniorCount %></strong> residents (<%= seniorPercent %> %)</p>
+
+    <!-- Age Distribution -->
+    <h3>Age Distribution</h3>
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th>Age Group</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% Object.keys(ageDist).forEach(key => { %>
+          <tr>
+            <td><%= key %></td>
+            <td><%= ageDist[key] %></td>
+            <td><%= ageDistPercent[key] %> %</td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Gender Distribution -->
+    <h3>Gender Distribution</h3>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card p-3 bg-secondary text-white">
+          <h5>Male</h5>
+          <p class="stat-value"><%= genderCount.Male %></p>
+          <p class="percentage"><%= genderPercent.Male %> %</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card p-3 bg-secondary text-white">
+          <h5>Female</h5>
+          <p class="stat-value"><%= genderCount.Female %></p>
+          <p class="percentage"><%= genderPercent.Female %> %</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
