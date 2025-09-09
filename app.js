@@ -21,7 +21,6 @@ const uploadDir = 'public/uploads';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
-
 // Use the file upload middleware
 
 
@@ -2043,10 +2042,8 @@ app.post("/add-business", async (req, res) => {
     }
 });
 
-
 app.get("/bus", isLogin, isRsd, async (req, res) => {
     try {
-        
         const residents = await db.collection("resident")
             .find({ archive: { $in: [0, "0", 1, "1"] } })
             .sort({ firstName: 1 })
@@ -2071,80 +2068,71 @@ app.get("/bus", isLogin, isRsd, async (req, res) => {
             familyMap.set(String(family._id), { poverty: family.poverty });
         });
 
-        // Process residents
+        // Attach household & family info to residents
         residents.forEach(resident => {
-            // Get household details
             const householdData = householdMap.get(String(resident.householdId)) || { houseNo: "-", purok: "-" };
             resident.houseNo = householdData.houseNo;
             resident.purok = householdData.purok;
 
-            // Get family details
             const familyData = familyMap.get(String(resident.familyId)) || { poverty: "No Income" };
             resident.familyPoverty = familyData.poverty;
-        }); 
+        });
 
-        // Get total counts from actual collections
+        // Totals
         const totalHouseholds = households.length;
         const totalFamilies = families.length;
         const totalInhabitants = residents.length;
-        const totalVoters = residents.filter(resident => resident.precinct === "Registered Voter").length;
+        const totalVoters = residents.filter(r => r.precinct === "Registered Voter").length;
 
-        // Fetch businesses where archive is 0, sorted by businessName
+        // Businesses
         const businesses = await db.collection("business")
-            .find({ archive: { $in: [0, "0"] } })  // Filter businesses where archive is 0
-            .sort({ businessName: 1 }) // Sorting by businessName in ascending order
+            .find({ archive: { $in: [0, "0"] } })
+            .sort({ businessName: 1 })
             .toArray();
 
+        // Map owner info
         const residentMap = new Map();
-        residents.forEach(resident => {
-        residentMap.set(String(resident._id), resident); // always string
-        });
+        residents.forEach(resident => residentMap.set(String(resident._id), resident));
 
         businesses.forEach(business => {
-        const ownerId = String(business.ownerName); // normalize
-        const owner = residentMap.get(ownerId);
+            const owner = residentMap.get(String(business.ownerName));
+            if (owner) {
+                business.owner = {
+                    _id: owner._id,
+                    firstName: owner.firstName,
+                    lastName: owner.lastName,
+                    phone: owner.phone,
+                    purok: owner.purok,
+                    houseNo: owner.houseNo,
+                    familyPoverty: owner.familyPoverty
+                };
+            } else {
+                business.owner = null;
+            }
 
-        if (owner) {
-            business.owner = {
-            _id: owner._id,
-            firstName: owner.firstName,
-            lastName: owner.lastName,
-            phone: owner.phone,
-            purok: owner.purok,
-            houseNo: owner.houseNo,
-            familyPoverty: owner.familyPoverty
-            };
-        } else {
-            business.owner = null;
-        }
+            // Safe estDate for EJS
+            business.estDateISO = business.estDate && !isNaN(new Date(business.estDate))
+                ? new Date(business.estDate).toISOString().split("T")[0]
+                : "";
         });
 
-       const totalCount = businesses.length;
+        const totalCount = businesses.length;
 
-        // If no businesses are found, display a message
-        if (businesses.length === 0) {
-            return res.render("bus", { 
-                layout: "layout", 
-                title: "Business", 
-                activePage: "bus", 
-                totalCount, 
-                message: "No active businesses found." // Pass a message if no businesses
-            });
-        }
-
-        // Render the 'bus' view and pass the businesses data
-        res.render("bus", { 
-            layout: "layout", 
-            title: "Business", 
+        // Render
+        res.render("bus", {
+            layout: "layout",
+            title: "Business",
             activePage: "bus",
             residents,
             totalHouseholds,
             totalFamilies,
             totalInhabitants,
             totalVoters,
-            totalCount, 
-            businesses // Pass the businesses data to the view
+            totalCount,
+            businesses,  // always defined
+            message: businesses.length === 0 ? "No active businesses found." : null
         });
+
     } catch (err) {
         console.error("Error fetching businesses:", err.message);
         res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/";</script>');
