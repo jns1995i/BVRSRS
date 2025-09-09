@@ -54,7 +54,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: store, // New: Use the MongoDB store
+    store: store,
     cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true
