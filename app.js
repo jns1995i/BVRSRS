@@ -91,7 +91,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: "uploads",
-    allowed_formats: ["jpg", "png", "jpeg"],
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
   },
 });
 const upload = multer({ storage });
@@ -1973,8 +1973,8 @@ app.post("/update-resident/:id", async (req, res) => {
 
 app.post("/upload-photo/:id", upload.single("photo"), async (req, res) => {
     try {
-        console.log("Request body:", req.body); // Debugging
-        console.log("Uploaded file:", req.file); // Debugging
+        console.log("Request body:", req.body);
+        console.log("Uploaded file:", req.file); // Cloudinary response
 
         const residentId = req.params.id;
 
@@ -1982,11 +1982,12 @@ app.post("/upload-photo/:id", upload.single("photo"), async (req, res) => {
             return res.status(400).send("No file uploaded.");
         }
 
-        const photoPath = `/uploads/${req.file.filename}`;
+        // Cloudinary gives direct URL in req.file.path
+        const photoUrl = req.file.path;
 
         await db.collection("resident").updateOne(
             { _id: new ObjectId(residentId) },
-            { $set: { photo: photoPath } }
+            { $set: { photo: photoUrl } }
         );
 
         res.redirect(`/rsdView/${residentId}`);
@@ -1995,8 +1996,7 @@ app.post("/upload-photo/:id", upload.single("photo"), async (req, res) => {
         res.status(500).send("Error uploading photo.");
     }
 });
-
-app.post("/upload-my-photo", isLogin, express.json({ limit: '10mb' }), async (req, res) => {
+app.post("/upload-my-photo", isLogin, express.json({ limit: "10mb" }), async (req, res) => {
     try {
         const { image } = req.body;
         const userId = req.session.userId;
@@ -2005,17 +2005,15 @@ app.post("/upload-my-photo", isLogin, express.json({ limit: '10mb' }), async (re
             return res.status(400).send("Missing image or session.");
         }
 
-        const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
-        const buffer = Buffer.from(base64Data, 'base64');
+        // Upload base64 directly to Cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(image, {
+            folder: "residents",
+        });
 
-        const filename = `${Date.now()}.jpg`;
-        const filepath = path.join(__dirname, 'public/uploads', filename);
-
-        fs.writeFileSync(filepath, buffer);
-
+        // Save Cloudinary URL
         await db.collection("resident").updateOne(
             { _id: new ObjectId(userId) },
-            { $set: { photo: `/uploads/${filename}` } }
+            { $set: { photo: uploadResponse.secure_url } }
         );
 
         res.status(200).send("Photo uploaded successfully.");
@@ -2024,6 +2022,7 @@ app.post("/upload-my-photo", isLogin, express.json({ limit: '10mb' }), async (re
         res.status(500).send("Error uploading photo.");
     }
 });
+
 
 
 
