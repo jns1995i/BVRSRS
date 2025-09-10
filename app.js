@@ -490,6 +490,17 @@ const isHr = async (req, res, next) => {
     }
 };
 
+const getPublicIdFromUrl = (url) => {
+  try {
+    const parts = url.split("/upload/")[1]; // "v1698765432/uploads/abc123.jpg"
+    const withoutVersion = parts.split("/").slice(1).join("/"); // "uploads/abc123.jpg"
+    return withoutVersion.replace(/\.[^/.]+$/, ""); // "uploads/abc123"
+  } catch (err) {
+    console.error("Failed to extract public_id:", err);
+    return null;
+  }
+};
+
 // Routes
 app.get("/", (req, res) => res.render("index", { error: "", layout: "layout", title: "Home", activePage: "home" }));
 app.get("/passSuccess", (req, res) => res.render("passSuccess", { error: "", layout: "layout", title: "Home", activePage: "home" }));
@@ -791,29 +802,20 @@ app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
             description: description || existingAnnouncement.description, // Use existing description if new description is not provided
             updatedAt: new Date() // Always update the timestamp
         };
-
-        // If there's an image, handle it
 if (image) {
-    // Cloudinary gives you a direct URL in image.path
     const imageUrl = image.path; 
+    updateData.image = imageUrl; 
 
-    updateData.image = imageUrl; // Save Cloudinary URL to DB
-
-    // If there was an old image, you may want to delete it from Cloudinary
     if (existingAnnouncement.image) {
-        // Extract Cloudinary public_id from the old URL
-        const publicId = existingAnnouncement.image
-            .split('/')
-            .pop()
-            .split('.')[0]; // take last segment of URL without extension
-
-        cloudinary.uploader.destroy(publicId, (err, result) => {
-            if (err) console.error("Error deleting old image from Cloudinary:", err);
-            else console.log("Old image deleted:", result);
-        });
+        const publicId = getPublicIdFromUrl(existingAnnouncement.image);
+        if (publicId) {
+            cloudinary.uploader.destroy(publicId, (err, result) => {
+                if (err) console.error("Error deleting old image from Cloudinary:", err);
+                else console.log("Old image deleted:", result);
+            });
+        }
     }
 } else {
-    // No new image uploaded → keep old one
     updateData.image = existingAnnouncement.image;
 }
 
