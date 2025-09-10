@@ -11472,12 +11472,8 @@ app.post("/add-family", async (req, res) => {
             return res.status(400).json({ message: "Family Head can't be a minor" });
         }
 
-        let username = null;
-        let password = null;
-        if (age >= 15 && age <= 59) {
-            username = generateUsername(firstName, middleName, lastName, bDay, bYear);
-            password = generateRandomPassword();
-        }
+        let username = generateUsername(firstName, middleName, lastName, bDay, bYear);
+        let password = generateRandomPassword();
 
         // Determine resident access level
         const privilegedPositions = ["Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"];
