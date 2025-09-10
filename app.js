@@ -7158,7 +7158,7 @@ const myReqView3 = async (req, res) => {
         request.documents = documents;
 
         // Render the EJS page with the data
-        res.render("docView", { request, resident, documents, title: "Document", activePage: "dsb" });
+        res.render("docView", { request, resident, documents, title: "Document", activePage: "dsb",  });
 
     } catch (err) {
         console.error("⚠️ Error in myReqView2:", err);

@@ -383,6 +383,9 @@
                                         Previous
                                     </a>
                                     <% } %>
+                                    <% if ( user.access === "1" || user.access === 1) { %>
+                                    <a href="/" class="nav"><i class="fas fa-share-from-square"></i>Logout</a>
+                                    <% } %>
                                     
                                 </div>
                                 <p class="size18 str500"><%= resident.position || "" %> <i class="bi bi-patch-check-fill inline green"></i></p>
