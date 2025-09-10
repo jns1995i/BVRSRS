@@ -21,6 +21,36 @@
                 border-radius: 20px;
                 box-shadow: var(--shadow);
             }
+            
+            #passCard {
+                max-width: 0;
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+            }
+            #passCard.active {
+                max-width: 100%;
+                max-height: 100%;
+                opacity: 1;
+                padding: 0;
+                position: absolute;
+                z-index: 500;
+                top: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+            .unseen {
+                max-height: 0;
+                opacity: 0;
+                overflow: hidden;
+                transition: max-height 0.9s ease, opacity 0.6s ease;
+            }
+            .seen {
+                max-height: 300px;
+                opacity: 1;
+                padding: 0;
+                transition: max-height 0.9s ease, opacity 0.6s ease;
+            }
             .main {
                 display: flex;
                 gap: 0;
@@ -290,6 +320,253 @@
             </div>
         </div>
     </div>
+    <div class="height100 block alignStart overflow-y1" id="passCard" style="overflow-y: auto !important;">
+        <div class="height100 padding20 justifyCenter alignCenter modalCard">
+            <form action="/myPasswordAdmin" method="POST" id="changePassForm" class="flex bgWhite borderRadius10 col height0 padding30 gap15 width35 darkShadow relative">
+                <a href="" class="nav cnav absolute right10 top10"><i class="fas fa-times"></i></a>
+                <p class="size18 str500 green">Reset Password</p>
+
+                <div class="height0 col alignStart padding10 borderRadius10 borderPrimary">
+                    <p class="size12">Take Note! Password must contain the following:</p>
+                    <p class="size12">&bull; Atleast 1 Special Character</p>
+                    <p class="size12">&bull; Atleast 1 Upper Case Letter</p>
+                    <p class="size12">&bull; Combination of Letter and Numbers</p>
+                    <p class="size12">&bull; Minimum of 8 characters</p>
+                </div>
+                <hr>
+
+                <!-- Current password (hidden) -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="currentPassword" class="marginTop0">Current Password</label>
+                        <div class="width0 success1 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Verified</div>
+                    </div>
+                    <input type="password" id="currentPassword" name="currentPassword" required>
+                    <div class="error1 red size12 justifyStart height0" style="display:none;">Wrong Password!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match current -->
+
+                <!-- New password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="newPassword" class="marginTop0">Create Password </label>                        
+                        <div class="width0 success3 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Strong Password</div>
+                        <div class="width0 success4 colorPrimary size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Good but Too Short</div>
+                    </div>
+                    <input type="password" id="newPassword" name="password" required>
+                    <div class="error3 red size12 justifyStart height0" style="display:none;">
+                        Weak Password!
+                    </div>
+                </div>
+
+                <!-- Error if password is weak -->
+
+                <!-- Confirm new password -->
+                <div class="height0 gap5 col alignStart">
+                    <div class="height0 justifyBetween">
+                        <label for="confirmPassword" class="marginTop0">Confirm Password</label>
+                        <div class="width0 success2 green size12 justifyStart height0" style="display:none;"><i class="fas fa-check-circle marginLeft10 marginRight5"></i> Passwords Matched</div>
+                    </div>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <div class="error2 red size12 justifyStart height0" style="display:none;">Passwords do not match!</div>
+                </div>
+
+                <!-- Error if confirm doesn't match new password -->
+
+                <!-- Show/hide -->
+                <div class="height0 justifyStart">
+                    <label class="showPass size12 marginTop0" style="cursor:pointer;" onclick="togglePasswords()"><i class="fas fa-eye"></i> Show Password</label>
+                </div>
+
+                <div class="textCenter size12 red str500 warning padding10 borderPrimary borderRadius10" style="display: none;">
+                    Please ensure all inputs are valid!
+                </div>
+                <!-- Submit -->
+                <div class="height0 justifyEnd faded2" id="submitBtn">
+                    <button type="submit" class="nav fnav width0 bgGreen white border0">Update</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+<script>
+const currentPassword = document.querySelector("#passCard #currentPassword");
+const newPass = document.querySelector("#passCard #newPassword");
+const confirmPass = document.querySelector("#passCard #confirmPassword");
+const form = document.querySelector("#passCard #changePassForm");
+const warningDiv = document.querySelector("#passCard .warning");
+
+const error1 = document.querySelector("#passCard .error1");
+const error2 = document.querySelector("#passCard .error2");
+const error3 = document.querySelector("#passCard .error3");
+
+const success1 = document.querySelector("#passCard .success1");
+const success2 = document.querySelector("#passCard .success2");
+const success3 = document.querySelector("#passCard .success3");
+const success4 = document.querySelector("#passCard .success4");
+
+const showToggle = document.querySelector("#passCard .showPass");
+const submitBtnDiv = document.querySelector("#passCard #submitBtn");
+
+let debounceTimerNewConfirm;
+let debounceTimerCurrent; // New debounce timer for current password validation
+let isCurrentPasswordValid = false; // New state variable
+
+function isStrong(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(password);
+}
+
+function isGood(password) {
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{4,}$/.test(password);
+}
+
+// ✅ Checks if all conditions are met before showing submit button
+function checkFormValidity() {
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+    
+    // Passwords must match, be strong, and the current password must be valid
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    if (passwordsMatch && passwordIsStrong && isCurrentPasswordValid) {
+        submitBtnDiv.classList.remove("faded2");
+        warningDiv.style.display = "none";
+    } else {
+        submitBtnDiv.classList.add("faded2");
+    }
+}
+
+// ✅ Function to validate current password with the server
+async function validateCurrentPassword() {
+    const curVal = currentPassword.value.trim();
+    if (!curVal) {
+        // Clear states if the input is empty
+        success1.style.display = "none";
+        error1.style.display = "none";
+        isCurrentPasswordValid = false;
+        checkFormValidity();
+        return;
+    }
+
+    try {
+        const response = await fetch("/verify-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ currentPassword: curVal }),
+        });
+
+        const data = await response.json();
+        isCurrentPasswordValid = data.valid;
+
+        if (isCurrentPasswordValid) {
+            success1.style.display = "inline";
+            error1.style.display = "none";
+        } else {
+            success1.style.display = "none";
+            error1.style.display = "flex";
+        }
+    } catch (err) {
+        console.error("Failed to verify password:", err);
+        isCurrentPasswordValid = false;
+        success1.style.display = "none";
+        error1.style.display = "flex";
+    }
+    
+    checkFormValidity();
+}
+
+form.addEventListener("submit", (e) => {
+    warningDiv.style.display = "none";
+
+    const newVal = newPass.value.trim();
+    const confVal = confirmPass.value.trim();
+
+    const passwordsMatch = newVal !== "" && newVal === confVal;
+    const passwordIsStrong = isStrong(newVal);
+
+    if (!(passwordsMatch && passwordIsStrong && isCurrentPasswordValid)) {
+        e.preventDefault();
+        warningDiv.style.display = "flex";
+    } else {
+        const confirmReset = confirm("Are you sure you want to reset your password?");
+        if (!confirmReset) {
+            e.preventDefault();
+        }
+    }
+});
+
+// ✅ Debounced new/confirm password validation (no changes needed here)
+function validateNewPasswords() {
+    clearTimeout(debounceTimerNewConfirm);
+    debounceTimerNewConfirm = setTimeout(() => {
+        const newVal = newPass.value.trim();
+        const confVal = confirmPass.value.trim();
+
+        // Error 2: New and confirm password mismatch
+        if (newVal && confVal) {
+            if (newVal !== confVal) {
+                error2.style.display = "flex";
+                success2.style.display = "none";
+            } else {
+                error2.style.display = "none";
+                success2.style.display = "inline";
+            }
+        } else {
+            error2.style.display = "none";
+            success2.style.display = "none";
+        }
+
+        // Error 3: Weak password
+        if (newVal) {
+            if (!isGood(newVal)) {
+                error3.style.display = "flex";
+                success3.style.display = "none";
+                success4.style.display = "none";
+            } else if (!isStrong(newVal)) {
+                error3.style.display = "none";
+                success3.style.display = "none";
+                success4.style.display = "inline";
+            } else {
+                error3.style.display = "none";
+                success3.style.display = "inline";
+                success4.style.display = "none";
+            }
+        } else {
+            error3.style.display = "none";
+            success3.style.display = "none";
+            success4.style.display = "none";
+        }
+
+        checkFormValidity();
+    }, 500);
+}
+
+newPass.addEventListener("input", validateNewPasswords);
+confirmPass.addEventListener("input", validateNewPasswords);
+currentPassword.addEventListener("input", () => {
+    clearTimeout(debounceTimerCurrent);
+    debounceTimerCurrent = setTimeout(validateCurrentPassword, 500);
+});
+
+
+// ✅ Show/Hide toggle
+showToggle.addEventListener("click", () => {
+    const isHidden = newPass.type === "password";
+
+    [newPass, confirmPass, currentPassword].forEach(input => {
+        input.type = isHidden ? "text" : "password";
+    });
+
+    showToggle.innerHTML = isHidden
+        ? '<i class="fas fa-eye-slash"></i> Hide Password'
+        : '<i class="fas fa-eye"></i> Show Password';
+});
+</script>
+
 
     
     <div class="suspendCard2" id="suspendCard2" style="display: none;">
@@ -383,9 +660,7 @@
                                         Previous
                                     </a>
                                     <% } %>
-                                    <% if ( user.access === "1" || user.access === 1) { %>
-                                    <a href="/" class="nav hidden"><i class="fas fa-share-from-square"></i>Logout</a>
-                                    <% } %>
+                                    <a href="/" class="nav dnav"><i class="fas fa-share-from-square"></i>Logout</a>
                                     
                                 </div>
                                 <p class="size18 str500"><%= resident.position || "" %> <i class="bi bi-patch-check-fill inline green"></i></p>
@@ -539,41 +814,47 @@
                                 <p class="size14 str600"><%= resident.email || "-" %></p>
                             </div>
                         </div>
+
                         
+                        <div class="height0 justifyBetween paddingInline10">
+                            <p class="size14 str500">Username: <%= resident.username %></p>
+                            <a href="javascript:void()" class="nav tnav dnav" id="passBtn"><i class="fas fa-key w15"></i>Reset Password</a>
+                        </div>
+
                         
-                                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
-                                <div class="head userH width0 index50 gap10">
-                                        <% if (resident.archive === 0 || resident.archive === "0") { %>  
-                                            <a href="javascript:void()" class="nav" id="openResetCard">
-                                                <i class="fas fa-key"></i> Reset
-                                            </a>
-                                            <% if (resident.suspend === 1) { %>
-                                            <a href="javascript:void(0)" class="nav openSuspendCard2" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fas fa-unlock"></i> Unsuspend
-                                            </a>
-                                            <% } else { %>
-                                            <a href="javascript:void(0)" class="nav openSuspendCard" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fas fa-lock"></i> Suspend
-                                            </a>
-                                            <% } %>
-                                            <a href="javascript:void(0)" class="nav openArchiveCard" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fa fa-trash"></i> Archive
-                                            </a>
-                                        <% } else { %>
-                                        <a href="javascript:void(0)" class="nav openArchiveCard2" data-resident-id="<%= resident._id.toString() %>">
-                                            <i class="fas fa-arrows-rotate"></i> Restore
-                                        </a>
-                                        <% } %>
-                                        <% if (calculateAge(birthday) <= 1.5) { %>
-                                            <p class="">|</p>
-                                            <a href="javascript:void(0)" class="nav" id="immuBtn"><i class="fas fa-syringe"></i>Immunization</a>
-                                        <% } %>
-                                        <% if ( resident.pregnant === 'on') { %>
-                                            <p class="">|</p>
-                                            <a href="javascript:void(0)" class="nav" id="pregBtn"><i class="fas fa-syringe"></i>Vaccination</a>
-                                        <% } %>
-                                </div>
-                                <% } %>
+<script>
+document.getElementById("passBtn").addEventListener("click", function (event) {
+    event.preventDefault(); // Prevent default link behavior
+
+    let passCard = document.getElementById("passCard");
+    let passBtn = document.getElementById("passBtn");
+
+    // Toggle 'active' class
+    passCard.classList.toggle("active");
+
+    // Change button text & icon based on active state
+    if (passCard.classList.contains("active")) {
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+    } else {
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+    }
+});
+
+// Add logic to handle closing when closeBtn is clicked
+document.getElementById("closeBtn").addEventListener("click", function () {
+    let passCard = document.getElementById("passCard");
+    let passBtn = document.getElementById("passBtn");
+
+    // Remove 'active' class
+    passCard.classList.remove("active");
+
+    // Reset button text & icon
+    passBtn.innerHTML = '<i class="fas fa-key"></i> Password';
+});
+
+</script>
+
+
 
                         <% if (calculateAge(birthday) >= 0) { %>
                         <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
