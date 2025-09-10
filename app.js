@@ -15,6 +15,15 @@ const nodemailer = require('nodemailer');
 
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
 const fs = require('fs');
 const uploadDir = 'public/uploads';
 
@@ -77,6 +86,15 @@ const requireAuth = (req, res, next) => {
     }
     next();
 };
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "uploads",
+    allowed_formats: ["jpg", "png", "jpeg"],
+  },
+});
+const upload = multer({ storage });
 
 const isLogin = async (req, res, next) => {
     try {
@@ -472,17 +490,6 @@ const isHr = async (req, res, next) => {
     }
 };
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, "public/uploads/");
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Rename file with timestamp
-    }
-});
-
-const upload = multer({ storage: storage });
-
 // Routes
 app.get("/", (req, res) => res.render("index", { error: "", layout: "layout", title: "Home", activePage: "home" }));
 app.get("/passSuccess", (req, res) => res.render("passSuccess", { error: "", layout: "layout", title: "Home", activePage: "home" }));
@@ -704,7 +711,7 @@ app.get("/ann", isLogin, async (req, res) => {
 app.post("/newAnn", upload.single("image"), async (req, res) => {
     try {
         const { title, description } = req.body;
-        const imagePath = req.file ? path.join("/uploads", req.file.filename) : null;
+        const imagePath = req.file ? req.file.path : null;
 
         if (!title || !description) {
             return res.send('<script>alert("Title and Description are required!"); window.location="/ann";</script>');
@@ -761,7 +768,8 @@ app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
     try {
         const { id } = req.params; // Get the ID from the URL parameter
         const { title, description } = req.body; // Get the form fields (title and description)
-        const image = req.file; // Get the uploaded image file (if any)
+        const image = req.file; // still valid
+        const imageUrl = image ? image.path : null; // Cloudinary URL
 
         // Validate the ID
         if (!ObjectId.isValid(id)) {
@@ -785,21 +793,29 @@ app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
         };
 
         // If there's an image, handle it
-        if (image) {
-            const imagePath = '/uploads/' + image.filename; // Define the path where the image will be saved
-            updateData.image = imagePath; // Save the image path to the database
+if (image) {
+    // Cloudinary gives you a direct URL in image.path
+    const imageUrl = image.path; 
 
-            // If there was an old image, delete it from the server
-            if (existingAnnouncement.image) {
-                const oldImagePath = path.join(__dirname, 'public', existingAnnouncement.image);
-                fs.unlink(oldImagePath, (err) => {
-                    if (err) console.error("Error deleting old image:", err);
-                });
-            }
-        } else {
-            // If no new image is provided, keep the existing image
-            updateData.image = existingAnnouncement.image;
-        }
+    updateData.image = imageUrl; // Save Cloudinary URL to DB
+
+    // If there was an old image, you may want to delete it from Cloudinary
+    if (existingAnnouncement.image) {
+        // Extract Cloudinary public_id from the old URL
+        const publicId = existingAnnouncement.image
+            .split('/')
+            .pop()
+            .split('.')[0]; // take last segment of URL without extension
+
+        cloudinary.uploader.destroy(publicId, (err, result) => {
+            if (err) console.error("Error deleting old image from Cloudinary:", err);
+            else console.log("Old image deleted:", result);
+        });
+    }
+} else {
+    // No new image uploaded → keep old one
+    updateData.image = existingAnnouncement.image;
+}
 
         // Update the announcement in the database
         const result = await db.collection("announcements").updateOne(
