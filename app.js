@@ -11467,87 +11467,122 @@ function generateUsername(firstName, middleName, lastName, bDay, bYear) {
 }
 
 app.post("/add-family", async (req, res) => {
-    try {
-        const residents = db.collection("resident");
-        const families = db.collection("family"); // Collection for family data
+  try {
+    const residents = db.collection("resident");
+    const families = db.collection("family");
 
-        const { 
-            firstName, middleName, lastName, extName, birthPlace, // Added fields
-            bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email, 
-            soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome, position, householdId, rel // Added rel field
-        } = req.body;
+    const {
+      firstName, middleName, lastName, extName, birthPlace,
+      bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct,
+      phone, email, soloParent, pwd, pwdType, employmentStatus,
+      work, monthlyIncome, position, householdId, rel
+    } = req.body;
 
-        // Calculate age
-        const birthDate = new Date(`${bYear}-${bMonth}-${bDay}`);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        if (age < 15) {
-            return res.status(400).json({ message: "Family Head can't be a minor" });
-        }
-
-        let username = generateUsername(firstName, middleName, lastName, bDay, bYear);
-        let password = generateRandomPassword();
-
-        // Determine resident access level
-        const privilegedPositions = ["Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"];
-        const access = privilegedPositions.includes(position) ? 1 : 0;
-
-        // Convert monthlyIncome to number
-        const income = monthlyIncome ? parseFloat(monthlyIncome) : 0;
-
-        // Determine poverty level for 1-2 members
-        let poverty = "Non-Indigent"; // Default
-        if (income < 7500) {
-            poverty = "Indigent";
-        } else if (income >= 7500 && income <= 10000) {
-            poverty = "Low Income";
-        }
-
-        // Create a new family document
-        const newFamily = {
-            familyIncome: income,
-            poverty, // Determined based on income
-            archive: 0,
-            updatedAt: new Date(),
-            createdAt: new Date(),
-            householdId,
-        };
-
-        // Insert into the `family` collection and get the newly created _id
-        const familyResult = await families.insertOne(newFamily);
-        const familyId = familyResult.insertedId; // Get the newly created family's _id
-
-        // Create the resident document with familyId and householdId
-        const newResident = {
-            firstName, middleName, lastName, extName, birthPlace, // Included the new fields
-            bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email,
-            soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome: income, position,
-            archive: 0,
-            reset: 0,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            successAt: null,
-            username,
-            password,
-            role: "Head", // Assign role as Head
-            familyId, // Link the resident to the newly created family
-            householdId, // ✅ Added householdId
-            access, // Set access level
-            rel // ✅ Added rel field
-        };
-
-        await residents.insertOne(newResident);
-
-        // ✅ Redirect to household view after success
-        res.redirect(`/hshView/${householdId}`);
-    } catch (error) {
-        console.error("Error adding resident:", error);
-        res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
+    // ✅ Calculate age
+    const birthDate = new Date(`${bYear}-${bMonth}-${bDay}`);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    if (
+      today.getMonth() < birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
     }
+
+    if (age < 15) {
+      return res.status(400).json({ message: "Family Head can't be a minor" });
+    }
+
+    // ✅ Always generate credentials for family head
+    const username = generateUsername(firstName, middleName, lastName, bDay, bYear);
+    const password = generateRandomPassword();
+    const shouldSendEmail = true;
+
+    // ✅ Determine access
+    const privilegedPositions = [
+      "Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"
+    ];
+    const access = privilegedPositions.includes(position) ? 1 : 0;
+
+    const income = monthlyIncome ? parseFloat(monthlyIncome) : 0;
+    let poverty = "Non-Indigent";
+    if (income < 7500) poverty = "Indigent";
+    else if (income >= 7500 && income <= 10000) poverty = "Low Income";
+
+    // ✅ Insert family
+    const newFamily = {
+      familyIncome: income,
+      poverty,
+      archive: 0,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+      householdId,
+    };
+    const familyResult = await families.insertOne(newFamily);
+    const familyId = familyResult.insertedId;
+
+    // ✅ Insert resident (family head)
+    const newResident = {
+      firstName, middleName, lastName, extName, birthPlace,
+      bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email,
+      soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome: income, position,
+      archive: 0,
+      reset: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      successAt: null,
+      username,
+      password,
+      role: "Head",
+      familyId,
+      householdId,
+      access,
+      rel
+    };
+
+    await residents.insertOne(newResident);
+
+    // ✅ Redirect first (avoid delay)
+    res.redirect(`/hshView/${householdId}`);
+
+    // ✅ Email sending (your consistent pattern)
+    if (shouldSendEmail) {
+      let recipientEmail = email;
+
+      // (For consistency — though family head is usually the recipient)
+      if (!recipientEmail) {
+        const headResident = await residents.findOne({ _id: newResident._id });
+        if (headResident && headResident.email) {
+          recipientEmail = headResident.email;
+        }
+      }
+
+      if (recipientEmail) {
+        const mailOptions = {
+          from: "johnniebre1995@gmail.com",
+          to: recipientEmail,
+          subject: "Your Resident Account Details",
+          text: `Dear ${firstName},\n\nYour family head account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+          html: `<p>Dear <strong>${firstName}</strong>,</p>
+                 <p>Your family head account has been created.</p>
+                 <p><strong>Username:</strong> ${username}</p>
+                 <p><strong>Password:</strong> ${password}</p>
+                 <p>Please keep your credentials secure.</p>
+                 <p>Thank you.</p>`,
+        };
+
+        try {
+          await transporter.sendMail(mailOptions);
+          console.log(`📧 Email sent to ${recipientEmail}`);
+        } catch (err) {
+          console.error("❌ Error sending email:", err);
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error adding resident:", error);
+    res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
+  }
 });
 
 
@@ -11585,11 +11620,11 @@ app.post("/add-member", async (req, res) => {
             bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email, 
             soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome, position, 
             householdId, familyId,
-            birthHeight, birthWeight, healthCenter, // ✅ Added new fields
-            rel // ✅ Added rel field
+            birthHeight, birthWeight, healthCenter,
+            rel,
+            headId // ✅ pass this if available for email fallback
         } = req.body;
 
-        // Ensure householdId and familyId are valid ObjectId instances
         if (!ObjectId.isValid(familyId) || !ObjectId.isValid(householdId)) {
             return res.status(400).json({ message: "Invalid householdId or familyId" });
         }
@@ -11597,36 +11632,37 @@ app.post("/add-member", async (req, res) => {
         const familyObjectId = new ObjectId(familyId);
         const householdObjectId = new ObjectId(householdId);
 
-        // Calculate age
+        // ✅ Calculate age
         const birthDate = new Date(`${bYear}-${bMonth}-${bDay}`);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
-        if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+        if (today.getMonth() < birthDate.getMonth() || 
+           (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
             age--;
         }
 
-        // Generate username & password only if age is between 15-59
+        // ✅ Generate credentials only if applicable
         let username = null;
         let password = null;
+        let shouldSendEmail = false;
         if (age >= 15 && age <= 59) {
             username = generateUsername(firstName, middleName, lastName, bDay, bYear);
             password = generateRandomPassword();
+            shouldSendEmail = true;
         }
 
-        // Determine resident access level
         const privilegedPositions = ["Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"];
         const access = privilegedPositions.includes(position) ? 1 : 0;
 
-        // Convert monthlyIncome to a number
         const income = monthlyIncome ? parseFloat(monthlyIncome) : 0;
 
-        // Insert the new resident into the `resident` collection
+        // ✅ Insert resident
         const newResident = {
             firstName, middleName, lastName, extName, birthPlace,
             bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email,
             soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome: income, position,
-            birthHeight, birthWeight, healthCenter, // ✅ Added new fields
-            rel, // ✅ Added rel field
+            birthHeight, birthWeight, healthCenter,
+            rel,
             archive: 0,
             reset: 0,
             createdAt: new Date(),
@@ -11635,21 +11671,55 @@ app.post("/add-member", async (req, res) => {
             username,
             password,
             role: "Member",
-            familyId: familyObjectId, // Link resident to existing family
-            householdId: householdObjectId, // ✅ Added householdId
+            familyId: familyObjectId,
+            householdId: householdObjectId,
             access,
         };
 
         await residents.insertOne(newResident);
 
-        // **Update familyIncome in the family collection**
+        // ✅ Update family income
         await families.updateOne(
             { _id: familyObjectId },
-            { $inc: { familyIncome: income } } // Add resident's income to family's income
+            { $inc: { familyIncome: income } }
         );
 
-        // **Redirect to household view after success**
+        // ✅ Redirect first (fast UX)
         res.redirect(`/hshView/${householdObjectId}`);
+
+        // ✅ Email sending logic (your format)
+        if (shouldSendEmail) {
+            let recipientEmail = email;
+
+            if (!recipientEmail && headId) {
+                const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
+                if (headResident && headResident.email) {
+                    recipientEmail = headResident.email;
+                }
+            }
+
+            if (recipientEmail) {
+                const mailOptions = {
+                    from: "johnniebre1995@gmail.com",
+                    to: recipientEmail,
+                    subject: "Your Resident Account Details",
+                    text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+                    html: `<p>Dear <strong>${firstName}</strong>,</p>
+                           <p>Your resident account has been created.</p>
+                           <p><strong>Username:</strong> ${username}</p>
+                           <p><strong>Password:</strong> ${password}</p>
+                           <p>Please keep your credentials secure.</p>
+                           <p>Thank you.</p>`,
+                };
+
+                try {
+                    await transporter.sendMail(mailOptions);
+                    console.log(`📧 Email sent to ${recipientEmail}`);
+                } catch (err) {
+                    console.error("❌ Error sending email:", err);
+                }
+            }
+        }
     } catch (error) {
         console.error("Error adding resident:", error);
         res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
