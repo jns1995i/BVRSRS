@@ -9979,6 +9979,30 @@ app.post("/myPassword", requireAuth, async (req, res) => {
     }
 });
 
+
+app.post("/myPasswordAdmin", requireAuth, async (req, res) => {
+    try {
+        const { password } = req.body;
+        const userId = req.session.userId; // Get the logged-in user's ID from session
+
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).send("Invalid user ID");
+        }
+
+        // Update user in MongoDB
+        await db.collection("resident").updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { password } }
+        );
+
+        res.redirect("/dsb"); // Redirect to the profile page after update
+    } catch (err) {
+        console.error("❌ Error updating user:", err);
+        res.status(500).send("Error updating user information");
+    }
+});
+
+
 app.post("/myPasswordRST", requireAuth, async (req, res) => {
     try {
         const { password } = req.body;
@@ -10576,6 +10600,144 @@ app.get("/rsdView/:id", isLogin, async (req, res) => {
         const schedules = caseIds.length ? await db.collection("schedule").find({ caseId: { $in: caseIds } }).toArray() : [];
 
         res.render("rsdView", {
+            layout: "layout",
+            title: "Resident Details",
+            activePage: "rsd",
+            resident,
+            requests,
+            documents,
+            cases,
+            schedules,
+            complainants,
+            complainees: complaineeRecords,
+            familyData,  // ✅ Added Poverty Level
+            householdData,  // ✅ Now passing the entire household data
+            familyMembers,  // ✅ Passing all residents with the same familyId
+            age,            // ✅ Added Age
+            birthday,        // ✅ Added Birthday
+            back: "rsd"
+        });
+
+    } catch (err) {
+        console.error("❌ Error fetching resident details:", err);
+        res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/rsd";</script>');
+    }
+});
+
+app.get("/rsdViewP/:id", isLogin, async (req, res) => {
+    try {
+        const residentId = new ObjectId(req.params.id);
+        const resident = await db.collection("resident").findOne({ _id: residentId });
+
+        if (!resident) {
+            return res.status(404).send('<script>alert("Resident not found!"); window.location="/rsd";</script>');
+        }
+
+        const families = db.collection("family");
+        const households = db.collection("household");
+
+        let familyData = null;
+        if (resident.familyId) {
+            familyData = await families.findOne({ _id: new ObjectId(resident.familyId) });
+        }
+
+        // Fetch Household Details (entire document)
+        let householdData = null;
+        if (resident.householdId) {
+            householdData = await households.findOne({ _id: new ObjectId(resident.householdId) });
+        }
+
+        // Fetch Family Members
+        let familyMembers = [];
+        if (resident.familyId) {
+            familyMembers = await db.collection("resident").find({ familyId: resident.familyId }).toArray();
+        
+            // Calculate age for each family member
+            familyMembers = familyMembers.map(member => {
+                let age = "Age Unknown";
+                if (member.bYear && member.bMonth && member.bDay) {
+                    const birthDate = new Date(member.bYear, member.bMonth - 1, member.bDay);
+                    const today = new Date();
+                    
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
+                    let days = today.getDate() - birthDate.getDate();
+        
+                    if (days < 0) {
+                        months--; // Adjust if days are negative
+                        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Get last month's days
+                    }
+                    if (months < 0) {
+                        years--; // Adjust if months are negative
+                        months += 12;
+                    }
+        
+                    if (years < 1) {
+                        if (months === 0) {
+                            age = "Less than a month old";
+                        } else {
+                            age = `${months} Month${months > 1 ? "s" : ""} Old`;
+                        }
+                    } else {
+                        age = `${years} Year${years > 1 ? "s" : ""} Old`;
+                    }
+                }
+                return { ...member, age };
+            });
+        }
+        
+
+        // Calculate Age and Format Birthday
+        let age = "--";
+        let birthday = "--";
+        
+        if (resident.bYear && resident.bMonth && resident.bDay) {
+            const birthDate = new Date(resident.bYear, resident.bMonth - 1, resident.bDay);
+            const today = new Date();
+        
+            const diffInMilliseconds = today - birthDate;
+            const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+            const diffInMonths = Math.floor(diffInDays / 30.44); // Average days in a month
+            const diffInYears = Math.floor(diffInMonths / 12);
+        
+            if (diffInDays < 30) {
+                age = "Less than a Month";
+            } else if (diffInMonths < 12) {
+                age = `${diffInMonths} ${diffInMonths === 1 ? "month old" : "months old"}`;
+            } else {
+                age = `${diffInYears} ${diffInYears === 1 ? "year old" : "years old"}`;
+            }
+        
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            birthday = `${monthNames[resident.bMonth - 1]} ${resident.bDay}, ${resident.bYear}`;
+        }
+
+        familyMembers.sort((a, b) => {
+            const ageA = parseInt(a.age) || 0; // Convert "29 Years Old" to 29
+            const ageB = parseInt(b.age) || 0;
+            return ageB - ageA; // Descending order
+        });
+        
+
+        // Fetch Resident's Requests & Documents
+        const requests = await db.collection("request").find({ requestBy: residentId, archive: { $in: [0, "0"] } }).toArray();
+        const requestIds = requests.map(req => req._id);
+        const documents = requestIds.length ? await db.collection("document").find({ reqId: { $in: requestIds } }).toArray() : [];
+
+        // Fetch Complainee Records where resident is a complainee
+        const complaineeRecords = await db.collection("complainees").find({ residentId: residentId }).toArray();
+        const caseIds = complaineeRecords.map(c => new ObjectId(c.caseId));
+
+        // Fetch Cases related to the resident as a complainee
+        const cases = caseIds.length ? await db.collection("cases").find({ _id: { $in: caseIds } }).toArray() : [];
+
+        // Fetch Complainants from the matched cases
+        const complainants = caseIds.length ? await db.collection("complainants").find({ caseId: { $in: caseIds } }).toArray() : [];
+
+        // Fetch Schedules related to these cases
+        const schedules = caseIds.length ? await db.collection("schedule").find({ caseId: { $in: caseIds } }).toArray() : [];
+
+        res.render("rsdViewP", {
             layout: "layout",
             title: "Resident Details",
             activePage: "rsd",
