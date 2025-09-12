@@ -608,7 +608,7 @@
 
                                             <% if ((doc.status === 'Approved' || doc.status === 'Declined') && elapsed < 30000) { %>
                                             <div
-                                                class="height0 justifyEnd gap10 padding5 revert-btn"
+                                                class="height0 justifyEnd gap10 padding5 revert-btn hidden"
                                                 data-updated-at="<%= updatedAt.toISOString() %>">
                                                 <a href="javascript:void(0)" class="nav fnav borderPrimary str500 width0"
                                                 onclick="restoreDocument('<%= doc._id %>')">
