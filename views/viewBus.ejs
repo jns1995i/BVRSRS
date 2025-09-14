@@ -363,7 +363,13 @@
                                 <br>
                                 <p class="p10 tnr">TO WHOM IT MAY CONCERN:</p>
                                     <br>
-                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that <span class="paragStr"><%= business.ownerName %></span> is the owner/manager of <span class="paragStr"><%= business.businessName %></span> located at <span class="paragStr"><%= business.houseNo %> <%= business.purok %>, Valdefuente, Cabanatuan City</span>.</p>
+                                    <p class="p10 parag" style="display: inline;">THIS IS TO CERTIFY that <span class="paragStr">
+                                    <% if (business.owner) { %>
+                                        <td><%= business.owner.firstName %> <%= business.owner.lastName %></td>
+                                    <% } else { %>
+                                        <td>Unknown Owner</td>
+                                    <% } %>
+                                    </span> is the owner/manager of <span class="paragStr"><%= business.businessName %></span> located at <span class="paragStr"><%= business.houseNo %> <%= business.purok %>, Valdefuente, Cabanatuan City</span>.</p>
                                     <br>
                                     <p class="p10 parag">This was issued upon request of the subject for <span class="paragStr blue" id="purposeRef">ANY LEGAL</span> Reference Purpose.</p>
                                     <br>

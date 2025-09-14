@@ -2245,25 +2245,63 @@ app.post("/delete-business/:id", isLogin, async (req, res) => {
 });
 
 app.get("/viewBus/:id", isLogin, async (req, res) => {
-    try {
-        const businessId = req.params.id;  // Get the business ID from the URL
-        const business = await db.collection("business").findOne({ _id: new ObjectId(businessId) });
+  try {
+    const businessId = req.params.id;
+    const business = await db.collection("business").findOne({ _id: new ObjectId(businessId) });
 
-        if (!business) {
-            return res.status(404).send("Business not found!");
-        }
-
-        // Render the page to display the business details
-        res.render("viewBus", { 
-            layout: "layout", 
-            title: "Business", 
-            activePage: "bus", 
-            business // Pass the businesses data to the view
-        })
-    } catch (err) {
-        console.error("Error fetching business:", err.message);
-        res.status(500).send("Error fetching business.");
+    if (!business) {
+      return res.status(404).send("Business not found!");
     }
+
+    // Get the owner from residents
+    let owner = null;
+    if (business.ownerName) {
+      const resident = await db.collection("resident").findOne({ _id: new ObjectId(business.ownerName) });
+
+      if (resident) {
+        // Fetch household info
+        const household = resident.householdId
+          ? await db.collection("household").findOne({ _id: new ObjectId(resident.householdId) })
+          : null;
+
+        // Fetch family info
+        const family = resident.familyId
+          ? await db.collection("family").findOne({ _id: new ObjectId(resident.familyId) })
+          : null;
+
+        owner = {
+          _id: resident._id,
+          firstName: resident.firstName,
+          lastName: resident.lastName,
+          phone: resident.phone || "-",
+          purok: household?.purok || "-",
+          houseNo: household?.houseNo || "-",
+          familyPoverty: family?.poverty || "No Income"
+        };
+      }
+    }
+
+    // Safe estDate for EJS
+    business.estDateISO =
+      business.estDate && !isNaN(new Date(business.estDate))
+        ? new Date(business.estDate).toISOString().split("T")[0]
+        : "";
+
+    // Attach owner
+    business.owner = owner;
+
+    // Render the page to display the business details
+    res.render("viewBus", {
+      layout: "layout",
+      title: "Business",
+      activePage: "bus",
+      business
+    });
+
+  } catch (err) {
+    console.error("Error fetching business:", err.message);
+    res.status(500).send("Error fetching business.");
+  }
 });
 
 app.get("/htl", isLogin, async (req, res) => {
