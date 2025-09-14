@@ -781,12 +781,21 @@
 
                     
         <div class="height0 gap10 paddingInline10 paddingBottom20">
-            <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
+            <div class="bgShade10 card borderRadius20 white abstractBG col alignStart padding20 gap10">
                 <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
                 <p class="size26 white str500"><%= Math.floor(highFam) %> <%= Math.floor(highFam) === 1 ? "member" : "members" %></p>
                 <a href="/bus" class="width0 height0 linkX">
                 <p class="size14 str300">
                     Highest Family Size <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="bgShade10 card borderRadius20 white abstractBG col alignStart padding20 gap10">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
+                <p class="size26 white str500"><%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %></p>
+                <a href="/bus" class="width0 height0 linkX">
+                <p class="size14 str300">
+                    Average Family Size <i class="fas fa-chevron-right inline"></i>
                 </p>
                 </a>
             </div>
@@ -808,23 +817,9 @@
                 </p>
                 </a>
             </div>
-            <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
-                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
-                <p class="size26 white str500"><%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %></p>
-                <a href="/bus" class="width0 height0 linkX">
-                <p class="size14 str300">
-                    Average Family Size <i class="fas fa-chevron-right inline"></i>
-                </p>
-                </a>
-            </div>
         </div>
-        <div class="h160 padding10 bgWhite borderRadius15 col">
+        <div class="h180 padding10 bgWhite borderRadius15 col">
             <div class="h180 justifyStart alignEnd paddingInline15 paddingBlock10 col relative">
-                <p class="size36 str400"><%= indigentCount %> Total Indigent Families</p>
-                <p class="size16 str400 green"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
-                <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
-                <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
-                <div class="absolute translateY left0 width32 padding20 borderRadius15 bgTint8 col justifyStart alignStart">
                     <p class="size14 str400">
                             Average Monthly Net Income per Family
                     </p>
@@ -832,19 +827,24 @@
                     <div class="height0 bottom15 left15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14">
                         Average Family Size: <%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %>
                     </div>
+                <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
+                <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
+                <div class="absolute translateY left0 width50 padding20 borderRadius15 bgTint8 col justifyStart alignStart">
+                    <p class="size36 str400"><%= indigentCount %> Total Indigent Families</p>
+                    <p class="size16 str400 green"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
+                    <div class="height0 bottom15 left15 width0 absolute gap10">
+                        <a href="/export-indigent" class="nav">
+                            <i class="fa-solid fa-file-excel"></i>
+                            Export All Records
+                        </a>
+                        <a href="/fml" class="nav">
+                            View Master List</p> &nbsp; <i class="fas fa-chevron-right inline size16"></i>
+                        </a>
+                    </div>
                 </div>
-                <img src="/images/family.png" alt="" class="absolute translateY h130" style="left: 300px; transform: scaleX(1); transform: translateY(-50%);">
+                <img src="/images/family.png" alt="" class="absolute h130" style="bottom: 5px; left: 43%; transform: scaleX(1);">
                 <div class="hidden height0 bottom5 left15 width0 absolute col alignStart bgTint8 colorPrimary padding5 borderRadius5">
                     Barangay Clearance is the most requested document</p>
-                </div>
-                <div class="height0 bottom5 right15 width0 absolute gap10">
-                    <a href="/export-indigent" class="nav">
-                        <i class="fa-solid fa-file-excel"></i>
-                        Export All Records
-                    </a>
-                    <a href="/fml" class="nav">
-                        View Master List</p> &nbsp; <i class="fas fa-chevron-right inline size16"></i>
-                    </a>
                 </div>
             </div>
         </div>
@@ -884,18 +884,18 @@
                     </div> 
                 </div>
 
-                <div class="h300 gap10 width55 borderRadius15 padding5 col borderGray">
+                <div class="h300 gap10 width55 borderRadius15 padding15 col bgTint8 borderPrimary">
                         <p class="keyL greenDark" style="font-weight: 600;">
                             <i class="fas fa-hands-holding"></i>
                             2023 DSWD Poverty Threshold Guide
                         </p>
-                    <table id="userInfo faded" style="background-color: transparent !important;">
+                    <table id="userInfo" style="background-color: white !important;">
                         <thead>
                             <tr>
-                                <th class="textCenter bgSoft">Family Size</th>
-                                <th class="textCenter bgSoft">Indigent</th>
-                                <th class="textCenter bgSoft">Low Income</th>
-                                <th class="textCenter bgSoft">Non-Indigent</th>
+                                <th class="textCenter">Family Size</th>
+                                <th class="textCenter">Indigent</th>
+                                <th class="textCenter">Low Income</th>
+                                <th class="textCenter">Non-Indigent</th>
                             </tr>
                         </thead>
                         <tbody>
