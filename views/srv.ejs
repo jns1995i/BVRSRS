@@ -108,7 +108,7 @@
                             </div>
                             <div class="height0 width0 col alignStart">
                                 <p class="size18 str500"><%= request.resident.firstName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
-                                <p class="size12 str400 gray"><%= request.household ? request.household.houseNo : 'N/A' %> <%= request.household ? request.household.purok : 'N/A' %>, Valdefuente</p>
+                                <p class="size12 str400 gray"><%= request.household ? request.household.houseNo : 'Unknown' %> <%= request.household ? request.household.purok : 'Purok' %>, Valdefuente</p>
                             </div>
                         </div>
                     <% } else { %>

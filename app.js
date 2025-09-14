@@ -4335,6 +4335,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
 
+  const response = await fetch(url);
+  const weather = await response.json();
+
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
             res.render("dsb", {
@@ -4845,6 +4848,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
 
+  const response = await fetch(url);
+  const weather = await response.json();
+
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
             res.render("dsb", {
@@ -5332,6 +5338,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lat = 15.4869;   // Cabanatuan latitude
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+
+  const response = await fetch(url);
+  const weather = await response.json();
 
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
@@ -5821,6 +5830,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
 
+  const response = await fetch(url);
+  const weather = await response.json();
+
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
             res.render("dsb", {
@@ -6309,6 +6321,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
 
+  const response = await fetch(url);
+  const weather = await response.json();
+
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
             res.render("dsb", {
@@ -6796,6 +6811,9 @@ const aveIncome = count > 0 ? (totalIncome / count).toFixed(2) : 0;
   const lat = 15.4869;   // Cabanatuan latitude
   const lon = 120.9730;  // Cabanatuan longitude
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+
+  const response = await fetch(url);
+  const weather = await response.json();
 
 console.log("✅ Family Aggregation Complete");
             // Render to EJS
