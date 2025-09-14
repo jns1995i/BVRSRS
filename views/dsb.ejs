@@ -782,16 +782,7 @@
                     
         <div class="height0 gap10 paddingInline10 paddingBottom20">
             <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
-                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-building"></i></a>
-                <p class="size26 white str500"><%= nonIndigent %></p>
-                <a href="/bus" class="width0 height0 linkX">
-                <p class="size14 str300">
-                    Non-Indigent Families <i class="fas fa-chevron-right inline"></i>
-                </p>
-                </a>
-            </div>
-            <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
-                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-building"></i></a>
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
                 <p class="size26 white str500"><%= Math.floor(highFam) %> <%= Math.floor(highFam) === 1 ? "member" : "members" %></p>
                 <a href="/bus" class="width0 height0 linkX">
                 <p class="size14 str300">
@@ -800,7 +791,7 @@
                 </a>
             </div>
             <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
-                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-building"></i></a>
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
                 <p class="size26 white str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(lowIncome) %></p>
                 <a href="/bus" class="width0 height0 linkX">
                 <p class="size14 str300">
@@ -809,11 +800,20 @@
                 </a>
             </div>
             <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
-                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-building"></i></a>
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
                 <p class="size26 white str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(highIncome) %></p>
                 <a href="/bus" class="width0 height0 linkX">
                 <p class="size14 str300">
                     Maximum Monthly Income <i class="fas fa-chevron-right inline"></i>
+                </p>
+                </a>
+            </div>
+            <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
+                <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
+                <p class="size26 white str500"><%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %></p>
+                <a href="/bus" class="width0 height0 linkX">
+                <p class="size14 str300">
+                    Average Family Size <i class="fas fa-chevron-right inline"></i>
                 </p>
                 </a>
             </div>
@@ -850,44 +850,7 @@
         </div>
         <br>
 
-            <div class="height0 paddingInline10 gap20 paddingBlock5 relative col">
-                <div class="height0 bgWhite gap10 borderRadius15 darkShadow padding20 relative">
-                    <div class="height100 width40 bgWhite col justifyStart borderRadius15 darkShadow padding15 gap5">
-                        <table id="userInfo" class="padding5 borderRadius10 darkShadow">
-                            <thead>
-                                <tr>
-                                <th class="textCenter">Family Size</th>
-                                <th class="textCenter">Indigent</th>
-                                <th class="textCenter">Non-Indigent</th>
-                                <th class="textCenter">Low Income</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (let range in povertyCounts) { %>
-                                <tr>
-                                    <td class="textCenter"><%= range %></td>
-                                    <td class="textCenter"><%= povertyCounts[range]["Indigent"] %></td>
-                                    <td class="textCenter"><%= povertyCounts[range]["Non-Indigent"] %></td>
-                                    <td class="textCenter"><%= povertyCounts[range]["Low Income"] %></td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="height100 width60 col gap justifyStart">
-                        <p class="keyL greenDark" style="font-weight: 600;">
-                            <i class="fas fa-user-friends"></i>
-                            Poverty Statistics per Family Size
-                        </p>
-                        <div class="card height85 paddingInline10 shadowNone" style="align-items: center !important; width: 100% !important; height: 260px;">
-                            <canvas id="familyChart" class=""></canvas>
-                        </div>
-                    </div> 
-                </div>
-
-            </div>
-            
-            <br>
+        
         
             <div class="height0 gap20 padding10 alignStart">
                 <div class="h300 gap10 darkShadow bgWhite width45 borderRadius15 padding20 alignStart relative">
@@ -969,6 +932,45 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <br>
+
+            <div class="height0 paddingInline10 gap20 paddingBlock5 relative col">
+                <div class="height0 bgWhite gap10 borderRadius15 darkShadow padding20 relative">
+                    <div class="height100 width40 bgWhite col justifyStart borderRadius15 darkShadow padding15 gap5">
+                        <table id="userInfo" class="padding5 borderRadius10 darkShadow">
+                            <thead>
+                                <tr>
+                                <th class="textCenter">Family Size</th>
+                                <th class="textCenter">Indigent</th>
+                                <th class="textCenter">Non-Indigent</th>
+                                <th class="textCenter">Low Income</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let range in povertyCounts) { %>
+                                <tr>
+                                    <td class="textCenter"><%= range %></td>
+                                    <td class="textCenter"><%= povertyCounts[range]["Indigent"] %></td>
+                                    <td class="textCenter"><%= povertyCounts[range]["Non-Indigent"] %></td>
+                                    <td class="textCenter"><%= povertyCounts[range]["Low Income"] %></td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="height100 width60 col gap justifyStart">
+                        <p class="keyL greenDark" style="font-weight: 600;">
+                            <i class="fas fa-user-friends"></i>
+                            Poverty Statistics per Family Size
+                        </p>
+                        <div class="card height85 paddingInline10 shadowNone" style="align-items: center !important; width: 100% !important; height: 260px;">
+                            <canvas id="familyChart" class=""></canvas>
+                        </div>
+                    </div> 
+                </div>
+
             </div>
 
         </div>
