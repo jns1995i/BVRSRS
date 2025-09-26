@@ -202,6 +202,9 @@
             .hidden {
                 display: none !important;
             }
+            .bgR {
+                background-color: rgb(54, 0, 0);
+            }
             @media print {
                 body {
                     -webkit-print-color-adjust: exact;
@@ -275,7 +278,7 @@
         min-width: none !important;
         justify-self: start;
         font-weight: 600;
-        color: var(--primary);
+        color: var(--white);
     }
     #viewD:hover {
         transition: none;
@@ -301,61 +304,71 @@
                         Previous
                     </a>
                 </div>
-                <div class="absolute height0 width33 padding20 borderRadius10 bgWhite darkShadow col gap10" style="z-index: 10 !important; left: 12px; top: 65px;">
-                    <div class="height0 justifyStart">
-                        <p class="size20 str500">Requested By</p>
-                    </div>
-                    
-                    <div class="height0 witch abstractBG padding20 borderRadius10 col alignStart justifyBetween relative hidden">
-                        <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-receipt"></i></a>
-                        <p class="size14 white str400">
-                            <%= request.createdAt 
-                                ? new Date(request.createdAt).toLocaleString("en-US", { 
-                                    year: "numeric", 
-                                    month: "short",  
-                                    day: "2-digit", 
-                                    hour: "2-digit", 
-                                    minute: "2-digit", 
-                                    hour12: true 
-                                }).replace(/,\s(\d{4}),/, ', $1') 
-                                : "Unreleased" 
-                            %>
-                        </p>
-                        <p class="size26 str400 white">TR# <%= request.tr %></p>
+                <div class="absolute height0 width30 borderRadius10 bgWhite darkShadow col gap10" style="z-index: 10 !important; left: 22px; top: 65px;">
+                    <br>
+                    <div class="height0">
+                        <p class="size18 str500">Requested By</p>
                     </div>
                     
 
 
-                    <div class="height0 justifyStart alignStart col padding5 relative">
-                        <img src="<%= request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" class="borderRadius10 h100 w100 borderPrimary marginBottom5" onerror="this.onerror=null; this.src='/images/profile.jpg';">
-                        <p class="size18 str600"><%= request.resident.firstName %> <%= request.resident.middleName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
-                        <p class="size16 str400"><%= request.resident.household ? request.resident.household.houseNo : "N/A" %> <%= request.resident.household ? request.resident.household.purok : "N/A" %> Valdefuente</p>
+                    <div class="height0 justifyStart col relative">
+                        <img src="<%= request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" class="borderRadius10 h180 w180 borderPrimary marginBottom5" onerror="this.onerror=null; this.src='/images/profile.jpg';">
+                        <br><br>
+                        <p class="size20 str600"><%= request.resident.firstName %> <%= request.resident.middleName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
                         <p class="size16 str400">Poverty Status: <%= request.resident.family ? request.resident.family.poverty : "N/A" %></p>
                         <br>
-                        <% if (request.cases.length > 0) { %>
-                            <% request.cases.forEach(caseItem => { %>
-                                <% 
-                                    const isRespondent = caseItem.respondents.some(r => r._id && r._id.equals(request.resident._id));
-                                %>
-                                <% if (isRespondent) { %>
-                                    <p class="size16 str500" style="color: rgb(126, 0, 0);">
-                                        <i class="fas fa-exclamation-circle inline width15"></i> Pending Case Found : &nbsp;
-                                        <a id="viewD" class="inline">Show Details</a>
-                                    </p>
-                                <% } else { %>
-                                    <p class="size16 str500">
-                                    <i class="fas fa-check-circle marginInline5"></i>
-                                    No case records found!
-                                    </p>
+                        <p class="size16 str400"><%= request.resident.household ? request.resident.household.houseNo : "N/A" %> <%= request.resident.household ? request.resident.household.purok : "N/A" %>, Valdefuente</p>
+                        <% 
+                        const birthDate = new Date(request.resident.bYear, request.resident.bMonth - 1, request.resident.bDay);
+                        const today = new Date();
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const m = today.getMonth() - birthDate.getMonth();
 
-                                <% } %>
-                            <% }) %>
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--; // adjust if birthday hasn't happened yet this year
+                        }
+                        %>
+
+                        <p class="size16 str400">
+                        <%= age %> years old
+                        </p>
+
+                        <br>
+                        <a href="/rsdView-srv/<%= request.resident._id %>" class="nav borderRadius10">View Resident Info</a>
+                        <br><br>
+                        <div class="height0 padding15 white
+                        <% if (request.cases.length > 0) { %>
+                        bgR
                         <% } else { %>
-                            <p class="size16 str500">
-                                <i class="fas fa-check-circle w15 inline"></i>
-                                No case records found!
-                            </p>
+                        bgBlack
                         <% } %>
+                        ">
+                            <% if (request.cases.length > 0) { %>
+                                <% request.cases.forEach(caseItem => { %>
+                                    <% 
+                                        const isRespondent = caseItem.respondents.some(r => r._id && r._id.equals(request.resident._id));
+                                    %>
+                                    <% if (isRespondent) { %>
+                                        <p class="size16 str500" style="color: rgb(255, 255, 255);">
+                                            <i class="fas fa-exclamation-circle inline width15"></i> Pending Case Found : &nbsp;
+                                            <a id="viewD" class="inline">Show Details</a>
+                                        </p>
+                                    <% } else { %>
+                                        <p class="size16 str500">
+                                        <i class="fas fa-check-circle marginInline5"></i>
+                                        No case records found!
+                                        </p>
+
+                                    <% } %>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="size16 str500">
+                                    <i class="fas fa-check-circle w15 inline"></i>
+                                    No case records found!
+                                </p>
+                            <% } %>
+                        </div>
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', function() {

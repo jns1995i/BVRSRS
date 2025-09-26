@@ -377,6 +377,11 @@
                                         <i class="fas fa-chevron-left"></i>
                                         Previous
                                     </a>
+                                    <% } else if ( back === "srv") { %>
+                                    <a href="javascript:history.back()" class="nav index10">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Previous
+                                    </a>
                                     <% } else { %>
                                     <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav index10">
                                         <i class="fas fa-chevron-left"></i>
