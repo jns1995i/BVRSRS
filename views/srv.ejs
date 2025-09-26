@@ -9,7 +9,7 @@
 </head>
 
             
-<div class="height0 abstractBG padding20 borderRadius10 absolute right50 top100 width25 index50 col justifyStart alignCenter gap5">
+<div class="height0 abstractBG padding20 borderRadius10 absolute right50 top100 width25 index50 col justifyStart alignCenter gap5 hidden">
     <p class="size16 white str400"></p>
     <BR>
         <div class="height0 paddingBlock10 col">
@@ -26,7 +26,7 @@
         <div class="height10">
             <div class="height0 width100">
                 <div class="ctrl left">
-                    <p class="size30 str500">Document Services</p>
+                    <p class="size30 str500">Transactions</p>
                 </div>
                 <div class="ctrl">
                     <div class="searchBar">
@@ -35,10 +35,6 @@
                     </div>
                 </div>
                 <div class="ctrl right">
-                    <a href="/ovv" class="nav">
-                        <i class="fas fa-bar-chart"></i>
-                        All transactions
-                    </a>
                     <a href="/mainReq" class="nav pnav">
                         <i class="fas fa-plus"></i>
                         Request Document
@@ -48,7 +44,7 @@
         </div>
 
         <div class="height90 overflow-y1 padding20 col justifyStart blockX bgSoft borderRadius15 relative">
-            <div class="height0 width70 hidden size18" id="noRecord">No Records Found!
+            <div class="height0 hidden size18" id="noRecord">No Records Found!
             </div>
             <% 
     // Get current date values
@@ -84,23 +80,34 @@
         { title: "TODAY", data: todayRequests },
         { title: "YESTERDAY", data: yesterdayRequests },
         { title: "THIS WEEK", data: thisWeekRequests },
-        { title: "OTHERS", data: otherRequests }
+        { title: "Older Requests", data: otherRequests }
     ];
 %>
 
 <% if (requests.length > 0) { %>
     <% categorizedRequests.forEach(category => { %>
         <% if (category.data.length > 0) { %>
-            <div class="height0 padding0 marginBottom5 titleCard justifyStart">
+            <div class="height0 padding0 paddingInline25 marginBottom5 titleCard justifyStart">
                 <p class="size16 str500 gray width65 textLeft"><%= category.title %></p>
             </div>
             <% category.data.forEach(request => { %>
                 <div class="height0 padding5 srvCard justifyStart" id="srvCard">
-                    <div class="width70 height0 bgWhite borderRadius15 paddingInline25 paddingBlock25 gap10 marginBottom20 justifyBetween darkShadow 
+                    <div class="height0 bgWhite borderRadius10 padding15 gap10 marginBottom5 justifyBetween darkShadow 
                     <% if (['Processed', 'Approved', 'Declined', 'For Pickup', 'Claimed', 'Cancelled'].includes(request.status)) { %>
-                        bgSoft paddingBlock15 shadowNone
+                        bgSoft paddingBlock10 shadowNone
                     <% } %>
                     " id="srvCard">
+                        <div class="width20 height0 col gap0 marginLeft10 alignStart">
+                            <p class="size12 str500 gray">
+                                <%= new Date(request.createdAt).toLocaleString('en-US', { weekday: 'long' }) %> -
+                                <%= new Date(request.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase() %>
+                                 <%= ("0" + new Date(request.createdAt).getDate()).slice(-2) %>
+                                  <%= new Date(request.createdAt).getFullYear() %>
+                            </p>
+                            <p class="size16 str500">
+                                TR#<%= request.tr %>
+                                </p>
+                        </div>
                     <% if (request.resident) { %>
                         <div class="height0 width30 gap10 justifyStart">
                             <div class="width0 h50">
@@ -114,45 +121,76 @@
                     <% } else { %>
                         No resident data available
                     <% } %>
-                        <div class="width0 height0 col gap0 marginLeft10 alignStart">
-                            <p class="size12 str500 gray">
-                                <%= new Date(request.createdAt).toLocaleString('en-US', { weekday: 'long' }) %> -
-                                <%= new Date(request.createdAt).toLocaleString('en-US', { month: 'short' }).toUpperCase() %>
-                                 <%= ("0" + new Date(request.createdAt).getDate()).slice(-2) %>
-                                  <%= new Date(request.createdAt).getFullYear() %>
-                            </p>
-                            <p class="size16 str500">
-                                TR#<%= request.tr %>
-                                </p>
+                        
+                            <%
+                            let mergedDocuments = {};
+                            request.documents.forEach(doc => {
+                                if (mergedDocuments[doc.type]) {
+                                    mergedDocuments[doc.type]++;
+                                } else {
+                                    mergedDocuments[doc.type] = 1;
+                                }
+                            });
+                        
+                            // Step 2: Convert to an array for easy iteration
+                            let mergedArray = Object.keys(mergedDocuments).map(type => ({
+                                type: type,
+                                count: mergedDocuments[type]
+                            }));
+                        
+                            // Step 3: Define how many items to show before "+X more"
+                            let visibleItems = 1;
+                            let hiddenCount = mergedArray.length - visibleItems; // Count remaining hidden items
+                        %>
+
+                        <div class="height0 width25 justifyStart">
+                            <% if (request.documents && request.documents.length > 0) { %>
+                                <% if (mergedArray.length > visibleItems) { %>
+                                    <% for (let i = 0; i < visibleItems; i++) { %>
+                                        <p class="size12 str400"><%= mergedArray[i].count %> <%= mergedArray[i].type %>, &nbsp; </p>
+                                    <% } %>
+                                    <% if (hiddenCount > 0) { %> 
+                                        <p class="size12 str400 green">+<%= hiddenCount %> more items</p>
+                                    <% } %>
+                                <% } else { %>
+                                    <% mergedArray.forEach(document => { %>
+                                        <p class="size12 str400"><%= document.count %> <%= document.type %>  &nbsp;  </p>
+                                    <% }) %>
+                                <% } %>
+                            <% } else { %>
+                            <p>No documents linked.</p>
+                            <% } %>
                         </div>
-                        <div class="height0 col alignStart" style="width: 12%;">
+                        <div class="height0 col alignStart width15" style="width: 10%;">
                             <p class="size12 gray hidden">Status</p>
                             <% if (request.status === 'Approved') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Processed') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Claimed') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-flag gray inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Processing') { %>
-                            <height0 class="size12 upperCase str500 bgSoft  padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgSoft  padding5 borderRadius5"><i class="fas fa-clock gray inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Declined') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Cancelled') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'For Pickup') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Pending') { %>
-                            <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><i class="fas fa-hourglass white inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                         </div>
-                        <a href="/srvView/<%= request._id %>" class="nav cnav"><i class="fas fa-chevron-right"></i></a>
+                        <div class="height0 width10 justifyEnd">
+                            <a href="/srvView/<%= request._id %>" class="nav cnav" style="background-color: transparent;"><i class="fas fa-arrow-right"></i></a>
+                        </div>
                     </div>
                 </div>
             <% }) %>

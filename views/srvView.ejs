@@ -321,11 +321,12 @@
                     
 
 
-                    <div class="height0 justifyStart alignStart col padding5">
-                        <img src="<%= request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" class="borderRadius10 h60 w60 borderPrimary marginBottom5" onerror="this.onerror=null; this.src='/images/profile.jpg';">
-                        <p class="size16 str500"><%= request.resident.firstName %> <%= request.resident.middleName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
-                        <p class="size16 str500"><%= request.resident.household ? request.resident.household.houseNo : "N/A" %> <%= request.resident.household ? request.resident.household.purok : "N/A" %> Valdefuente</p>
-                        <p class="size16 str500">Poverty Status: <%= request.resident.family ? request.resident.family.poverty : "N/A" %></p>
+                    <div class="height0 justifyStart alignStart col padding5 relative">
+                        <a href="" class="nav disabled absolute right0 top10 borderRadius10">Status: <%= request.status %></a>
+                        <img src="<%= request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" class="borderRadius10 h100 w100 borderPrimary marginBottom5" onerror="this.onerror=null; this.src='/images/profile.jpg';">
+                        <p class="size18 str600"><%= request.resident.firstName %> <%= request.resident.middleName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
+                        <p class="size16 str400"><%= request.resident.household ? request.resident.household.houseNo : "N/A" %> <%= request.resident.household ? request.resident.household.purok : "N/A" %> Valdefuente</p>
+                        <p class="size16 str400">Poverty Status: <%= request.resident.family ? request.resident.family.poverty : "N/A" %></p>
                         <br>
                         <% if (request.cases.length > 0) { %>
                             <% request.cases.forEach(caseItem => { %>
@@ -404,7 +405,6 @@
                     </div>
 
                     <div class="height0 alignStart padding5 col">
-                        <p class="size16 str500">Status: <%= request.status %></p>
                         <p class="size16 str500">
                             <%= request.successAt 
                                 ? new Date(request.successAt).toLocaleString("en-US", { 
@@ -415,18 +415,9 @@
                                     minute: "2-digit", 
                                     hour12: true 
                                 }).replace(/,\s(\d{4}),/, ', $1') 
-                                : "Unreleased" 
+                                : "" 
                             %>
                         </p>
-                    </div>
-
-                    <div class="height0 gap10">
-                            <% if ( request.status === 'For Pickup') { %>
-                            <p class="size14 str400">Has the document been released?</p>
-                                <a href="#" class="nav" onclick="showNoCard2('<%= request._id %>')">
-                                <i class="fas fa-check"></i> Set as Claimed
-                                </a>
-                            <% } %>
                     </div>
 
 
@@ -537,92 +528,109 @@
 
 
                     <div class="height0 padding15 col borderRadius10 darkShadow">
-                        <div class="height0 padding20 aqua abstractBG borderRadius10 white justifyBetween">
-                        <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8); z-index: 0;"><i class="fas fa-file-alt"></i></a>
-                            <p class="size24 str400">Requested Document</p>
-                            <div class="height0 gap10 width0 justifyEnd index50">
-                                <% if ( request.status === 'Processing' || request.status !== 'Approved' &&  request.status !== 'Declined' && request.status !== 'For Pickup' && request.status !== 'Claimed' ) { %>
-                                <% } %>
-
-                                <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing' ) { %>
-                                <a href="#" class="nav" onclick="viewDocs()">
-                                    <i class="fas fa-eye"></i>
-                                    View Documents
-                                </a>
-                                <a href="#" class="nav" onclick="printDocs()">
-                                    <i class="fas fa-print"></i>
-                                    Print Documents
-                                </a>
-                                <% } %>
-                            </div>
+                    
+                        <div class="h120 abstractBG padding20 borderRadius10 col alignStart justifyBetween relative">
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-receipt"></i></a>
+                            <p class="size14 white str400">
+                                <%= request.createdAt 
+                                    ? new Date(request.createdAt).toLocaleString("en-US", { 
+                                        year: "numeric", 
+                                        month: "short",  
+                                        day: "2-digit", 
+                                        hour: "2-digit", 
+                                        minute: "2-digit", 
+                                        hour12: true 
+                                    }).replace(/,\s(\d{4}),/, ', $1') 
+                                    : "Unreleased" 
+                                %>
+                            </p>
+                            <p class="size26 str400 white">TR# <%= request.tr %></p>
                         </div>
-                        <br>
-                            <div class="height0 gap20 borderRadius20 wrap alignStart padding5">
+                        <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing' ) { %>
+                            <div class="height0 gap10 paddingBlock20">
+                                <p class="size14 str400 marginLeft10">Would you like to view the generated documents?</p>
+                                <a href="javascript:void(0)" class="nav" onclick="viewDocs()">
+                                    View Here
+                                </a>
+                            </div>
+                        <% } else { %>
+                            <br>
+                        <% } %>
+                        <div class="height0 gap5 col padding5">
                                 <% if (request.documents.length > 0) { %>
                                     <% request.documents.forEach(doc => { %>
-                                        <div id="doc-<%= doc._id %>" class="
+                                    <div class="h80 padding15 marginBottom5 relative borderRadius10
                                             <% if ( doc.status === 'Approved') { %>
-                                            bgWhite softShadow
+                                            bgWhite borderGray
                                             <% } else if  ( doc.status === 'Declined') { %>
-                                            borderGray bgSoft
+                                            borderGray
                                             <% } else { %>
                                             bgWhite softShadow
                                             <% } %>
-                                            borderRadius10 padding20 relative justifyBetween h160 alignStart" style="min-width: 48%; flex: 1 1 48%;">
-                                            <a href="#" class="nav cnav disabled absolute right10 top10 hidden"><i class="fas fa-file"></i></a>
-                                            <div class="height0 col justifyStart alignStart marginTop40">
-                                                <p class="size14 str400"><%= doc.qty == 1 ? doc.qty + " Copy" : doc.qty + " Copies" %> for</p>
-                                                <p class="size14 str500 colorPrimary"><%= doc.purpose %> Purpose</p>
-                                            </div>
-                                                
-                                            <div class="height0 padding0 gap10 absolute top15 left0 justifyStart width100">
-                                                <% if (doc.status === 'Approved') { %>
-                                                    <p class="size14 str500 abstractBG paddingInline15 paddingBlock10 alignStart flex gap10 white" style="border-top-right-radius: 20px;">
-                                                        <i class="fas fa-check-square size18"></i> Approved
-                                                    </p>
-                                                <% } else if  (doc.status === 'Declined') { %>
-                                                    <p class="size14 str500 bgGray abstractBG paddingInline15 paddingBlock10 alignStart flex gap10 white" style="border-top-right-radius: 20px;">
-                                                        <i class="fas fa-check-square size18"></i> Declined
-                                                    </p>
-                                                <% } else { %>
-                                                    <p class="size14 str500 bgGray abstractBG paddingInline15 paddingBlock10 alignStart flex gap10 white" style="border-top-right-radius: 20px;">
-                                                        <i class="fas fa-hourglass size18"></i> Pending
-                                                    </p>
-                                                <% } %>
-                                                <p class="size16 str500"><%= doc.type %></p>
-                                            </div>                                               
-                                            <% if (doc.status === 'Pending' && request.status !== 'Cancelled') { %>  
-                                            <div class="height0 justifyEnd gap10 padding5">
-                                                    <a href="javascript:void(0)" onclick="showNoCard('<%= doc._id %>')" class="nav fnav dnav w150">
-                                                        Decline
-                                                    </a>                          
-                                                    <a href="javascript:void(0)" class="nav fnav pnav borderPrimary str400 w150" onclick="approveDocument('<%= doc._id %>')">
-                                                        Approve
-                                                    </a>
-                                            </div>
+                                    ">
+                                        <div class="height0 alignStart col gap5">
+                                            <% if (doc.status === 'Approved') { %>
+                                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= doc.status %></height0>
                                             <% } %>
+                                            <% if (doc.status === 'Declined') { %>
+                                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= doc.status %></height0>
+                                            <% } %>
+                                            <% if (doc.status === 'Pending') { %>
+                                            <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><i class="fas fa-hourglass white inline marginRight5"></i><%= doc.status %></height0>
+                                            <% } %>
+                                            <p class="size16 str400"><%= doc.type %></p>
+                                        </div>  
+                                        <div class="height0 alignStart col gap5">
+                                                <p class="size14 str400"><%= doc.purpose %> Purpose</p>
+                                                <p class="size12 str400"><%= doc.qty == 1 ? doc.qty + " Copy" : doc.qty + " Copies" %></p>
+                                        </div>     
+                                        <div class="height0 justifyEnd gap5 paddingInline10">                                         
+                                        <% if (doc.status === 'Pending' && request.status !== 'Cancelled') { %>
+                                            <a href="javascript:void(0)" onclick="showNoCard('<%= doc._id %>')" class="nav dnav">Decline</a>                          
+                                            <a href="javascript:void(0)" class="nav pnav borderPrimary str400" onclick="approveDocument('<%= doc._id %>')">Approve</a>
+                                        <% } else { %>
+                                            <p class="size12 str400 gray">Approval Done</p>
                                             <% 
                                             const updatedAt = new Date(request.updatedAt);
                                             const elapsed = Date.now() - updatedAt.getTime();
                                             %>
-
                                             <% if ((doc.status === 'Approved' || doc.status === 'Declined') && elapsed < 30000) { %>
-                                            <div
-                                                class="height0 justifyEnd gap10 padding5 revert-btn hidden"
-                                                data-updated-at="<%= updatedAt.toISOString() %>">
+                                            <div class="height0 justifyEnd gap10 padding5 revert-btn" data-updated-at="<%= updatedAt.toISOString() %>">
                                                 <a href="javascript:void(0)" class="nav fnav borderPrimary str500 width0"
                                                 onclick="restoreDocument('<%= doc._id %>')">
                                                 <i class="fas fa-arrows-rotate"></i> Revert Action
                                                 </a>
                                             </div>
                                             <% } %>
+                                        <% } %>
                                         </div>
+                                    </div>
                                     <% }); %>
                                  <% } else { %>
                                     Missing Document in request
                                 <% } %>
+                        </div>
+                            <br>
+                            <div class="height0 gap10 index50 padding15 borderRadius15 justifyBetween bgSoft">
+                                <p class="size14 str400">Next Action <i class="fas fa-arrow-right inline"></i></p>
+                                <div class="height0 width0 gap10">
+                                    <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing' ) { %>
+                                    <a href="#" class="nav" onclick="printDocs()">
+                                        <i class="fas fa-print"></i>
+                                        Print Documents
+                                    </a>
+                                    <% } %>
+                                    <% if ( request.status === 'For Pickup' || request.status === 'Processed') { %>
+                                        <a href="#" class="nav" onclick="showNoCard2('<%= request._id %>')">
+                                        <i class="fas fa-flag"></i> Mark as Claimed
+                                        </a>
+                                    <% } %>
+                                </div>
                             </div>
+
+                            <div class="height0 gap10 justifyBetween">
                             </div>
+                    </div>
             </div>
         </div>
 

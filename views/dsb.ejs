@@ -827,11 +827,19 @@
                     <div class="height0 bottom15 left15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14">
                         Average Family Size: <%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %>
                     </div>
+
                 <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
                 <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
-                <div class="absolute translateY left0 width50 padding20 borderRadius15 bgTint8 col justifyStart alignStart">
-                    <p class="size36 str400"><%= indigentCount %> Total Indigent Families</p>
-                    <p class="size16 str400 green"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
+
+                <div class="absolute translateY left0 width40 padding20 borderRadius15 bgTint8 col justifyStart alignStart">
+                    <p class="size34 str400"><%= indigentCount %> Indigent Families</p>
+                    <p class="size16 str400 green hidden"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
+                    <div class="height0 gap10 width0 justifyStart">
+                        <span class="padding5 borderRadius5 bgTint7 str500 size14 colorPrimary"><%= indigentPercentage %>%</span>
+                        <p class="size16 str400">
+                            of <%= totalFamilies %> Families
+                        </p>
+                    </div>
                     <div class="height0 bottom15 left15 width0 absolute gap10">
                         <a href="/export-indigent" class="nav">
                             <i class="fa-solid fa-file-excel"></i>
@@ -842,7 +850,7 @@
                         </a>
                     </div>
                 </div>
-                <img src="/images/family.png" alt="" class="absolute h130" style="bottom: 5px; left: 43%; transform: scaleX(1);">
+                <img src="/images/family.png" alt="" class="absolute h130" style="bottom: 5px; left: 33%; transform: scaleX(1);">
                 <div class="hidden height0 bottom5 left15 width0 absolute col alignStart bgTint8 colorPrimary padding5 borderRadius5">
                     Barangay Clearance is the most requested document</p>
                 </div>
