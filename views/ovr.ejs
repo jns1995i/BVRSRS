@@ -222,7 +222,12 @@
 
   <br><br><hr><br><br>
   <div class="height0 justifyEnd paddingInline20">
-    <div class="selectBar filter index50 widthMax0 width0 borderNone" style="max-width: none;">
+  </div>
+  <br>
+
+  <div class="height0 gap10 alignStart wrap relative">  
+
+    <div class="selectBar filter index50 widthMax0 width0 borderNone absolute right10 top10" style="max-width: none;">
       <i class="fas fa-filter w15"></i>
       <select>
         <option value="all">Show All</option>
@@ -236,10 +241,6 @@
         <option value="ageDistributionChart">Requests by Age Distribution</option>
       </select>
     </div> 
-  </div>
-  <br>
-
-  <div class="height0 gap10 alignStart wrap relative">  
 
     <div class="height0 col width30 padding5 h320 bgWhite borderRadius10">
       <p class="size24 str500">Top Household</p>
@@ -541,7 +542,7 @@ const labels = trendData.map(x => {
   });
 
   // --- LINE (keep as is) ---
-  const peakLabels = <%- JSON.stringify(peakHours.map(x => x._id)) %>;
+const peakLabels = <%- JSON.stringify(peakHours.map(x => x._id)) %>;
 const peakCounts = toCounts(<%- JSON.stringify(peakHours) %>);
 const peakMax = peakCounts.length ? Math.max(...peakCounts) : 1;
 

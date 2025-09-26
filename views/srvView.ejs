@@ -3,6 +3,8 @@
         <style>
             .mainf {
                 position: relative;
+                background-color:  rgb(237, 237, 237);
+                border-radius: 15px;
             }
             .resetPassCard, .newAccCard {
                 position: absolute;
@@ -283,25 +285,28 @@
         </style>
     </head>
         <div class="hidden successCard padding10 fixed height0 borderRadius10 width0 darkShadow col" id="successCard" style="bottom: 30px; right: 30px; z-index: 100;">
-                <p class="size14 str400"> <i class="fas fa-thumbs-up inline green"  style="transform: rotate(-8deg);"></i> The document has been approved successfully!</p>
+                <p class="size14 str400"> <i class="fas fa-thumbs-up inline green"  style="transform: rotate(-8deg);"></i> Processing approval for the document request…</p>
         </div>
         <div class="hidden decCard padding10 fixed height0 borderRadius10 width0 darkShadow col black" id="decCard" style="bottom: 30px; right: 30px; z-index: 100;">
-                <p class="size14 str400"> <i class="fas fa-thumbs-up inline black"  style="transform: rotate(-8deg);"></i> The document has been declined successfully!</p>
+                <p class="size14 str400"> <i class="fas fa-thumbs-up inline black"  style="transform: rotate(-8deg);"></i> Declining the requested document .. </p>
         </div>
         
         <div class="hidden claimedCard padding10 absolute height0 borderRadius10 width0 darkShadow col" id="claimedCard" style="bottom: 30px; left: 30px; z-index: 100;">
                 <p class="size14 str400"> <i class="fas fa-thumbs-up inline green"  style="transform: rotate(-8deg);"></i> The request has been marked claimed successfully!</p>
         </div>
     
-                <div class="absolute height0 width33 padding20 borderRadius10 bgWhite darkShadow col gap10" style="z-index: 10 !important; left: 12px; top: 10px;">
-                    <div class="height0 justifyStart">                    
-                        <a href="/srv" class="nav" onclick="">
-                            <i class="fas fa-chevron-left"></i>
-                            Previous
-                        </a>
+                <div class="height0 justifyStart absolute width33" style="z-index: 15 !important; left: 12px; top: 15px;">                    
+                    <a href="/srv" class="nav" onclick="">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </a>
+                </div>
+                <div class="absolute height0 width33 padding20 borderRadius10 bgWhite darkShadow col gap10" style="z-index: 10 !important; left: 12px; top: 65px;">
+                    <div class="height0 justifyStart">
+                        <p class="size20 str500">Requested By</p>
                     </div>
                     
-                    <div class="h120 witch abstractBG padding20 borderRadius10 col alignStart justifyBetween relative">
+                    <div class="height0 witch abstractBG padding20 borderRadius10 col alignStart justifyBetween relative hidden">
                         <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-receipt"></i></a>
                         <p class="size14 white str400">
                             <%= request.createdAt 
@@ -322,7 +327,6 @@
 
 
                     <div class="height0 justifyStart alignStart col padding5 relative">
-                        <a href="" class="nav disabled absolute right0 top10 borderRadius10">Status: <%= request.status %></a>
                         <img src="<%= request.resident.photo ? request.resident.photo : '/images/profile.jpg' %>" class="borderRadius10 h100 w100 borderPrimary marginBottom5" onerror="this.onerror=null; this.src='/images/profile.jpg';">
                         <p class="size18 str600"><%= request.resident.firstName %> <%= request.resident.middleName %> <%= request.resident.lastName %> <%= request.resident.extName %></p>
                         <p class="size16 str400"><%= request.resident.household ? request.resident.household.houseNo : "N/A" %> <%= request.resident.household ? request.resident.household.purok : "N/A" %> Valdefuente</p>
@@ -404,25 +408,8 @@
                             </script>
                     </div>
 
-                    <div class="height0 alignStart padding5 col">
-                        <p class="size16 str500">
-                            <%= request.successAt 
-                                ? new Date(request.successAt).toLocaleString("en-US", { 
-                                    year: "numeric", 
-                                    month: "short",  
-                                    day: "2-digit", 
-                                    hour: "2-digit", 
-                                    minute: "2-digit", 
-                                    hour12: true 
-                                }).replace(/,\s(\d{4}),/, ', $1') 
-                                : "" 
-                            %>
-                        </p>
-                    </div>
-
-
                 </div>
-    <div class="blockX overflow-y1 relative">
+    <div class="blockX overflow-y1 relative borderRadius10">
 
         <div id="caseCard7" class="hidden height100 absolute top0 left0 index50 overflow-y1 alignStart padding30">
             <div class="width60 darkShadow height0 heightMin100 bgWhite padding20 borderRadius15 relative col justifyStart">
@@ -501,7 +488,7 @@
             id="noCard2">
         <form class="flex height0 bgWhite padding40 borderRadius10 width40 darkShadow col" 
                 onsubmit="return false;">
-            <p class="size30 str500">Are you sure this request has been released?</p>
+            <p class="size30 str500 textCenter">Are you sure this request has been released?</p>
             <br>
             <div class="height0 padding20 borderRadius10 borderPrimary">
             Note: This action can't be undone!
@@ -524,14 +511,20 @@
         
             
 
-            <div class="card col height0 shadowNone" style="padding: 5px 5px 5px 35%;">
+            <div class="card col height0 shadowNone transparent" style="padding: 5px 5px 5px 35%;">
 
 
-                    <div class="height0 padding15 col borderRadius10 darkShadow">
+                    <div class="height0 padding20 col borderRadius10 darkShadow bgWhite">
                     
-                        <div class="h120 abstractBG padding20 borderRadius10 col alignStart justifyBetween relative">
-                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas fa-receipt"></i></a>
-                            <p class="size14 white str400">
+                        <div class="height0 abstractBG padding20 borderRadius10 col alignStart justifyBetween relative"
+                        <% if (request.status === 'Cancelled') { %>
+                            style="filter: grayscale(0.7);"
+                        <% } else { %>
+                        <% } %>
+                        >
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.08; transform: scale(3.5);"><i class="fas fa-receipt"></i></a>
+                            <p class="size26 str400 white">TR# <%= request.tr %></p>
+                            <p class="size14 white str400 width0">
                                 <%= request.createdAt 
                                     ? new Date(request.createdAt).toLocaleString("en-US", { 
                                         year: "numeric", 
@@ -544,10 +537,10 @@
                                     : "Unreleased" 
                                 %>
                             </p>
-                            <p class="size26 str400 white">TR# <%= request.tr %></p>
+                            <a href="" class="nav disabled borderRadius10 transparent white absolute right15 top15">Status: <%= request.status %></a>
                         </div>
-                        <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing' ) { %>
-                            <div class="height0 gap10 paddingBlock20">
+                        <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing'  && request.status !== 'Cancelled' ) { %>
+                            <div class="height0 gap10 paddingBlock10">
                                 <p class="size14 str400 marginLeft10">Would you like to view the generated documents?</p>
                                 <a href="javascript:void(0)" class="nav" onclick="viewDocs()">
                                     View Here
@@ -559,7 +552,7 @@
                         <div class="height0 gap5 col padding5">
                                 <% if (request.documents.length > 0) { %>
                                     <% request.documents.forEach(doc => { %>
-                                    <div class="h80 padding15 marginBottom5 relative borderRadius10
+                                    <div class="height0 padding15 marginBottom5 relative borderRadius10
                                             <% if ( doc.status === 'Approved') { %>
                                             bgWhite borderGray
                                             <% } else if  ( doc.status === 'Declined') { %>
@@ -568,23 +561,31 @@
                                             bgWhite softShadow
                                             <% } %>
                                     ">
-                                        <div class="height0 alignStart col gap5">
-                                            <% if (doc.status === 'Approved') { %>
-                                            <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= doc.status %></height0>
-                                            <% } %>
-                                            <% if (doc.status === 'Declined') { %>
-                                            <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= doc.status %></height0>
-                                            <% } %>
-                                            <% if (doc.status === 'Pending') { %>
-                                            <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><i class="fas fa-hourglass white inline marginRight5"></i><%= doc.status %></height0>
-                                            <% } %>
-                                            <p class="size16 str400"><%= doc.type %></p>
+                                        <div class="height0 alignStart col gap5 width25">
+                                            <p class="size12 str500"><%= doc.type %></p>
                                         </div>  
-                                        <div class="height0 alignStart col gap5">
-                                                <p class="size14 str400"><%= doc.purpose %> Purpose</p>
+                                        <div class="height0 alignStart col gap5 width25">
+                                                <p class="size12 str400"><%= doc.purpose %></p>
+                                        </div>  
+                                        <div class="height0 alignStart col gap5 width15">
                                                 <p class="size12 str400"><%= doc.qty == 1 ? doc.qty + " Copy" : doc.qty + " Copies" %></p>
-                                        </div>     
-                                        <div class="height0 justifyEnd gap5 paddingInline10">                                         
+                                        </div>  
+                                        <div class="height0 alignStart col gap5 width15">
+                                            <% if (request.status === 'Cancelled') { %>
+                                                <height0 class="size12 upperCase str500 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i>Cancelled</height0>
+                                            <% } else  { %>
+                                                <% if (doc.status === 'Approved') { %>
+                                                <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= doc.status %></height0>
+                                                <% } %>
+                                                <% if (doc.status === 'Declined') { %>
+                                                <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= doc.status %></height0>
+                                                <% } %>
+                                                <% if (doc.status === 'Pending') { %>
+                                                <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><i class="fas fa-hourglass white inline marginRight5"></i><%= doc.status %></height0>
+                                                <% } %>
+                                            <% } %>
+                                        </div>    
+                                        <div class="height0 justifyEnd gap5 paddingInline10 width20">                                         
                                         <% if (doc.status === 'Pending' && request.status !== 'Cancelled') { %>
                                             <a href="javascript:void(0)" onclick="showNoCard('<%= doc._id %>')" class="nav dnav">Decline</a>                          
                                             <a href="javascript:void(0)" class="nav pnav borderPrimary str400" onclick="approveDocument('<%= doc._id %>')">Approve</a>
@@ -595,7 +596,7 @@
                                             const elapsed = Date.now() - updatedAt.getTime();
                                             %>
                                             <% if ((doc.status === 'Approved' || doc.status === 'Declined') && elapsed < 30000) { %>
-                                            <div class="height0 justifyEnd gap10 padding5 revert-btn" data-updated-at="<%= updatedAt.toISOString() %>">
+                                            <div class="height0 justifyEnd gap10 padding5 revert-btn hidden" data-updated-at="<%= updatedAt.toISOString() %>">
                                                 <a href="javascript:void(0)" class="nav fnav borderPrimary str500 width0"
                                                 onclick="restoreDocument('<%= doc._id %>')">
                                                 <i class="fas fa-arrows-rotate"></i> Revert Action
@@ -611,15 +612,31 @@
                                 <% } %>
                         </div>
                             <br>
+                            <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing'  && request.status !== 'Cancelled' ) { %>
                             <div class="height0 gap10 index50 padding15 borderRadius15 justifyBetween bgSoft">
-                                <p class="size14 str400">Next Action <i class="fas fa-arrow-right inline"></i></p>
+                                <% if ( request.status === 'For Pickup' || request.status === 'Processed') { %>
+                                    <p class="size14 str400">Next Action <i class="fas fa-arrow-right inline"></i></p>
+                                <% } else { %>
+                                    <p class="size14 str500">
+                                        Claimed at
+                                        <%= request.successAt 
+                                            ? new Date(request.successAt).toLocaleString("en-US", { 
+                                                year: "numeric", 
+                                                month: "short",  
+                                                day: "2-digit", 
+                                                hour: "2-digit", 
+                                                minute: "2-digit", 
+                                                hour12: true 
+                                            }).replace(/,\s(\d{4}),/, ', $1') 
+                                            : "" 
+                                        %>
+                                    </p>
+                                <% } %>
                                 <div class="height0 width0 gap10">
-                                    <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing' ) { %>
                                     <a href="#" class="nav" onclick="printDocs()">
                                         <i class="fas fa-print"></i>
-                                        Print Documents
+                                        Print Document
                                     </a>
-                                    <% } %>
                                     <% if ( request.status === 'For Pickup' || request.status === 'Processed') { %>
                                         <a href="#" class="nav" onclick="showNoCard2('<%= request._id %>')">
                                         <i class="fas fa-flag"></i> Mark as Claimed
@@ -627,15 +644,14 @@
                                     <% } %>
                                 </div>
                             </div>
+                            <% } %>
 
-                            <div class="height0 gap10 justifyBetween">
-                            </div>
                     </div>
             </div>
         </div>
 
         <div class="height0 col relative hidden vdoc bgSoft borderRadius10" id="vdoc" style="padding-left: 35%;">
-            <a href="" class="nav fixed top40 index50 marginRight35" id="xBtn" style="left: 40%;"><i class="fas fa-times"></i>Close View</a>
+            <a href="javascript:void(0)" class="nav pnav fixed top30 index50 marginRight35" id="xBtn" style="right: 20px;"><i class="fas fa-times"></i>Close View</a>
             <% 
             function calculateAge(bDay, bMonth, bYear) {
                 const birthDate = new Date(bYear, bMonth - 1, bDay);

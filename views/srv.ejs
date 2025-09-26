@@ -87,8 +87,9 @@
 <% if (requests.length > 0) { %>
     <% categorizedRequests.forEach(category => { %>
         <% if (category.data.length > 0) { %>
-            <div class="height0 padding0 paddingInline25 marginBottom5 titleCard justifyStart">
-                <p class="size16 str500 gray width65 textLeft"><%= category.title %></p>
+            <div class="height0 padding0 marginBlock5 titleCard col alignStart justifyStart">
+                <p class="size16 str500 gray textLeft"><%= category.title %></p>
+                <hr>
             </div>
             <% category.data.forEach(request => { %>
                 <div class="height0 padding5 srvCard justifyStart" id="srvCard">
@@ -194,6 +195,7 @@
                     </div>
                 </div>
             <% }) %>
+            <br>
         <% } %>
     <% }) %>
 <% } else { %>
