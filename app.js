@@ -118,7 +118,7 @@ const isLogin = async (req, res, next) => {
         }
 
         // ✅ 4. Block archived/suspended users
-        if (user.archive == 1 || user.suspend == 1) { // == handles both string/number
+        if (user.archive === 1 || user.archive === "1" || user.suspend === 1 || user.suspend === "1") { // == handles both string/number
             console.log("Blocked user tried to access:", user.username);
             req.session.destroy(() => {
                 return res.render("index", { error: "Your account is suspended!" });
@@ -1996,6 +1996,7 @@ app.post("/upload-photo/:id", upload.single("photo"), async (req, res) => {
         res.status(500).send("Error uploading photo.");
     }
 });
+
 app.post("/upload-my-photo", isLogin, express.json({ limit: "10mb" }), async (req, res) => {
     try {
         const { image } = req.body;

@@ -138,11 +138,11 @@ table td {
 
             <div class="height0 justifyStart hidden EmerText gap10">
                 <a href="/hom" class="nav cnav"><i class="fas fa-chevron-left"></i></a>
-                <p class="size28 str500">Emergency Hotlines</p>
+                <p class="size28 str500">Hotlines</p>
             </div>
             
 
-            <div class="height0 col alignStart gap10 absolute right20 top20 width20 borderRadius10" id="perCard">
+            <div class="height0 col alignStart gap10 absolute right20 top20 width20 borderRadius10 responsive" id="">
                 <% hotlineData.forEach(function(hotline) { %>
                     <% if (["City Health Office", "PNP Cabanatuan", "BFP Cabanatuan", "CDRRMO"].includes(hotline.office)) { %>
                         <div class="card keyPlain white 
@@ -173,8 +173,72 @@ table td {
                     <% } %>
                 <% }); %>
             </div>
+            
+            <div class="height0 alignStart gap10 borderRadius10 EmerText hidden" id="">
+                <% hotlineData.forEach(function(hotline) { %>
+                    <% if (["City Health Office", "PNP Cabanatuan"].includes(hotline.office)) { %>
+                        <div class="card keyPlain white 
+                            <% if (hotline.office === 'City Health Office') { %>
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                witch
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                witch
+                            <% } %>
+                             abstractBG col" style="width: 100% !important; align-items: start; justify-content: space-between; max-width: 100%;">
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas 
+                            <% if (hotline.office === 'City Health Office') { %>
+                                fa-heartbeat
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                fa-shield-alt
+                            <% } else if (hotline.office === 'BFP Cabanatuan') { %>
+                                fa-fire-extinguisher
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                fa-cloud-showers-heavy
+                            <% } %>
+                            "></i></a>
+                            <p class="size20 str400 marginBottom10"><%= hotline.office %></p>
+                            <div class="height0 col alignStart">
+                                <p class="size14 str300"><%= hotline.phone1 %></p>
+                                <p class="size14 str300"><%= hotline.phone2 %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
+            
+            <div class="height0 alignStart gap10 borderRadius10 EmerText hidden" id="">
+                <% hotlineData.forEach(function(hotline) { %>
+                    <% if (["BFP Cabanatuan", "CDRRMO"].includes(hotline.office)) { %>
+                        <div class="card keyPlain white 
+                            <% if (hotline.office === 'City Health Office') { %>
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                witch
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                witch
+                            <% } %>
+                             abstractBG col" style="width: 100% !important; align-items: start; justify-content: space-between; max-width: 100%;">
+                            <a href="" class="nav cnav disabled marginBottom15 absolute right10 bottom0" style="opacity: 0.1; transform: scale(2.8);"><i class="fas 
+                            <% if (hotline.office === 'City Health Office') { %>
+                                fa-heartbeat
+                            <% } else if (hotline.office === 'PNP Cabanatuan') { %>
+                                fa-shield-alt
+                            <% } else if (hotline.office === 'BFP Cabanatuan') { %>
+                                fa-fire-extinguisher
+                            <% } else if (hotline.office === 'CDRRMO') { %>
+                                fa-cloud-showers-heavy
+                            <% } %>
+                            "></i></a>
+                            <p class="size20 str400 marginBottom10"><%= hotline.office %></p>
+                            <div class="height0 col alignStart">
+                                <p class="size14 str300"><%= hotline.phone1 %></p>
+                                <p class="size14 str300"><%= hotline.phone2 %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
 
-            <div class="bgWhite darkShadow borderRadius10 height0 padding20 size12 textCenter col absolute left20 top80 width20" id="sidePanel">
+            <div class="bgWhite darkShadow borderRadius10 height0 padding20 size12 textCenter col absolute left20 top80 width20 responsive" id="sidePanel">
                 
                 <p class="size20 str500">Hello <%= user.firstName %></p>
                 <p class="size14 str400">📞 Need Help? Reach out faster with our list of community essential and emergency hotlines.</p>
