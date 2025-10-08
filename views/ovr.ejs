@@ -124,28 +124,28 @@
 
   <div class="h160 padding10 bgWhite borderRadius15 col">
     <div class="h180 justifyStart alignStart paddingInline15 paddingBlock10 col relative">
-      <p class="size36 str400"><%= totalCount %> Total Request</p>
+      <p class="size30 str500"><%= totalCount %> Total Request</p>
       <p class="size16 str500 hidden"><%= (povertyCounts.find(x=>x._id==='Indigent')?.count)||0 %> requests from Indigent Residents</p>
       <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
       <a href="/srv" class="nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= statusCounts["Pending"] %></span></a>
-      <div class="absolute translateY right0 width30 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
+      <div class="absolute translateY right0 width32 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
           <p class="size14 str400">
             <% if (currentFilter === 'today') { %>
                 Awesome! Today Is
             <% } else if (currentFilter === 'specificDate' && specificDate) { %>
                 Awesome! Today Is
             <% } else { %>
-                Day of Week with Highest Request
+                Day of the Week with Highest Request
             <% } %>
           </p>
           <p class="size34 str500 upperCase colorPrimary"><%= maxDay %></p>
-          <div class="height0 bottom15 right15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14 str500">
+          <div class="height0 bottom15 right15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size20 str500">
             <%= maxHour %> is the Peak Hour</p>
           </div>
       </div>
-      <img src="/images/calendar.png" alt="" class="absolute bottom0 h150" style="right: 240px; transform: rotate(-10deg);">
-      <div class="height0 bottom5 left15 width0 absolute col alignStart bgTint8 colorPrimary padding5 borderRadius5 str500 size14">
-        <%= highest ? highest._id : "No Data" %> is the Most Requested document!</p>
+      <img src="/images/calendar.png" alt="" class="absolute bottom0 h150" style="right: 300px; transform: rotate(-10deg);">
+      <div class="height0 bottom5 left15 width0 absolute col alignStart bgTint8 padding5 borderRadius5 str500 size14">
+        <p class="size16 str500"><i class="fas fa-star yellow inline"></i> <%= highest ? `${highest._id} is the Most Requested document!` : "There is no in-demand document." %></p>
       </div>
     </div>
   </div>
@@ -215,7 +215,7 @@
       <% }) %>
     </div>   
     <div class="borderRadius10 bgWhite padding20 col justifyAround h320">
-      <p class="size16 str500 hidden"><i class="fas fa-hourglass inline w15"></i> Request per Status</p>
+      <p class="size20 str500 marginBottom5"><i class="fas fa-hourglass inline w15"></i> Request Status</p>
       <canvas id="reqStatusChart"></canvas>
     </div>
   </div>
@@ -298,7 +298,7 @@
 
     <div class="card padding30 shadowNone alignStart col gap15 h300 justifyStart width35  abstractBG witch">
           <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(4); bottom: -10px;"><i class="fas fa-file-alt"></i></a>
-      <p class="size24 str500">Average Qty per Document Type</p>
+      <p class="size20 str400">Average Qty per Document Type</p>
       <hr>
            <% docTypes.forEach((d, index) => { %>
           <div class="height0 justifyBetween size16 str500">
@@ -323,8 +323,10 @@
           </div>
         <% }) %>
     </div>
-    <div class="borderRadius10 abstractBG witch bgWhite padding20 h300 col  justifyAround alignStart paddingTop30 width25">
-        <p class="size16 str500"><i class="fas fa-hourglass inline w15"></i> By Gender</p>
+    <div class="borderRadius10 abstractBG witch bgWhite padding20 h300 col justifyStart paddingTop30 width25">
+        <p class="size20 str400">Request Per</p>
+        <p class="size20 str400"><i class="fas fa-venus-mars inline w20 h20 marginRight5"></i> Gender</p>
+        <br>
       <canvas id="genderBar"></canvas>
     </div>
   </div>

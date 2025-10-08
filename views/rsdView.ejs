@@ -545,6 +545,33 @@
                             </div>
                         </div>
                         
+
+                        <% if (calculateAge(birthday) >= 0) { %>
+                        <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
+
+                            <div class="height0 justifyBetween">
+                                <p class="size24 colorPrimary str500">Employment</p>
+                            </div><hr>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Employment Status</p>
+                                <p class="size14 str600"><%= resident.employmentStatus || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Work or Business</p>
+                                <p class="size14 str600"><%= resident.work || "-" %></p>
+                            </div>
+
+                            <div class="height0 justifyBetween">
+                                <p class="size14  str400">Monthly Gross Income</p>
+                                <% let income = Number(resident.monthlyIncome) || null; %>
+                                <p class="size14 str600"><%= income ? "₱ " + income.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %></p>
+                            </div>
+
+                        </div>
+                        <% } %>
+                        
                         
                                 <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
                                 <div class="head userH width0 index50 gap10">
@@ -580,32 +607,6 @@
                                 </div>
                                 <% } %>
 
-                        <% if (calculateAge(birthday) >= 0) { %>
-                        <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
-
-                            <div class="height0 justifyBetween">
-                                <p class="size24 colorPrimary str500">Employment</p>
-                            </div><hr>
-
-                            <div class="height0 justifyBetween">
-                                <p class="size14  str400">Employment Status</p>
-                                <p class="size14 str600"><%= resident.employmentStatus || "-" %></p>
-                            </div>
-
-                            <div class="height0 justifyBetween">
-                                <p class="size14  str400">Work or Business</p>
-                                <p class="size14 str600"><%= resident.work || "-" %></p>
-                            </div>
-
-                            <div class="height0 justifyBetween">
-                                <p class="size14  str400">Monthly Gross Income</p>
-                                <% let income = Number(resident.monthlyIncome) || null; %>
-                                <p class="size14 str600"><%= income ? "₱ " + income.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %></p>
-                            </div>
-
-                        </div>
-                        <% } %>
-
                         <% 
                             let filteredMembers = familyMembers
                                 .filter(member => member._id.toString() !== resident._id.toString()) // Exclude the resident
@@ -638,7 +639,7 @@
                 </div>
 
                 <div class="height0 padding25 bgSoft col borderRadius15 hidden marginTop30" id="famCard">
-                    <div class="height0 justifyBetween">
+                    <div class="height0 justifyBetween paddingInline5">
                         <div class="height0 col width0 alignStart">
                             <% if (familyData) { %>
                             <p class="size20 str500">
@@ -649,52 +650,71 @@
                             <% } %>
                         </div>
                         <% if (householdData) { %>
-                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav">View Household Details</a>
+                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav pnav"><i class="fas fa-house"></i> View Household Details</a>
                         <% } %>
                     </div>
                     <br>                   
                     <% filteredMembers.forEach(member => { %>
                         <div class="height0 padding10 borderRadius25 bgWhite gap20 justifyStart">
-                            <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h55 w55 borderRadius500 borderPrimary">
-                            <div class="height0 width25 col alignStart">
-                                <p class="size12 str400">
-                                    <% if (
-                                        (resident.rel === "Father" && member.rel === "Mother") || 
-                                        (resident.rel === "Mother" && member.rel === "Father")
-                                    ) { %>
-                                        Spouse
-                                    <% } else if (resident.rel === "Siblings") { %>
-                                        <% if (member.rel === "Siblings") { %>
-                                            <% if (member.gender === "Male") { %>
-                                                Brother
-                                            <% } else if (member.gender === "Female") { %>
-                                                Sister
+                            <div class="height0 width40 justifyStart gap15">
+                                <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h55 w55 borderRadius500 borderPrimary">
+                                <div class="height0 width0 col alignStart">
+                                    <p class="size12 str400">
+                                        <% if (
+                                            (resident.rel === "Father" && member.rel === "Mother") || 
+                                            (resident.rel === "Mother" && member.rel === "Father")
+                                        ) { %>
+                                            Spouse
+                                        <% } else if (resident.rel === "Siblings") { %>
+                                            <% if (member.rel === "Siblings") { %>
+                                                <% if (member.gender === "Male") { %>
+                                                    Brother
+                                                <% } else if (member.gender === "Female") { %>
+                                                    Sister
+                                                <% } else { %>
+                                                    Sibling
+                                                <% } %>
                                             <% } else { %>
-                                                Sibling
+                                                <%= member.rel %>
                                             <% } %>
                                         <% } else { %>
-                                            <%= member.rel %>
-                                        <% } %>
-                                    <% } else { %>
-                                        <% if (member.rel === "Siblings") { %>
-                                            <% if (member.gender === "Male") { %>
-                                                Son
-                                            <% } else if (member.gender === "Female") { %>
-                                                Daughter
+                                            <% if (member.rel === "Siblings") { %>
+                                                <% if (member.gender === "Male") { %>
+                                                    Son
+                                                <% } else if (member.gender === "Female") { %>
+                                                    Daughter
+                                                <% } else { %>
+                                                    Child
+                                                <% } %>
                                             <% } else { %>
-                                                Child
+                                                <%= member.rel %>
                                             <% } %>
-                                        <% } else { %>
-                                            <%= member.rel %>
                                         <% } %>
-                                    <% } %>
-                                    
-                                </p>
-                                <p class="size16 str500"><%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %></p>
+                                        
+                                    </p>
+                                    <p class="size16 str500"><%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %></p>
+                                </div>
                             </div>
                             <div class="height0 col width30 alignStart">
-                                <p class="size12 str400"><%= member.age ? member.age + "" : "--" %></p>
+                                <p class="size16 str500"><%= member.age ? member.age + "" : "--" %></p>
+                                <p class="size12 str400"><%
+                                    const months = [
+                                        "January", "February", "March", "April", "May", "June",
+                                        "July", "August", "September", "October", "November", "December"
+                                    ];
+                                    %>
+                                    <%= member.bMonth ? months[member.bMonth - 1] : "--" %>
+                                    <%= member.bDay ? member.bDay + "" : "--" %>, 
+                                    <%= member.bYear ? member.bYear + "" : "--" %>
+                                </p>
+                            </div>
+                            <div class="height0 col width20 alignStart">
+                                <p class="size16 str500"><%= member.phone ? member.phone + "" : "No Phone" %></p>
+                                <p class="size12 str400"><%= member.email ? member.email + "" : "No Email" %></p>
+                            </div>
+                            <div class="height0 col width20 alignEnd paddingRight10">
                                 <p class="size16 str500"><%= member.employmentStatus ? member.employmentStatus + "" : "--" %></p>
+                                <p class="size12 str400"><%= member.work ? member.work + "" : "--" %></p>
                             </div>
                         </div>
                         

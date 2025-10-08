@@ -436,7 +436,7 @@
                     <% } else if ( titlePage === "Maharlika Highway") { %>/rsdH
                     <% } %>" class="height0 width0 linkX green"><p class="size18 str400"><%= titlePage %> Records</p> &nbsp; <i class="fas fa-chevron-right inline size16"></i></a>
                 <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
-                <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
+                
                 <div class="absolute translateY right0 width30 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
                     <p class="size14 str400">
                             Welcome! Today Is
@@ -445,18 +445,15 @@
                     <div class="hidden height0 bottom15 right15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5">
                         Office Hours 8am to 6pm</p>
                     </div>
-                    <div class="selectBar absolute bottom15 right15 border0">
-                        <i class="fas fa-filter inline width10"></i>
-                        <select id="purokSelector" class="">
-                            <option value="" disabled selected>Filter by Purok</option>
-                            <option value="/dsb">All Purok</option>
-                            <option value="/dsbDike">Dike</option>
-                            <option value="/dsbShortcut">Shortcut</option>
-                            <option value="/dsbCantarilla">Cantarilla</option>
-                            <option value="/dsbHighway">Maharlika Highway</option>
-                            <option value="/dsbBagongDaan">Bagong Daan</option>
-                            <option value="/dsbPerigola">Perigola</option>
-                        </select>
+                    <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
+                    <div class="height0 absolute right10 bottom10 width0">
+                        <a href="/srv" class="nav relative">
+                            <i class="fas fa-bell"></i>Request Notification
+                            <p class="size14 str500 marginRight30"></p>
+                            <span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua">
+                                <%= pendingCount %>
+                            </span>
+                        </a>
                     </div>
                 </div>
                 <img id="weatherIcon" src="/images/sun2.png" alt="" class="absolute bottom0 h150" style="right: 240px; transform: rotate(-10deg);">
@@ -504,15 +501,21 @@
                 <div class="hidden height0 bottom5 left15 width0 absolute col alignStart bgTint8 colorPrimary padding5 borderRadius5">
                     Barangay Clearance is the most requested document</p>
                 </div>
-                <div class="height0 bottom5 left15 width0 absolute gap10">
+                <div class="height0 bottom5 left15 width60 absolute gap10 justifyStart">
                     <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
-                    <a href="/srv" class="nav relative">
-                        <i class="fas fa-bell"></i>Request Notification
-                        <p class="size14 str500 marginRight30"></p>
-                        <span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua">
-                            <%= pendingCount %>
-                        </span>
-                    </a>
+                    <div class="selectBar">
+                        <i class="fas fa-filter inline width10"></i>
+                        <select id="purokSelector" class="">
+                            <option value="" disabled selected>Filter by Purok</option>
+                            <option value="/dsb">All Purok</option>
+                            <option value="/dsbDike">Dike</option>
+                            <option value="/dsbShortcut">Shortcut</option>
+                            <option value="/dsbCantarilla">Cantarilla</option>
+                            <option value="/dsbHighway">Maharlika Highway</option>
+                            <option value="/dsbBagongDaan">Bagong Daan</option>
+                            <option value="/dsbPerigola">Perigola</option>
+                        </select>
+                    </div>
                     <a href="/abt" class="nav cnav hidden">
                         <i class="fas fa-cog"></i>
                     </a>
@@ -823,17 +826,28 @@
                     <p class="size14 str400">
                             Average Monthly Net Income per Family
                     </p>
-                    <p class="size34 str500 upperCase colorPrimary"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(aveIncome) %></p>
+                    <p class="size20 str500 upperCase colorPrimary"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(aveIncome) %></p>
                     <div class="height0 bottom15 left15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14">
                         Average Family Size: <%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %>
                     </div>
+                    <div class="height0 padding15 borderRadius15 darkShadow absolute bottom5 right5 width25">
+                        <div class="col">
+                            <p class="size30 str500"><%= nonIndigent %></p>
+                            <p class="size14 str400">Non-Indigent</p>
+                        </div>
+                        <div class="borderGray w1 h50"></div>
+                        <div class="col">
+                            <p class="size30 str500"><%= npoorCount %></p>
+                            <p class="size14 str400">Low Income</p>
+                        </div>
+                    </div>
+                    <p class="size16 str400 green absolute bottom20 right20 hidden"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
 
                 <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
                 <a href="/srv" class="hidden nav relative"><i class="fas fa-bell"></i>Pending Request<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= pendingCount %></span></a>
 
                 <div class="absolute translateY left0 width40 padding20 borderRadius15 bgTint8 col justifyStart alignStart">
-                    <p class="size34 str400"><%= indigentCount %> Indigent Families</p>
-                    <p class="size16 str400 green hidden"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>
+                    <p class="size34 str500"><%= indigentCount %> Indigent Families</p>
                     <div class="height0 gap10 width0 justifyStart">
                         <span class="padding5 borderRadius5 bgTint7 str500 size14 colorPrimary"><%= indigentPercentage %>%</span>
                         <p class="size16 str400">
