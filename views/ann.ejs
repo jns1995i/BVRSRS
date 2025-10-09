@@ -44,7 +44,7 @@
 </head>
 
   <% if (message) { %>
-<div id="messageCard" class="seen height0 width0 padding15 bgWhite absolute darkShadow left50 bottom50 borderRadius10 col">
+<div id="messageCard" class="<%= message ? 'seen' : 'unseen' %> height0 width0 padding15 bgWhite absolute darkShadow left50 bottom50 borderRadius10 col">
 
     <div
         class="h75 w78 relative borderRadius500 borderGray hidden">
