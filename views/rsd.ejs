@@ -595,21 +595,12 @@
                     <i class="fa-solid fa-download"></i>
                     Export Excel File
                 </a>
-                <a href="/newRsd" class="nav pnav borderNone paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>New Record</a>   
-                <a href="/nonRes" class="nav pnav borderNone paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>Add Non-Resident</a>             
+                |       
                 <a href="/arcRsd" class="nav borderNone paddingBlock12 borderRadius10">
                     <i class="fa-solid fa-archive"></i>
-                    Archive
+                    Archive Inhabitants
                 </a>
-
-            <form action="/generate-households" method="POST" class="hidden height0 width0 padding0 shadowNone paddingInline5">
-                <button type="submit" class="nav">Create Households</button>
-            </form>
-            <form action="/delete-archived-households" method="POST"  class="hidden height0 width0 padding0 shadowNone paddingInline5">
-                <button type="submit" class="nav dnav borderRadius10 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-trash"></i> Delete Dumps
-                </button>
-            </form>
+                <a href="/nonRes" class="nav paddingBlock12 borderRadius10"><i class="fas fa-plus"></i>Add Non-Resident</a>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 const purokSelector = document.getElementById("purokSelector");
@@ -628,6 +619,7 @@
         </div>
         <div class="h180 abstractBG borderRadius10 padding25 justifyStart col alignStart relative">
             <div class="height0 absolute left25 bottom25 justifyStart gap10 paddingInline5">
+                <a href="/newRsd" class="nav pnav paddingBlock12 borderRadius10" style="border: 0.5px solid white;"><i class="fas fa-plus"></i>New Household</a>
                 <div class="searchBar">
                     <input type="search" id="univ" placeholder="Search here ..">
                     <i class="fas fa-search"></i>
@@ -714,24 +706,28 @@ document.getElementById('closeBtn').addEventListener('click', function() {
                         
                         <% if (residents && residents.length > 0) { %>
                             <% residents.forEach((resident, index) => { %>
-                                  <%
-                                    // Flags
-                                    let flags = [];
-                                    if (resident.pregnant && resident.pregnant.toString() === "on") flags.push("Pregnant");
-                                    if (resident.pwd && resident.pwd.toString() === "on") flags.push("PWD");
-                                    if (resident.soloParent && resident.soloParent.toString() === "on") flags.push("Solo Parent");
+                                <%
+                                // Flags
+                                let flags = [];
+                                if (resident.pregnant && resident.pregnant.toString() === "on") flags.push("Pregnant");
+                                if (resident.pwd && resident.pwd.toString() === "on") flags.push("PWD");
+                                if (resident.soloParent && resident.soloParent.toString() === "on") flags.push("Solo Parent");
 
-                                    // Calculate age
-                                    function calculateAge(bMonth, bDay, bYear) {
+                                // Calculate age
+                                function calculateAge(bMonth, bDay, bYear) {
                                     if (!bMonth || !bDay || !bYear) return 0;
                                     const month = isNaN(bMonth) ? moment().month(bMonth).format("M") : parseInt(bMonth);
                                     const day = parseInt(bDay);
                                     const year = parseInt(bYear);
                                     return moment().diff(`${year}-${month}-${day}`, 'years');
-                                    }
+                                }
 
-                                    const age = calculateAge(resident.bMonth, resident.bDay, resident.bYear);
-                                    if (age >= 60) flags.push("Senior");
+                                const age = calculateAge(resident.bMonth, resident.bDay, resident.bYear);
+
+                                // Format age display
+                                const ageDisplay = `${age} Year${age === 1 ? '' : 's'} Old`;
+
+                                if (age >= 60) flags.push("Senior");
                                 %>
                                 <tr>
                                     <td class="textCenter"><%= index + 1 %></td>
@@ -746,7 +742,7 @@ document.getElementById('closeBtn').addEventListener('click', function() {
                                         </div>
                                     </td>
                                     <td><%= resident.houseNo %> <%= resident.purok %></td>
-                                    <td> <%= age %> Years Old</td>
+                                    <td><%= ageDisplay %></td>
                                     <td><%= resident.familyPoverty %></td>
                                     <td><%= resident.precinct %></td>
                                     <td>

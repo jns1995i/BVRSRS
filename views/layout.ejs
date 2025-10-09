@@ -52,7 +52,7 @@
         </div>
 
         <div class="menu relative">
-            <a href="/" class="nav width100 transparent white borderRadius10 absolute right0 bottom10 <%= activePage === 'abt' ? 'active' : '' %>" style="opacity: 0;">
+            <a href="/" class="nav width100 transparent white borderRadius10 absolute right0 bottom10 hidden <%= activePage === 'abt' ? 'active' : '' %>" style="opacity: 0;">
                 <i class="fas fa-share-from-square"></i> LOGOUT
             </a>
             <hr>
@@ -75,16 +75,17 @@
                 </div>
             </div>            
             <div class="height0 col menu gap0 padding0" style="padding-inline: 0.15rem;">
-                <a href="#" class="width95 nav mnav relative <%= (['rsd', 'fml', 'vtr', 'hsh', 'ind'].includes(activePage)) ? 'active' : '' %>" id="nav">
+                <a href="#" class="width95 nav mnav relative <%= (['rsd', 'fml', 'vtr', 'hsh', 'ind','prior'].includes(activePage)) ? 'active' : '' %>" id="nav">
                     <i class="fas fa-home"></i> Residents
                     <i class="fas fa-chevron-down absolute right5"></i>
                 </a>
-                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['rsd', 'hsh', 'fml', 'vtr', 'ind'].includes(activePage) ? '' : 'hidden' %> justifyStart padding15" id="subNav">
+                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['rsd', 'hsh', 'fml', 'vtr', 'ind','prior'].includes(activePage) ? '' : 'hidden' %> justifyStart padding15" id="subNav">
                     <a href="/hsh" class="nav2 mnav <%= activePage === 'hsh' ? 'active' : '' %>"><i class="fas fa-home-alt"></i> Households</a>
                     <a href="/fml" class="nav2 mnav <%= activePage === 'fml' ? 'active' : '' %>"><i class="fas fa-baby"></i> Families</a>
                     <a href="/rsd" class="nav2 mnav <%= activePage === 'rsd' ? 'active' : '' %>"><i class="fas fa-user"></i> Inhabitants</a>
                     <a href="/vtr" class="nav2 mnav <%= activePage === 'vtr' ? 'active' : '' %>"><i class="fas fa-stamp"></i> Voters List</a>
                     <a href="/ind" class="nav2 mnav <%= activePage === 'ind' ? 'active' : '' %>"><i class="fas fa-hands-holding"></i> Indigent</a>
+                    <a href="/prior" class="nav2 mnav <%= activePage === 'prior' ? 'active' : '' %>"><i class="fas fa-hand-holding-heart"></i> Priority List</a>
                 </div>                
             </div>
             <% } %>
@@ -93,11 +94,11 @@
                     <i class="fas fa-file"></i> Request
                 </a>           
             <div class="height0 col menu gap0 padding0" style="padding-inline: 0.15rem;">
-                <a href="#" class="width95 nav mnav relative <%= (['rsd', 'fml', 'vtr', 'hsh'].includes(activePage)) ? 'active' : '' %>" id="xtr">
+                <a href="#" class="width95 nav mnav relative <%= (['rsd', 'fml', 'vtr', 'hsh','prior'].includes(activePage)) ? 'active' : '' %>" id="xtr">
                     <i class="fas fa-home"></i> Residents
                     <i class="fas fa-chevron-down absolute right10"></i>
                 </a>
-                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['rsd', 'hsh', 'fml', 'vtr'].includes(activePage) ? '' : 'hidden' %> justifyStart padding15" id="xtrDiv">
+                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['rsd', 'hsh', 'fml', 'vtr','prior'].includes(activePage) ? '' : 'hidden' %> justifyStart padding15" id="xtrDiv">
                     <a href="/rsd" class="nav2 mnav <%= activePage === 'rsd' ? 'active' : '' %>"><i class="fas fa-user"></i> Inhabitants</a>
                     <a href="/hsh" class="nav2 mnav <%= activePage === 'hsh' ? 'active' : '' %>"><i class="fas fa-home-alt"></i> Households</a>
                     <a href="/fml" class="nav2 mnav <%= activePage === 'fml' ? 'active' : '' %>"><i class="fas fa-baby"></i> Families</a>

@@ -1244,7 +1244,7 @@ app.get("/prior", isLogin, async (req, res) => {
     res.render("prior", {
       layout: "layout",
       title: "Residents",
-      activePage: "rsd",
+      activePage: "prior",
       residents,
       totalHouseholds,
       totalFamilies,
@@ -2002,6 +2002,113 @@ app.get("/updateRsd/:id", isLogin, async (req, res) => {
     }
 });
 
+app.get("/changeH/:id", isLogin, async (req, res) => {
+  try {
+    if (!db) return res.status(500).send("Database not connected");
+
+    const residentId = req.params.id.trim();
+
+    if (!ObjectId.isValid(residentId)) {
+      return res.status(400).send("Invalid resident ID");
+    }
+
+    // Fetch the specific resident
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+
+    if (!resident) {
+      return res.status(404).send("Resident not found");
+    }
+
+    // Fetch all residents for the head selection
+    const heads = await db.collection("resident").find().toArray();
+
+    // ✅ Fetch all household records where archive is 0 or "0"
+    const households = await db.collection("household").find({
+      $or: [
+        { archive: 0 },
+        { archive: "0" }
+      ]
+    }).toArray();
+
+    res.render("changeH", {
+      resident,   // The resident being updated
+      heads,      // All residents for selecting headId
+      households, // All active (non-archived) households
+      layout: "layout",
+      title: "Update Resident",
+      activePage: "rsd",
+    });
+
+  } catch (error) {
+    console.error("Error fetching resident:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/changeF/:id", isLogin, async (req, res) => {
+  try {
+    if (!db) return res.status(500).send("Database not connected");
+
+    const residentId = req.params.id.trim();
+    if (!ObjectId.isValid(residentId)) {
+      return res.status(400).send("Invalid resident ID");
+    }
+
+    // Fetch the specific resident
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!resident) {
+      return res.status(404).send("Resident not found");
+    }
+
+    // ✅ Fetch all active (non-archived) families
+    const families = await db.collection("family").find({
+      $or: [{ archive: 0 }, { archive: "0" }]
+    }).toArray();
+
+    // ✅ For each family, find the resident who is the "Head"
+    const familyOptions = [];
+
+    for (const fam of families) {
+      const headResident = await db.collection("resident").findOne({
+        $and: [
+          { role: "Head" },
+          {
+            $or: [
+              { familyId: fam._id },
+              { familyId: fam._id.toString() }
+            ]
+          }
+        ]
+      });
+
+      if (headResident) {
+        const firstName = headResident.firstName || "";
+        const middleName = headResident.middleName ? ` ${headResident.middleName}` : "";
+        const lastName = headResident.lastName ? ` ${headResident.lastName}` : "";
+        const fullName = `${firstName}${middleName}${lastName}`.trim();
+
+        familyOptions.push({
+          familyId: fam._id.toString(),
+          headName: fullName || "Unknown Head"
+        });
+      }
+    }
+
+    res.render("changeF", {
+      resident,
+      familyOptions,
+      layout: "layout",
+      title: "Update Resident Family",
+      activePage: "rsd"
+    });
+
+  } catch (error) {
+    console.error("Error fetching resident:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
 app.post("/update-resident/:id", async (req, res) => {
     try {
         const residentId = req.params.id;
@@ -2051,6 +2158,225 @@ app.post("/update-resident/:id", async (req, res) => {
     }
 });
 
+app.post("/update-changeH/:id", async (req, res) => {
+  try {
+    const residentId = req.params.id;
+
+    if (!ObjectId.isValid(residentId)) {
+      return res.status(400).send("Invalid resident ID");
+    }
+
+    // Fetch existing resident data
+    const existingResident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!existingResident) {
+      return res.status(404).send("Resident not found");
+    }
+
+    console.log("Existing Resident Data:", existingResident);
+    console.log("New Form Data:", req.body);
+
+    // Prepare update fields by checking differences
+    const updateFields = {};
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] && req.body[key] !== existingResident[key]) {
+        updateFields[key] = req.body[key];
+      }
+    });
+
+    if (Object.keys(updateFields).length === 0) {
+      console.log("No changes were made.");
+      return res.status(400).send("No changes were made.");
+    }
+
+    // ✅ Get householdId from form or resident record, store as STRING
+    let householdId = req.body.householdId || existingResident.householdId || null;
+    if (householdId) householdId = householdId.toString();
+
+    // ✅ Fetch all residents under the same household (for family computation)
+    const familyResidents = await db.collection("resident").find({ householdId: householdId }).toArray();
+
+    // ✅ Compute total family income
+    let totalIncome = Number(existingResident.monthlyIncome) || 0;
+    let familySize = 1;
+
+    // ✅ Poverty Status Logic
+    let povertyStatus = "Non-Indigent";
+    if (familySize >= 1 && familySize <= 2) {
+      if (totalIncome < 7500) povertyStatus = "Indigent";
+      else if (totalIncome <= 10000) povertyStatus = "Low Income";
+    } else if (familySize >= 3 && familySize <= 4) {
+      if (totalIncome < 10000) povertyStatus = "Indigent";
+      else if (totalIncome <= 13000) povertyStatus = "Low Income";
+    } else if (familySize >= 5 && familySize <= 6) {
+      if (totalIncome < 12500) povertyStatus = "Indigent";
+      else if (totalIncome <= 15000) povertyStatus = "Low Income";
+    } else if (familySize >= 7 && familySize <= 8) {
+      if (totalIncome < 15000) povertyStatus = "Indigent";
+      else if (totalIncome <= 18000) povertyStatus = "Low Income";
+    } else if (familySize >= 9) {
+      if (totalIncome < 17000) povertyStatus = "Indigent";
+      else if (totalIncome <= 20000) povertyStatus = "Low Income";
+    }
+
+    // ✅ Create a new family record
+    const newFamily = {
+      householdId: householdId,
+      familyIncome: totalIncome,
+      poverty: povertyStatus,
+      archive: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const insertResult = await db.collection("family").insertOne(newFamily);
+    const newFamilyId = insertResult.insertedId;
+
+    console.log("✅ New family created with householdId:", householdId);
+    console.log("🆔 New familyId:", newFamilyId);
+
+    // ✅ Update resident with new familyId
+    updateFields.familyId = newFamilyId;
+
+    await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: updateFields }
+    );
+
+    console.log("Resident updated successfully with new familyId.");
+    res.redirect(`/rsdView/${residentId}`);
+
+  } catch (error) {
+    console.error("Error updating resident:", error);
+    res.status(500).send("Error updating resident");
+  }
+});
+
+app.post("/update-changeF/:id", async (req, res) => {
+  try {
+    const residentId = req.params.id;
+
+    if (!ObjectId.isValid(residentId)) {
+      return res.status(400).send("Invalid resident ID");
+    }
+
+    // ✅ Fetch existing resident
+    const existingResident = await db.collection("resident").findOne({
+      _id: new ObjectId(residentId),
+    });
+
+    if (!existingResident) {
+      return res.status(404).send("Resident not found");
+    }
+
+    console.log("Existing Resident Data:", existingResident);
+    console.log("New Form Data:", req.body);
+
+    const updateFields = {};
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] && req.body[key] !== existingResident[key]) {
+        updateFields[key] = req.body[key];
+      }
+    });
+
+    if (Object.keys(updateFields).length === 0) {
+      console.log("No changes were made.");
+      return res.redirect(`/rsdView/${residentId}`);
+    }
+
+    // ✅ Convert and handle familyId properly
+    if (updateFields.familyId) {
+      const familyId = updateFields.familyId.trim();
+      const familyObjId = ObjectId.isValid(familyId)
+        ? new ObjectId(familyId)
+        : null;
+
+      if (!familyObjId) {
+        console.warn("Invalid familyId format:", familyId);
+      } else {
+        // Find family
+        const family = await db.collection("family").findOne({ _id: familyObjId });
+
+        if (family) {
+          console.log("Linked family found:", family._id.toString());
+
+          // ✅ Assign ObjectId references
+          updateFields.familyId = familyObjId;
+
+          if (family.householdId && ObjectId.isValid(family.householdId)) {
+            updateFields.householdId = new ObjectId(family.householdId);
+          } else {
+            updateFields.householdId = null;
+            console.warn("Family has invalid or missing householdId.");
+          }
+
+          // ✅ Update familyIncome and poverty status
+          // Get all members of the same family
+          const familyMembers = await db.collection("resident").find({
+            familyId: familyObjId,
+          }).toArray();
+
+          // Compute total income and size
+          const totalIncome =
+            familyMembers.reduce(
+              (sum, res) => sum + (Number(res.monthlyIncome) || 0),
+              0
+            ) + (Number(existingResident.monthlyIncome) || 0); // include current resident income if new
+
+          const familySize = familyMembers.length + 1; // include the reassigned resident
+
+          // Poverty status computation
+          let povertyStatus = "Non-Indigent";
+          if (familySize >= 1 && familySize <= 2) {
+            if (totalIncome < 7500) povertyStatus = "Indigent";
+            else if (totalIncome <= 10000) povertyStatus = "Low Income";
+          } else if (familySize >= 3 && familySize <= 4) {
+            if (totalIncome < 10000) povertyStatus = "Indigent";
+            else if (totalIncome <= 13000) povertyStatus = "Low Income";
+          } else if (familySize >= 5 && familySize <= 6) {
+            if (totalIncome < 12500) povertyStatus = "Indigent";
+            else if (totalIncome <= 15000) povertyStatus = "Low Income";
+          } else if (familySize >= 7 && familySize <= 8) {
+            if (totalIncome < 15000) povertyStatus = "Indigent";
+            else if (totalIncome <= 18000) povertyStatus = "Low Income";
+          } else if (familySize >= 9) {
+            if (totalIncome < 17000) povertyStatus = "Indigent";
+            else if (totalIncome <= 20000) povertyStatus = "Low Income";
+          }
+
+          // ✅ Update the family document
+          await db.collection("family").updateOne(
+            { _id: familyObjId },
+            {
+              $set: {
+                familyIncome: totalIncome,
+                poverty: povertyStatus,
+              },
+            }
+          );
+
+          console.log(
+            `Updated family (${family._id}) income=${totalIncome}, poverty=${povertyStatus}`
+          );
+        } else {
+          console.warn("Family not found for familyId:", familyId);
+        }
+      }
+    }
+
+    // ✅ Perform resident update
+    await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: updateFields }
+    );
+
+    console.log("Resident updated successfully with ObjectId references.");
+    res.redirect(`/rsdView/${residentId}`);
+
+  } catch (error) {
+    console.error("Error updating resident:", error);
+    res.status(500).send("Error updating resident");
+  }
+});
 
 app.post("/upload-photo/:id", upload.single("photo"), async (req, res) => {
     try {
@@ -10891,6 +11217,144 @@ app.get("/rsdView/:id", isLogin, async (req, res) => {
             age,            // ✅ Added Age
             birthday,        // ✅ Added Birthday
             back: "rsd"
+        });
+
+    } catch (err) {
+        console.error("❌ Error fetching resident details:", err);
+        res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/rsd";</script>');
+    }
+});
+
+app.get("/rsdViewO/:id", isLogin, async (req, res) => {
+    try {
+        const residentId = new ObjectId(req.params.id);
+        const resident = await db.collection("resident").findOne({ _id: residentId });
+
+        if (!resident) {
+            return res.status(404).send('<script>alert("Resident not found!"); window.location="/rsd";</script>');
+        }
+
+        const families = db.collection("family");
+        const households = db.collection("household");
+
+        let familyData = null;
+        if (resident.familyId) {
+            familyData = await families.findOne({ _id: new ObjectId(resident.familyId) });
+        }
+
+        // Fetch Household Details (entire document)
+        let householdData = null;
+        if (resident.householdId) {
+            householdData = await households.findOne({ _id: new ObjectId(resident.householdId) });
+        }
+
+        // Fetch Family Members
+        let familyMembers = [];
+        if (resident.familyId) {
+            familyMembers = await db.collection("resident").find({ familyId: resident.familyId }).toArray();
+        
+            // Calculate age for each family member
+            familyMembers = familyMembers.map(member => {
+                let age = "Age Unknown";
+                if (member.bYear && member.bMonth && member.bDay) {
+                    const birthDate = new Date(member.bYear, member.bMonth - 1, member.bDay);
+                    const today = new Date();
+                    
+                    let years = today.getFullYear() - birthDate.getFullYear();
+                    let months = today.getMonth() - birthDate.getMonth();
+                    let days = today.getDate() - birthDate.getDate();
+        
+                    if (days < 0) {
+                        months--; // Adjust if days are negative
+                        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Get last month's days
+                    }
+                    if (months < 0) {
+                        years--; // Adjust if months are negative
+                        months += 12;
+                    }
+        
+                    if (years < 1) {
+                        if (months === 0) {
+                            age = "Less than a month old";
+                        } else {
+                            age = `${months} Month${months > 1 ? "s" : ""} Old`;
+                        }
+                    } else {
+                        age = `${years} Year${years > 1 ? "s" : ""} Old`;
+                    }
+                }
+                return { ...member, age };
+            });
+        }
+        
+
+        // Calculate Age and Format Birthday
+        let age = "--";
+        let birthday = "--";
+        
+        if (resident.bYear && resident.bMonth && resident.bDay) {
+            const birthDate = new Date(resident.bYear, resident.bMonth - 1, resident.bDay);
+            const today = new Date();
+        
+            const diffInMilliseconds = today - birthDate;
+            const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+            const diffInMonths = Math.floor(diffInDays / 30.44); // Average days in a month
+            const diffInYears = Math.floor(diffInMonths / 12);
+        
+            if (diffInDays < 30) {
+                age = "Less than a Month";
+            } else if (diffInMonths < 12) {
+                age = `${diffInMonths} ${diffInMonths === 1 ? "month old" : "months old"}`;
+            } else {
+                age = `${diffInYears} ${diffInYears === 1 ? "year old" : "years old"}`;
+            }
+        
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            birthday = `${monthNames[resident.bMonth - 1]} ${resident.bDay}, ${resident.bYear}`;
+        }
+
+        familyMembers.sort((a, b) => {
+            const ageA = parseInt(a.age) || 0; // Convert "29 Years Old" to 29
+            const ageB = parseInt(b.age) || 0;
+            return ageB - ageA; // Descending order
+        });
+        
+
+        // Fetch Resident's Requests & Documents
+        const requests = await db.collection("request").find({ requestBy: residentId, archive: { $in: [0, "0"] } }).toArray();
+        const requestIds = requests.map(req => req._id);
+        const documents = requestIds.length ? await db.collection("document").find({ reqId: { $in: requestIds } }).toArray() : [];
+
+        // Fetch Complainee Records where resident is a complainee
+        const complaineeRecords = await db.collection("complainees").find({ residentId: residentId }).toArray();
+        const caseIds = complaineeRecords.map(c => new ObjectId(c.caseId));
+
+        // Fetch Cases related to the resident as a complainee
+        const cases = caseIds.length ? await db.collection("cases").find({ _id: { $in: caseIds } }).toArray() : [];
+
+        // Fetch Complainants from the matched cases
+        const complainants = caseIds.length ? await db.collection("complainants").find({ caseId: { $in: caseIds } }).toArray() : [];
+
+        // Fetch Schedules related to these cases
+        const schedules = caseIds.length ? await db.collection("schedule").find({ caseId: { $in: caseIds } }).toArray() : [];
+
+        res.render("rsdView", {
+            layout: "layout",
+            title: "Resident Details",
+            activePage: "rsd",
+            resident,
+            requests,
+            documents,
+            cases,
+            schedules,
+            complainants,
+            complainees: complaineeRecords,
+            familyData,  // ✅ Added Poverty Level
+            householdData,  // ✅ Now passing the entire household data
+            familyMembers,  // ✅ Passing all residents with the same familyId
+            age,            // ✅ Added Age
+            birthday,        // ✅ Added Birthday
+            back: "rsdView"
         });
 
     } catch (err) {

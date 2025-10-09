@@ -258,6 +258,10 @@
   #famBtn i.rotate {
     transform: rotate(180deg);
   }
+  #memberBtn:hover {
+    transform: scale(1.01);
+    color: green;
+  }
         </style>
     </head>
 
@@ -354,15 +358,74 @@
 
                 <div class="card col tray height0" style="padding: 10px; border-radius: 10px;">
                     <div class="height0 paddingTop15 relative gap15 alignStart justifyBetween paddingRight5"> 
+                        
+                        <div class="width0 height0 padding10 borderRadius15 col darkShadow bgWhite absolute alignStart hidden" id="optionCard" style="right: 46%; top: 15%; z-index: 100;">
+                            <a href="/updateRsd/<%= resident._id %>" class="nav border0 borderRadius0"><i class="fas fa-pen"></i>Edit Information</a>
+                            <hr>
+                            <% if (resident.archive === 0 || resident.archive === "0") { %>  
+                                <a href="javascript:void()" class="nav  border0 borderRadius0 width100 justifyStart" id="openResetCard">
+                                    <i class="fas fa-key"></i> Reset
+                                </a>
+                                <hr>
+                                <% if (resident.suspend === 1) { %>
+                                <a href="javascript:void(0)" class="nav  border0 borderRadius0 width100 justifyStart openSuspendCard2" data-resident-id="<%= resident._id.toString() %>">
+                                    <i class="fas fa-unlock"></i> Unsuspend
+                                </a>
+                                <hr>
+                                <% } else { %>
+                                <a href="javascript:void(0)" class="nav  border0 borderRadius0 width100 justifyStart openSuspendCard" data-resident-id="<%= resident._id.toString() %>">
+                                    <i class="fas fa-lock"></i> Suspend
+                                </a>
+                                <hr>
+                                <% } %>
+                                <a href="javascript:void(0)" class="nav  border0 borderRadius0 width100 justifyStart openArchiveCard" data-resident-id="<%= resident._id.toString() %>">
+                                    <i class="fa fa-trash"></i> Archive
+                                </a>
+                                <hr>
+                                <% if ( resident.role === 'Head') { %>
+                                <a href="/changeH/<%= resident._id %>" class="nav border0 borderRadius0"><i class="fas fa-user-friends"></i>Change Household</a>
+                                <hr>
+                                <% } else { %>
+                                <a href="/changeF/<%= resident._id %>" class="nav border0 borderRadius0"><i class="fas fa-user-friends"></i>Change Family</a>
+                                <hr>
+                                <% } %>
+                            <% } else { %>
+                            <a href="javascript:void(0)" class="nav  border0 borderRadius0 width100 justifyStart openArchiveCard2" data-resident-id="<%= resident._id.toString() %>">
+                                <i class="fas fa-arrows-rotate"></i> Restore
+                            </a>
+                            <hr>
+                            <% } %>
+                        </div>
 
                         <div class="height0 width55 absolute left0 top0 index50">
-                            <div class="section relative">
+                            <div class="section relative index50">
+                                <div class="height0 width0 absolute right25 top75 col alignEnd paddingInline5">
+                                    <a href="javascript:void(0)" class="height0 width0 size26 white" id="optionBtn" style="z-index: 201 !important;"><i class="fas fa-ellipsis"></i></a>
+                                </div>
                                 <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="User Photo" class="userPhoto">
                                 <a href="javascript:void()" class="nav cnav index10 colorPrimary" id="newBtn" style="position: absolute; right: 40%; bottom: 10px; transform: scale(0.9);">
                                     <i class="fas fa-pen"></i>
                                 </a>
                             </div> 
                         </div>
+                        <script>
+                        const optionBtn = document.getElementById('optionBtn');
+                        const optionIcon = optionBtn.querySelector('i');
+                        const optionCard = document.getElementById('optionCard');
+
+                        optionBtn.addEventListener('click', () => {
+                            // Toggle visibility
+                            optionCard.classList.toggle('hidden');
+                            
+                            // Toggle icon
+                            if (optionIcon.classList.contains('fa-ellipsis')) {
+                            optionIcon.classList.replace('fa-ellipsis', 'fa-chevron-up');
+                            } else {
+                            optionIcon.classList.replace('fa-chevron-up', 'fa-ellipsis');
+                            }
+                        });
+                        </script>
+        
 
                         <div class="height0 gap10 col width55">
                             <div class="height0 gap10 justifyBetween paddingInline5" style="z-index: 200;">
@@ -382,6 +445,11 @@
                                         <i class="fas fa-chevron-left"></i>
                                         Previous
                                     </a>
+                                    <% } else if ( back === "rsdView") { %>
+                                    <a href="javascript:history.back()" class="nav index10">
+                                        <i class="fas fa-chevron-left"></i>
+                                        Previous
+                                    </a>
                                     <% } else { %>
                                     <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav index10">
                                         <i class="fas fa-chevron-left"></i>
@@ -397,7 +465,6 @@
                             </div>
 
                             <div class="height0 col padding15 index0 borderRadius20 relative <% if (resident.suspend === 1 || resident.archive === 1 || resident.archive === "1") { %> grayscale abstractBG <% } else { %> witch abstractBG <% } %>"> 
-                                <a href="" class="nav cnav disabled marginBottom15 responsive absolute right20 bottom10 green" style="opacity: 0.1; transform: scale(3.5);"><i class="fas fa-user"></i></a>  
                                 <div class="head userH marginTop55">
                                     <div class="ctrl">
                                         <p class="size28 str400 white"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName %></p>
@@ -425,17 +492,12 @@
                                     <% } else { %>
                                     <% } %>
                                 </div>
-                                
-                            </div>  
-                            <br>       
+                                <a href="" class="nav cnav disabled marginBottom15 responsive absolute right20 bottom10 green" style="opacity: 0.1; transform: scale(3.5);"><i class="fas fa-user"></i></a>
+                            </div>      
                             <div class="height0 padding15 bgTint8 gap15 borderRadius15 alignStart" id="hshCard">
                                 <div class="height0 bgWhite borderRadius15 col padding25 justifyStart alignStart relative width60">
-                                    
-                                <% if (householdData) { %>
-                                <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav absolute right10 top10">View Details</a>
-                                <% } %>
                                     <p class="size24 colorPrimary str500">Household</p>
-                                    <hr><br>
+                                    <hr style="z-index: 0;"><br>
                                     <label for="" class="margin0 marginTop5">Household No. & Purok</label>
                                     <p class="size14 str500 marginBottom15"><%= householdData ? householdData.houseNo : "-" %> <%= householdData ? householdData.purok : '-' %></p>
                                     <label for="" class="margin0 marginTop5">House Type</label>
@@ -446,6 +508,10 @@
                                     <p class="size14 str500 marginBottom15"><%= householdData ? householdData.roofMaterial : '-'  %></p>
                                     <label for="" class="margin0 marginTop5">Flooring Material</label>
                                     <p class="size14 str500"><%= householdData ? householdData.flooringMaterial : '-'  %></p>
+                                <img src="/images/house.png" alt="" class="h100 w100 absolute right40 bottom40" style="transform: scale(3); opacity: 0.1; filter: grayscale(1);">
+                                <% if (householdData) { %>
+                                <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="hidden nav pnav absolute right15 bottom15">Household Details</a>
+                                <% } %>
                                 </div>
                                 <div class="height0 gap15 col width40">
                                     <div class="height0 bgWhite borderRadius15 col padding20 justifyStart alignStart relative gap5">
@@ -470,12 +536,12 @@
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
 
                     <div class="height0 width45 col gap15" style="padding: 5px 5px 10px 20px;">
                         
                         <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
-                                <a href="/updateRsd/<%= resident._id %>" class="nav absolute right10 top10"><i class="fas fa-pen"></i>Edit Information</a>
                             
                                 <% 
                                     // Parse birthday into a Date object
@@ -543,11 +609,11 @@
                                 <p class="size14  str400">Email</p>
                                 <p class="size14 str600"><%= resident.email || "-" %></p>
                             </div>
-                        </div>
+                            
+                            <br>
                         
 
                         <% if (calculateAge(birthday) >= 0) { %>
-                        <div class="col padding25 justifyStart darkShadow borderRadius15 gap5 relative">
 
                             <div class="height0 justifyBetween">
                                 <p class="size24 colorPrimary str500">Employment</p>
@@ -568,89 +634,52 @@
                                 <% let income = Number(resident.monthlyIncome) || null; %>
                                 <p class="size14 str600"><%= income ? "₱ " + income.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %></p>
                             </div>
+                        <% } %>
+
+                            <% if (calculateAge(birthday) <= 1.5) { %>
+                                <a href="javascript:void(0)" class="nav absolute right10 top10 pnav" id="immuBtn"><i class="fas fa-syringe"></i>View Child Immunization Schedule</a>
+                            <% } %>
+                            <% if ( resident.pregnant === 'on') { %>
+                                <a href="javascript:void(0)" class="nav  absolute right10 top10 pnav hidden" id="pregBtn"><i class="fas fa-syringe"></i>View Pregnant Vaccination Schedule</a>
+                            <% } %>
 
                         </div>
-                        <% } %>
-                        
-                        
-                                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
-                                <div class="head userH width0 index50 gap10">
-                                        <% if (resident.archive === 0 || resident.archive === "0") { %>  
-                                            <a href="javascript:void()" class="nav" id="openResetCard">
-                                                <i class="fas fa-key"></i> Reset
-                                            </a>
-                                            <% if (resident.suspend === 1) { %>
-                                            <a href="javascript:void(0)" class="nav openSuspendCard2" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fas fa-unlock"></i> Unsuspend
-                                            </a>
-                                            <% } else { %>
-                                            <a href="javascript:void(0)" class="nav openSuspendCard" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fas fa-lock"></i> Suspend
-                                            </a>
-                                            <% } %>
-                                            <a href="javascript:void(0)" class="nav openArchiveCard" data-resident-id="<%= resident._id.toString() %>">
-                                                <i class="fa fa-trash"></i> Archive
-                                            </a>
-                                        <% } else { %>
-                                        <a href="javascript:void(0)" class="nav openArchiveCard2" data-resident-id="<%= resident._id.toString() %>">
-                                            <i class="fas fa-arrows-rotate"></i> Restore
-                                        </a>
-                                        <% } %>
-                                        <% if (calculateAge(birthday) <= 1.5) { %>
-                                            <p class="">|</p>
-                                            <a href="javascript:void(0)" class="nav" id="immuBtn"><i class="fas fa-syringe"></i>Immunization</a>
-                                        <% } %>
-                                        <% if ( resident.pregnant === 'on') { %>
-                                            <p class="">|</p>
-                                            <a href="javascript:void(0)" class="nav" id="pregBtn"><i class="fas fa-syringe"></i>Vaccination</a>
-                                        <% } %>
-                                </div>
-                                <% } %>
-
-                        <% 
-                            let filteredMembers = familyMembers
-                                .filter(member => member._id.toString() !== resident._id.toString()) // Exclude the resident
-                                .sort((a, b) => b.age - a.age); // Sort by age, eldest first
-                        %>
-                        <% if (filteredMembers.length > 0) { %>
-                        <div class="height0 col paddingInline5 marginTop20">
-                                <div class="height0 justifyBetween">
-                                        <% if (familyData) { %>
-                                        <div class="height0 padding10 borderRadius10 borderPrimary width0"><p> Member of <%= familyData.poverty || "Unidentified" %> Family</p></div>
-                                        <% } %>
-                                        <a href="" class="nav" id="famBtn"><% filteredMembers.forEach(member => { %>
-                                            <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h20 w20 borderRadius500 borderPrimary"> &nbsp;
-                                        <% }) %> Family Details &nbsp; <i class="fas fa-chevron-down"></i></a>
-                                </div>
-                        </div>
-                        <% } else { %>
-                                <div class="height0 justifyBetween">
-                                        <% if (familyData) { %>
-                                        <div class="height0 padding10 borderRadius10 borderPrimary width0"><p> Member of <%= familyData.poverty || "Unidentified" %> Family</p></div>
-                                        <% } %>
-                                        <% if (householdData) { %>
-                                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav hidden">View Family</a>
-                                        <% } %>
-                                        <p class="size14 str500">No Other Family Members</p>
-                                </div>
-                        <% } %>
 
                     </div>
                 </div>
 
-                <div class="height0 padding25 bgSoft col borderRadius15 hidden marginTop30" id="famCard">
+                
+
+                <% 
+                    let filteredMembers = familyMembers
+                        .filter(member => member._id.toString() !== resident._id.toString()) // Exclude the resident
+                        .sort((a, b) => b.age - a.age); // Sort by age, eldest first
+                %>
+                <% if (filteredMembers.length > 0) { %>
+                <div class="height0 col paddingInline5 hidden">
+                        <div class="height0 justifyBetween">
+                                <% if (familyData) { %>
+                                <div class="height0 padding10 borderRadius10 borderPrimary width0"><p> Member of <%= familyData.poverty || "Unidentified" %> Family</p></div>
+                                <% } %>
+                                <a href="" class="nav" id="famBtn"><% filteredMembers.forEach(member => { %>
+                                    <img src="<%= member.photo || '/images/profile.jpg' %>" alt="User Photo" class="h20 w20 borderRadius500 borderPrimary"> &nbsp;
+                                <% }) %> Family Details &nbsp; <i class="fas fa-chevron-down"></i></a>
+                        </div>
+                </div>
+
+                <div class="height0 padding25 bgSoft col borderRadius15 marginTop30" id="">
                     <div class="height0 justifyBetween paddingInline5">
                         <div class="height0 col width0 alignStart">
                             <% if (familyData) { %>
                             <p class="size20 str500">
-                                <%= familyData.poverty || "Unidentified" %> Family
+                                Member of <%= familyData.poverty || "Unidentified" %> Family
                             </p>
                             <p class="size14 str400">Total of <%= familyData.familyIncome ? "₱ " + familyData.familyIncome.toLocaleString("en-PH", { minimumFractionDigits: 2 }) : "-" %> Family Monthly Gross Income</p>
                             
                             <% } %>
                         </div>
                         <% if (householdData) { %>
-                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav pnav"><i class="fas fa-house"></i> View Household Details</a>
+                        <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav pnav"><i class="fas fa-house"></i> View Family Details</a>
                         <% } %>
                     </div>
                     <br>                   
@@ -692,7 +721,11 @@
                                         <% } %>
                                         
                                     </p>
-                                    <p class="size16 str500"><%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %></p>
+                                    <p class="size16 str500">
+                                        <a href="/rsdViewO/<%= member._id %>" class="height0 width0" id="memberBtn">
+                                            <%= member.firstName %> <%= member.middleName %> <%= member.lastName %> <%= member.extName %> <i class="fas fa-chevron-right inline"></i>
+                                        </a>
+                                    </p>
                                 </div>
                             </div>
                             <div class="height0 col width30 alignStart">
@@ -723,6 +756,15 @@
                     <% }) %>
 
                 </div>
+        
+                <% } else { %>
+                        <div class="height0 justifyBetween padding10 gap10 width55">
+                                <p class="size14 str500">No Other Family Members</p>
+                                <% if (householdData) { %>
+                                <a href="/hshView/<%= householdData ? householdData._id : "-" %>" class="nav pnav"><i class="fas fa-house"></i> View Family Details</a>
+                                <% } %>
+                        </div>
+                <% } %>
 
                     <%
                     function calculateAge(birthday) {

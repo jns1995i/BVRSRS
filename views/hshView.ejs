@@ -68,7 +68,7 @@
                                             <div class="height0 col bgWhite borderRadius10 paddingInline5 paddingBlock15" style="width: 23%;">
                                                 <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h70 w70 borderRadius500 borderPrimary">
                                                 <a href="/rsdView2/<%= resident._id %>" class="nav padding5 border0 size12"><%= resident.firstName %> &nbsp;<i class="fas fa-chevron-right"></i></a>  
-                                                <p class="size12 str400"><%= resident.rel %></p>
+                                                <p class="size12 str400"><%= (resident.rel === "Siblings" || resident.rel === "Children") ? "Child" : resident.role %></p>
                                                 <p class="size12 str400 hidden"><%= resident.employmentStatus || "--" %></p>
                                             </div>
                                     <% }); %>
@@ -97,7 +97,7 @@
                                                         <img src="<%= resident.photo || '/images/profile.jpg' %>" alt="" class="h25 w25 borderRadius500 borderPrimary"><%= resident.firstName %> <%= resident.middleName %> <%= resident.lastName %> <%= resident.extName || '' %>
                                                     </div>
                                                 </td>
-                                                <td><%= resident.role %></td>
+                                                <td><%= (resident.role === "Siblings" || resident.role === "Children") ? "Child" : resident.role %></td>
                                                 <td><%= resident.employmentStatus || "--" %></td>
                                                 <td class="tdCtrl">
                                                     <a href="/rsdView/<%= resident._id %>" class="nav"><i class="fas fa-eye"></i>Details</a>

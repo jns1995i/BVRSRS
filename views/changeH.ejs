@@ -1,0 +1,84 @@
+<% layout('layout') %>
+
+<style>
+    input {
+        min-height: 42px;
+    }
+</style>
+
+<div class="height padding10 borderRadius15 relative abstractBG">
+    <a href="/rsdView/<%= resident._id %>" class="hidden nav absolute left20 top20"><i class="fas fa-chevron-left"></i>Go Back</a>    
+    <div class="height100 blockX overflow-y1 padding10 borderRadius15">
+        <div class="height0 padding10">
+            <form id="residentForm" action="/update-changeH/<%= resident._id %>" method="POST" class="height0 width50">
+                <div class="gap10 justifyStart alignStart height0">
+                    <div class="height0 col justifyStart alignStart">
+                        <p class="size30 str500 colorPrimary">Change Household</p>
+                        <br>
+                        <div class="height0 col alignStart gap5">
+                            <label for="birthPlace">Existing Households</label>
+                            <div class="selectBar widthMin100">
+                                <select name="householdId" id="birthPlace" required>
+                                    <option value="">--Select Household--</option>
+                                      <% households.forEach(house => { %>
+                                        <option value="<%= house._id %>" <%= resident.householdId && resident.householdId.toString() === house._id.toString() ? "selected" : "" %>>
+                                        <%= house.purok %>, House No: <%= house.houseNo %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <br>
+                        
+                        <div class="height0 gap5">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="role">Family Membership</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="role" id="role" required>
+                                        <option value="" disabled <%= !resident.role ? "selected" : "" %>>Select Membership</option>
+                                        
+                                        <!-- Immediate Family -->
+                                        <option value="Head" <%= resident.role === "Head" ? "selected" : "" %>>Head</option>
+                                        <option value="Member" <%= resident.role === "Member" ? "selected" : "" %>>Member</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 gap5">
+                            <div class="height0 col gap5 alignStart">
+                                <label for="rel">Family Role</label>
+                                <div class="selectBar widthMin100">
+                                    <select name="rel" id="rel" required>
+                                        <option value="" disabled <%= !resident.rel ? "selected" : "" %>>Select Role</option>
+                                        
+                                        <!-- Immediate Family -->
+                                        <option value="Father" <%= resident.rel === "Father" ? "selected" : "" %>>Father</option>
+                                        <option value="Mother" <%= resident.rel === "Mother" ? "selected" : "" %>>Mother</option>
+                                        <option value="Siblings" <%= resident.rel === "Siblings" ? "selected" : "" %>>Siblings</option>
+                                        
+                                        <!-- Extended Family -->
+                                        <option value="Grand Parent" <%= resident.rel === "Grand Parent" ? "selected" : "" %>>Grand Parent</option>
+                                        <option value="Grandchild" <%= resident.rel === "Grandchild" ? "selected" : "" %>>Grandchild</option>
+                        
+                                        <!-- Household Members -->
+                                        <option value="Relative" <%= resident.rel === "Relative" ? "selected" : "" %>>Relative</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="height0 justifyBetween">
+                            <a href="/rsdView/<%= resident._id %>" class="nav"><i class="fas fa-chevron-left"></i>Cancel</a>  
+                            <button type="submit" class="nav pnav"><i class="fas fa-check-square"></i>Update Record</button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        
+    </div>
+</div>
