@@ -786,39 +786,39 @@
         <div class="height0 gap10 paddingInline10 paddingBottom20">
             <div class="bgShade10 card borderRadius20 white abstractBG col alignStart padding20 gap10">
                 <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
-                <p class="size26 white str500"><%= Math.floor(highFam) %> <%= Math.floor(highFam) === 1 ? "member" : "members" %></p>
-                <a href="/bus" class="width0 height0 linkX">
-                <p class="size14 str300">
-                    Highest Family Size <i class="fas fa-chevron-right inline"></i>
+                <a href="" class="width0 height0 linkX">
+                <p class="size16 str300">
+                    Non-Indigent Families
                 </p>
                 </a>
+                <p class="size26 white str400 flex justifyCenter alignCenter gap10"><%= nonIndigent %> <span class="padding5 borderRadius5 bgWhite str500 size14 colorPrimary"><%= nonIndigentPercentage%>%</span></p>
             </div>
             <div class="bgShade10 card borderRadius20 white abstractBG col alignStart padding20 gap10">
                 <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
-                <p class="size26 white str500"><%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %></p>
-                <a href="/bus" class="width0 height0 linkX">
-                <p class="size14 str300">
-                    Average Family Size <i class="fas fa-chevron-right inline"></i>
+                <a href="" class="width0 height0 linkX">
+                <p class="size16 str300">
+                    Low Income Familes
                 </p>
                 </a>
+                <p class="size26 white str400 flex justifyCenter alignCenter gap10"><%= npoorCount %> <span class="padding5 borderRadius5 bgWhite str500 size14 colorPrimary"><%= npoorPercentage %>%</span></p>
             </div>
             <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
                 <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
-                <p class="size26 white str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(lowIncome) %></p>
-                <a href="/bus" class="width0 height0 linkX">
+                <a href="" class="width0 height0 linkX">
                 <p class="size14 str300">
-                    Minimum Monthly Income <i class="fas fa-chevron-right inline"></i>
+                    Highest Family Size
                 </p>
                 </a>
+                <p class="size24 white str400"><%= Math.floor(highFam) %> <%= Math.floor(highFam) === 1 ? "member" : "members" %></p>
             </div>
             <div class="aqua card borderRadius20 white abstractBG col alignStart padding20 gap10">
                 <a href="" class="nav cnav disabled marginBottom15 absolute right10" style="opacity: 0.1; transform: scale(2.8); bottom: -10px;"><i class="fas fa-user-friends"></i></a>
-                <p class="size26 white str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(highIncome) %></p>
-                <a href="/bus" class="width0 height0 linkX">
+                <a href="" class="width0 height0 linkX">
                 <p class="size14 str300">
-                    Maximum Monthly Income <i class="fas fa-chevron-right inline"></i>
+                    Average Family Size
                 </p>
                 </a>
+                <p class="size24 white str400"><%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %></p>
             </div>
         </div>
         <div class="h180 padding10 bgWhite borderRadius15 col">
@@ -826,19 +826,19 @@
                     <p class="size14 str400">
                             Average Monthly Net Income per Family
                     </p>
-                    <p class="size20 str500 upperCase colorPrimary"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(aveIncome) %></p>
+                    <p class="size28 str500 upperCase colorPrimary"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(aveIncome) %></p>
                     <div class="height0 bottom15 left15 width0 absolute col alignStart bgTint7 colorPrimary padding5 borderRadius5 size14">
                         Average Family Size: <%= Math.floor(aveFam) %> <%= Math.floor(aveFam) === 1 ? "member" : "members" %>
                     </div>
-                    <div class="height0 padding15 borderRadius15 darkShadow absolute bottom5 right5 width25">
+                    <div class="height0 padding10 borderRadius15 darkShadow absolute bottom5 right5 width35">
                         <div class="col">
-                            <p class="size30 str500"><%= nonIndigent %></p>
-                            <p class="size14 str400">Non-Indigent</p>
+                            <p class="size16 str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(lowIncome) %></p>
+                            <p class="size12 str400">Minimum Family Income</p>
                         </div>
                         <div class="borderGray w1 h50"></div>
                         <div class="col">
-                            <p class="size30 str500"><%= npoorCount %></p>
-                            <p class="size14 str400">Low Income</p>
+                            <p class="size16 str500"><%= new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(highIncome) %></p>
+                            <p class="size12 str400">Maximum Family Income</p>
                         </div>
                     </div>
                     <p class="size16 str400 green absolute bottom20 right20 hidden"><%= nonIndigent %> Non-Indigent & <%= npoorCount %> Low Income</p>

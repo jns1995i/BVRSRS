@@ -710,6 +710,7 @@ app.get("/ann", isLogin, async (req, res) => {
             layout: "layout", 
             title: "Announcements", 
             activePage: "ann", 
+            message: null,
                 weatherCode: weather.current_weather.weathercode,
             announcements: announcements // Pass the announcements to the EJS template
         });
@@ -718,124 +719,204 @@ app.get("/ann", isLogin, async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
-app.post("/newAnn", upload.single("image"), async (req, res) => {
-    try {
-        const { title, description } = req.body;
-        const imagePath = req.file ? req.file.path : null;
-
-        if (!title || !description) {
-            return res.send('<script>alert("Title and Description are required!"); window.location="/ann";</script>');
-        }
-
-        const newAnnouncement = {
-            title,
-            description,
-            image: imagePath,
-            createdAt: new Date(),
-        };
-
-        await db.collection("announcements").insertOne(newAnnouncement);
-
-        // Fetch all resident emails
-        const residents = await db.collection("resident").find({ email: { $exists: true, $ne: null } }).toArray();
-
-        // Send emails using Nodemailer
-        const emailPromises = residents.map(resident => {
-            const mailOptions = {
-                from: 'johnniebre1995@gmail.com',
-                to: resident.email,
-                subject: `New Announcement: ${title}`,
-                text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
-                html: `
-                    <p>Dear Resident,</p>
-                    <p>We have a new announcement:</p>
-                    <p><strong>Title:</strong> ${title}</p>
-                    <p><strong>Description:</strong> ${description}</p>
-                    <p>Thank you.</p>
-                `
-            };
-
-            return transporter.sendMail(mailOptions)
-                .then(() => {
-                    console.log(`Email successfully sent to ${resident.email}`);
-                })
-                .catch((error) => {
-                    console.error(`Failed to send email to ${resident.email}:`, error.message);
-                });
-        });
-
-        await Promise.all(emailPromises);
-
-        res.send('<script>alert("Announcement added successfully and sent to all residents!"); window.location="/ann";</script>');
-
-    } catch (err) {
-        console.error("Error adding announcement:", err.stack);
-        res.status(500).send('<script>alert("Internal Server Error!"); window.location="/ann";</script>');
-    }
-});
-
-app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
-    try {
-        const { id } = req.params; // Get the ID from the URL parameter
-        const { title, description } = req.body; // Get the form fields (title and description)
-        const image = req.file; // still valid
-        const imageUrl = image ? image.path : null; // Cloudinary URL
-
-        // Validate the ID
-        if (!ObjectId.isValid(id)) {
-            return res.status(400).send('<script>alert("Invalid announcement ID!"); window.location="/ann";</script>');
-        }
-
-        const objectId = new ObjectId(id); // Convert the ID to an ObjectId
-
-        // Fetch the existing announcement from the database
-        const existingAnnouncement = await db.collection("announcements").findOne({ _id: objectId });
-
-        if (!existingAnnouncement) {
-            return res.status(404).send('<script>alert("Announcement not found!"); window.location="/ann";</script>');
-        }
-
-        // Prepare the update data object
-        const updateData = {
-            title: title || existingAnnouncement.title, // Use existing title if new title is not provided
-            description: description || existingAnnouncement.description, // Use existing description if new description is not provided
-            updatedAt: new Date() // Always update the timestamp
-        };
-if (image) {
-    const imageUrl = image.path; 
-    updateData.image = imageUrl; 
-
-    if (existingAnnouncement.image) {
-        const publicId = getPublicIdFromUrl(existingAnnouncement.image);
-        if (publicId) {
-            cloudinary.uploader.destroy(publicId, (err, result) => {
-                if (err) console.error("Error deleting old image from Cloudinary:", err);
-                else console.log("Old image deleted:", result);
-            });
-        }
-    }
-} else {
-    updateData.image = existingAnnouncement.image;
+async function getWeatherCode() {
+  try {
+    const lat = 15.4869;
+    const lon = 120.9730;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+    const response = await fetch(url);
+    const weather = await response.json();
+    return weather?.current_weather?.weathercode ?? 0;
+  } catch (err) {
+    console.warn("⚠️ Weather fetch failed:", err.message);
+    return 0;
+  }
 }
 
-        // Update the announcement in the database
-        const result = await db.collection("announcements").updateOne(
-            { _id: objectId }, // Find the announcement by ID
-            { $set: updateData } // Update the fields with new data
-        );
+app.post("/newAnn", upload.single("image"), async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const imagePath = req.file ? req.file.path : null;
 
-        // Check if the update was successful
-        if (result.modifiedCount > 0) {
-            return res.send('<script>alert("Announcement updated successfully!"); window.location="/ann";</script>');
-        } else {
-            return res.send('<script>alert("No changes were made!"); window.location="/ann";</script>');
-        }
-    } catch (err) {
-        console.error("Error updating announcement:", err);
-        res.status(500).send('<script>alert("Error updating the announcement. Please try again."); window.location="/ann";</script>');
+    // Fetch weather first (for consistency)
+    const weatherCode = await getWeatherCode();
+
+    // Validate required fields
+    if (!title || !description) {
+      const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+      return res.render("ann", { 
+        layout: "layout",
+        title: "Announcements",
+        activePage: "ann",
+        message: "Title and Description are required!",
+        announcements,
+        weatherCode
+      });
     }
+
+    // Insert new announcement
+    const newAnnouncement = {
+      title,
+      description,
+      image: imagePath,
+      createdAt: new Date(),
+    };
+
+    await db.collection("announcements").insertOne(newAnnouncement);
+
+    // Fetch all resident emails
+    const residents = await db.collection("resident").find({ email: { $exists: true, $ne: null } }).toArray();
+
+    // Send emails using Nodemailer
+    const emailPromises = residents.map(resident => {
+      const mailOptions = {
+        from: 'johnniebre1995@gmail.com',
+        to: resident.email,
+        subject: `New Announcement: ${title}`,
+        text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
+        html: `
+          <p>Dear Resident,</p>
+          <p>We have a new announcement:</p>
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Description:</strong> ${description}</p>
+          <p>Thank you.</p>
+        `
+      };
+
+      return transporter.sendMail(mailOptions)
+        .then(() => console.log(`📧 Email sent to ${resident.email}`))
+        .catch(err => console.error(`❌ Failed to send email to ${resident.email}:`, err.message));
+    });
+
+    await Promise.all(emailPromises);
+
+    // Fetch updated announcements
+    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "✅ Announcement added successfully and sent to all residents!",
+      announcements,
+      weatherCode
+    });
+
+  } catch (err) {
+    console.error("❌ Error adding announcement:", err.stack);
+    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+    const weatherCode = await getWeatherCode();
+    res.render("ann", { 
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "⚠️ Internal Server Error while adding announcement!",
+      announcements,
+      weatherCode
+    });
+  }
 });
+
+
+app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    const image = req.file;
+
+    // Validate ID
+    if (!ObjectId.isValid(id)) {
+      const announcements = await db.collection("announcements").find().toArray();
+      const weatherCode = await getWeatherCode(); // ✅ Fetch weather
+      return res.render("ann", { 
+        layout: "layout",
+        title: "Announcements",
+        activePage: "ann",
+        message: "Invalid announcement ID!",
+        announcements,
+        weatherCode
+      });
+    }
+
+    const objectId = new ObjectId(id);
+    const existingAnnouncement = await db.collection("announcements").findOne({ _id: objectId });
+
+    if (!existingAnnouncement) {
+      const announcements = await db.collection("announcements").find().toArray();
+      const weatherCode = await getWeatherCode(); // ✅ Fetch weather
+      return res.render("ann", { 
+        layout: "layout",
+        title: "Announcements",
+        activePage: "ann",
+        message: "Announcement not found!",
+        announcements,
+        weatherCode
+      });
+    }
+
+    // Prepare update data
+    const updateData = {
+      title: title || existingAnnouncement.title,
+      description: description || existingAnnouncement.description,
+      updatedAt: new Date(),
+    };
+
+    // If a new image was uploaded, update and delete old one from Cloudinary
+    if (image) {
+      const imageUrl = image.path;
+      updateData.image = imageUrl;
+
+      if (existingAnnouncement.image) {
+        const publicId = getPublicIdFromUrl(existingAnnouncement.image);
+        if (publicId) {
+          cloudinary.uploader.destroy(publicId, (err, result) => {
+            if (err) console.error("Error deleting old image:", err);
+            else console.log("Old image deleted:", result);
+          });
+        }
+      }
+    } else {
+      updateData.image = existingAnnouncement.image;
+    }
+
+    // Update the record
+    const result = await db.collection("announcements").updateOne(
+      { _id: objectId },
+      { $set: updateData }
+    );
+
+    const message = result.modifiedCount > 0
+      ? "Announcement updated successfully!"
+      : "No changes were made!";
+
+    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+    const weatherCode = await getWeatherCode(); // ✅ Always include
+
+    res.render("ann", { 
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message,
+      announcements,
+      weatherCode
+    });
+
+  } catch (err) {
+    console.error("❌ Error updating announcement:", err);
+    const announcements = await db.collection("announcements").find().toArray();
+    const weatherCode = await getWeatherCode(); // ✅ Include even on error
+    res.render("ann", { 
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "Error updating the announcement. Please try again.", 
+      announcements,
+      weatherCode
+    });
+  }
+});
+
+
 
 // Delete an announcement
 app.post("/deleteAnn/:id", async (req, res) => {
@@ -2029,10 +2110,10 @@ app.post("/upload-my-photo", isLogin, express.json({ limit: "10mb" }), async (re
 
 app.post("/add-business", async (req, res) => {
     try {
-        const { businessName, businessType, ownerName, contactNumber, houseNo, purok, estDate } = req.body;
+        const { businessName, businessType, ownerName, contactNumber, houseNo, purok } = req.body;
 
         // Validate required fields
-        if (!businessName || !businessType || !ownerName || !houseNo || !purok || !estDate) {
+        if (!businessName || !businessType || !ownerName || !houseNo || !purok ) {
             return res.send('<script>alert("Please fill out all required fields!"); window.location="/bus";</script>');
         }
 
@@ -2042,7 +2123,6 @@ app.post("/add-business", async (req, res) => {
             businessType,
             ownerName,
             contactNumber,
-            estDate,
             houseNo,
             purok,
             createdAt: new Date(),
@@ -2120,6 +2200,7 @@ app.get("/bus", isLogin, isRsd, async (req, res) => {
                     firstName: owner.firstName,
                     lastName: owner.lastName,
                     phone: owner.phone,
+                    photo: owner.photo,
                     purok: owner.purok,
                     houseNo: owner.houseNo,
                     familyPoverty: owner.familyPoverty
@@ -2157,13 +2238,113 @@ app.get("/bus", isLogin, isRsd, async (req, res) => {
     }
 });
 
+
+app.get("/busArc", isLogin, isRsd, async (req, res) => {
+    try {
+        const residents = await db.collection("resident")
+            .find({ archive: { $in: [0, "0", 1, "1"] } })
+            .sort({ firstName: 1 })
+            .toArray();
+
+        const households = await db.collection("household")
+            .find({ archive: { $in: [0, "0"] } })
+            .toArray();
+
+        const families = await db.collection("family")
+            .find({ archive: { $in: [0, "0"] } })
+            .toArray();
+
+        // Map household and family data
+        const householdMap = new Map();
+        households.forEach(household => {
+            householdMap.set(String(household._id), { houseNo: household.houseNo, purok: household.purok });
+        });
+
+        const familyMap = new Map();
+        families.forEach(family => {
+            familyMap.set(String(family._id), { poverty: family.poverty });
+        });
+
+        // Attach household & family info to residents
+        residents.forEach(resident => {
+            const householdData = householdMap.get(String(resident.householdId)) || { houseNo: "-", purok: "-" };
+            resident.houseNo = householdData.houseNo;
+            resident.purok = householdData.purok;
+
+            const familyData = familyMap.get(String(resident.familyId)) || { poverty: "No Income" };
+            resident.familyPoverty = familyData.poverty;
+        });
+
+        // Totals
+        const totalHouseholds = households.length;
+        const totalFamilies = families.length;
+        const totalInhabitants = residents.length;
+        const totalVoters = residents.filter(r => r.precinct === "Registered Voter").length;
+
+        // Businesses
+        const businesses = await db.collection("business")
+            .find({ archive: { $in: [1, "1"] } })
+            .sort({ businessName: 1 })
+            .toArray();
+
+        // Map owner info
+        const residentMap = new Map();
+        residents.forEach(resident => residentMap.set(String(resident._id), resident));
+
+        businesses.forEach(business => {
+            const owner = residentMap.get(String(business.ownerName));
+            if (owner) {
+                business.owner = {
+                    _id: owner._id,
+                    firstName: owner.firstName,
+                    lastName: owner.lastName,
+                    phone: owner.phone,
+                    photo: owner.photo,
+                    purok: owner.purok,
+                    houseNo: owner.houseNo,
+                    familyPoverty: owner.familyPoverty
+                };
+            } else {
+                business.owner = null;
+            }
+
+            // Safe estDate for EJS
+            business.estDateISO = business.estDate && !isNaN(new Date(business.estDate))
+                ? new Date(business.estDate).toISOString().split("T")[0]
+                : "";
+        });
+
+        const totalCount = businesses.length;
+
+        // Render
+        res.render("busArc", {
+            layout: "layout",
+            title: "Business",
+            activePage: "bus",
+            residents,
+            totalHouseholds,
+            totalFamilies,
+            totalInhabitants,
+            totalVoters,
+            totalCount,
+            businesses,  // always defined
+            message: businesses.length === 0 ? "No active businesses found." : null
+        });
+
+    } catch (err) {
+        console.error("Error fetching businesses:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/";</script>');
+    }
+});
+
+
 app.post("/update-business/:id", isLogin, async (req, res) => {
     try {
         const businessId = req.params.id;
-        const { businessName, estDate, businessType, ownerName, contactNumber, houseNo, purok } = req.body;
+        const { businessName, businessType, ownerName, contactNumber, houseNo, purok } = req.body;
 
         // Validate that required fields are provided
-        if (!businessName || !estDate || !businessType || !ownerName) {
+        if (!businessName || !businessType || !ownerName) {
             return res.send('<script>alert("All fields are required!"); window.location="/bus";</script>');
         }
 
@@ -2174,7 +2355,7 @@ app.post("/update-business/:id", isLogin, async (req, res) => {
 
         // Log the businessId and input data for debugging
         console.log("Business ID:", businessId);
-        console.log("Business Data:", { businessName, estDate, businessType, ownerName, contactNumber, houseNo, purok });
+        console.log("Business Data:", { businessName, businessType, ownerName, contactNumber, houseNo, purok });
 
         // Update the business data in the database
         const result = await db.collection("business").updateOne(
@@ -2182,7 +2363,6 @@ app.post("/update-business/:id", isLogin, async (req, res) => {
             { 
                 $set: {
                     businessName,
-                    estDate, 
                     businessType, 
                     ownerName, 
                     contactNumber, 
@@ -2242,6 +2422,44 @@ app.post("/delete-business/:id", isLogin, async (req, res) => {
     } catch (err) {
         console.error("Error archiving business:", err.message);
         res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/bus";</script>');
+    }
+});
+
+app.post("/restore-business/:id", isLogin, async (req, res) => {
+    try {
+        const businessId = req.params.id;
+
+        // Ensure the businessId is a valid MongoDB ObjectId
+        if (!ObjectId.isValid(businessId)) {
+            return res.send('<script>alert("Invalid business ID."); window.location="/busArc";</script>');
+        }
+
+        // Query the business to check if it exists and is not already archived
+        const business = await db.collection("business").findOne({ _id: new ObjectId(businessId) });
+
+        if (!business) {
+            return res.send('<script>alert("Business not found."); window.location="/busArc";</script>');
+        }
+
+        // If the business is already archived
+        if (business.archive === 0) {
+            return res.send('<script>alert("This business is already restored."); window.location="/busArc";</script>');
+        }
+
+        // Proceed with archiving the business
+        const result = await db.collection("business").updateOne(
+            { _id: new ObjectId(businessId) },
+            { $set: { archive: 0 } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.send('<script>alert("Failed to archive the business. Please try again."); window.location="/busArc";</script>');
+        }
+
+        res.send('<script>alert("Business archived successfully."); window.location="/busArc";</script>');
+    } catch (err) {
+        console.error("Error archiving business:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error! Please try again."); window.location="/busArc";</script>');
     }
 });
 

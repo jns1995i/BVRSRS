@@ -218,33 +218,20 @@
 
         
         <div class="height0 relative col">
-            <img src="/images/bus.png" alt="" class="absolute bottom10 right30 h210 index50" style="transform: rotate(-5deg);">    
+            <img src="/images/bus.png" alt="" class="absolute bottom10 right30 h210 index50" style="transform: rotate(-5deg); filter: grayscale(0.8);">    
                
             <div class="height0">
                 <div class="ctrl left gap10">
-                    <div class="searchBar">
-                        <input type="search" id="univ">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <a href="/export-business" class="nav">
-                        <i class="fa-solid fa-download"></i>
-                        Export Report
-                    </a>   
-                    <a href="/nonRes" class="nav"><i class="fas fa-plus"></i>Add Non-Resident</a> 
-                    | 
-                    <a href="/busArc" class="nav">
-                        <i class="fa-solid fa-archive"></i>
-                        Archive
-                    </a> 
+                    <a href="/bus" class="nav"><i class="fas fa-chevron-left"></i>Go Back</a>      
                 </div>
             </div>
-            <div class="h180 witch abstractBG borderRadius10 padding25 justifyStart col alignStart relative">
-                <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
-                    <a href="javascript:void()"  id="newBtn" class="nav borderNone absolute left25 bottom25 paddingBlock10 borderRadius10"><i class="fas fa-plus"></i>New Record</a>
-
-                <% } %>
+            <div class="h180 bgShade10 abstractBG borderRadius10 padding25 justifyStart col alignStart relative" style="filter: grayscale(0.8);">
+                <div class="searchBar  absolute left25 bottom25">
+                    <input type="search" id="univ" placeholder="Search here ..">
+                    <i class="fas fa-search"></i>
+                </div> 
                 <div class="height0 justifyStart alignStart col">
-                    <p class="size28 white">Business & Other Commercial Establishments</p>
+                    <p class="size28 white">Archived Business</p>
                     <p class="size18 str300 white">Total of <%= totalCount %> on Record</p>
                 </div>
             </div>
@@ -290,14 +277,8 @@
                                 <% } %>
                                 <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
                                 <td class="tdCtrl">
-                                    <a href="/viewBus/<%= business._id %>" class="nav">
-                                        <i class="fas fa-eye"></i> Permit
-                                    </a>
-                                    <a href="javascript:void()" class="nav" onclick="editBusiness('<%= business._id %>', '<%= business.businessName %>', '<%= business.businessType %>', '<%= business.ownerName %>', '<%= business.contactNumber %>', '<%= business.houseNo %>', '<%= business.purok %>')">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="/delete-business/<%= business._id %>" method="POST" onsubmit="return confirm('Are you sure you want to archive this business?');" class="vers borderRadius0">
-                                        <button type="submit" class="nav dnav-fill"><i class="fas fa-trash"></i></button>
+                                    <form action="/restore-business/<%= business._id %>" method="POST" onsubmit="return confirm('Are you sure you want to restore this record?');" class="vers borderRadius0 paddingInline10" style="padding-inline: 7px !important;">
+                                        <button type="submit" class="nav"><i class="fas fa-arrows-rotate"></i> &nbsp; Restore</button>
                                     </form>                                    
                                 </td>
                                 <% } %>
