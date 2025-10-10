@@ -12,6 +12,7 @@ const axios = require("axios");
 const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
@@ -97,11 +98,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-import { Resend } from 'resend';
-import dotenv from 'dotenv';
-
 dotenv.config();
-
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const isLogin = async (req, res, next) => {
