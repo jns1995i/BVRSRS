@@ -5,45 +5,120 @@
             gap: 10px;
             display: flex;
         }
+        .cursor {
+            cursor:pointer !important;
+        }
+        .mainf {
+            gap: 0 !important;
+        }
     </style>
 </head>
 
 
         <div class="height10">
-            <div class="height0 width100">
-                <div class="ctrl left">
-                    <p class="size30 str500">Request Document</p>
-                </div>
-                <div class="ctrl">
-                </div>
-                <div class="ctrl right">
-                </div>
+            <div class="ctrl left">
+                <a href="/ipr" class="nav"><i class="fas fa-chevron-left"></i> Go Back</a>
+                <p class="size30 str500">Request Document</p>
+            </div>
+            <div class="ctrl">
+            </div>
+            <div class="ctrl right">
             </div>
         </div>
         
-            <div class="padding20 width100 bgWhite blockX overflow-y1 relative" style="border: 10px solid rgb(255, 255, 255);">
+            <div class="height90 padding5 width100 bgWhite blockX overflow-y1 relative" style="border: 10px solid rgb(255, 255, 255);">
                         
-                <form action="/reqDocument" method="POST" enctype="application/x-www-form-urlencoded" class="height0 padding25 darkShadow  relative width55">
+                <form action="/reqDocumentW" method="POST" enctype="application/x-www-form-urlencoded" class="height0 padding25 darkShadow  relative width55">
                     
-                        
-                        <div class="height0 col marginBottom20">
-                            <div class="field">
-                                <label for="">Search Resident</label>
-                                <input type="search" id="searchResident">
+                    <div class="height0 col marginBottom20">
+                        <div class="field">
+                            <label for="">Search Resident</label>
+                            <input type="search" id="searchResident" placeholder="Type name here...">
+                            <div id="residentList" class="bgWhite borderRadius10 width100 hidden col padding10" 
+                                style="max-height: 500px; overflow-y: auto; z-index: 1000;">
                             </div>
                         </div>
+                    </div>
 
-                        <div class="height0 wrap gap10">
-                            <button class="nav" style="max-width: fit-content;" id="item">Resident Name</button>
+                    <hr><br>
+
+                    <div class="height0 col marginBottom20">
+                        <div class="field">
+                            <label for="">Request For</label>
+                            <input type="hidden" name="requestBy" id="residentValue">
+                            <input type="text" id="residentInput" readonly placeholder="Selected Resident from Results" class="disabled">
                         </div>
-                        
-                        <div class="height0 col marginBottom20">
-                            <div class="field">
-                                <label for="">Complete Name</label>
-                                <input type="hidden" name="requestBy" id="residentValue">
-                                <input type="text" id="residentInput" value="">
-                            </div>
-                        </div>
+                    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("searchResident");
+        const residentList = document.getElementById("residentList");
+        const residentValue = document.getElementById("residentValue");
+        const residentInput = document.getElementById("residentInput");
+
+        let residents = [];
+
+        // 🔹 Fetch all residents for autocomplete
+        fetch("/getResidents")
+            .then(res => res.json())
+            .then(data => {
+                residents = data; // expected array of residents
+            })
+            .catch(err => console.error("Error fetching residents:", err));
+
+        // 🔹 Filter results as user types
+        searchInput.addEventListener("input", function() {
+            const query = this.value.trim().toLowerCase();
+            residentList.innerHTML = "";
+            
+            if (query.length === 0) {
+                residentList.classList.add("hidden");
+                return;
+            }
+
+            const filtered = residents.filter(r => 
+                r.firstName.toLowerCase().includes(query) ||
+                r.lastName.toLowerCase().includes(query) ||
+                (`${r.firstName} ${r.lastName}`).toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                residentList.innerHTML = `<div class="padding10">No results found.</div>`;
+                residentList.classList.remove("hidden");
+                return;
+            }
+
+            filtered.forEach(res => {
+                const item = document.createElement("div");
+                item.classList.add("padding10", "hover:bgSoft", "cursorPointer", "borderRadius0", "justifyStart", "borderGray", "cursor", "height0");
+                item.textContent = `${res.lastName}, ${res.firstName} ${res.middleName ? res.middleName.charAt(0) + '.' : ''}`;
+                item.dataset.id = res._id;
+                item.dataset.name = `${res.firstName} ${res.middleName ? res.middleName + ' ' : ''}${res.lastName}`;
+                
+                // 🔸 Click to select resident
+                item.addEventListener("click", function() {
+                    residentInput.value = this.dataset.name;
+                    residentValue.value = this.dataset.id;
+                    searchInput.value = "";
+                    residentList.innerHTML = "";
+                    residentList.classList.add("hidden");
+                });
+
+                residentList.appendChild(item);
+            });
+
+            residentList.classList.remove("hidden");
+        });
+
+        // 🔹 Hide list when clicking outside
+        document.addEventListener("click", function(e) {
+            if (!searchInput.contains(e.target) && !residentList.contains(e.target)) {
+                residentList.classList.add("hidden");
+            }
+        });
+    });
+    </script>
 
                     <div class="fieldsetContainer height0 width100 col" id="fieldsetContainer">
 

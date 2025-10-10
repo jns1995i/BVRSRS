@@ -26,7 +26,7 @@
         <div class="height10">
             <div class="height0 width100">
                 <div class="ctrl left">
-                    <p class="size30 str500">Online Transactions</p>
+                    <p class="size30 str500">Walk In Requests</p>
                 </div>
                 <div class="ctrl">
                     <div class="searchBar">
@@ -35,9 +35,9 @@
                     </div>
                 </div>
                 <div class="ctrl right">
-                    <a href="/mainReq" class="nav pnav hidden">
+                    <a href="/mainReq" class="nav pnav">
                         <i class="fas fa-plus"></i>
-                        Request Document
+                        New Request
                     </a>
                 </div>
             </div>
@@ -94,7 +94,7 @@
             <% category.data.forEach(request => { %>
                 <div class="height0 padding5 srvCard justifyStart" id="srvCard">
                     <div class="height0 bgWhite borderRadius10 padding15 gap10 marginBottom5 justifyBetween darkShadow 
-                    <% if (['Processed', 'Approved', 'Declined', 'For Pickup', 'Claimed', 'Cancelled'].includes(request.status)) { %>
+                    <% if (['Processed', 'Approved', 'Declined', 'Claimed', 'Cancelled'].includes(request.status)) { %>
                         bgSoft paddingBlock10 shadowNone
                     <% } %>
                     " id="srvCard">
@@ -171,7 +171,10 @@
                             <height0 class="size12 upperCase str500 bgTint8 green padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'Claimed') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-flag gray inline marginRight5"></i><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-flag gray inline marginRight5"></i>
+                                <% if ( request.status === 'Claimed' ) { %>
+                                    Released
+                                <% } %></height0>
                             <% } %>
                             <% if (request.status === 'Processing') { %>
                             <height0 class="size12 upperCase str500 bgSoft  padding5 borderRadius5"><i class="fas fa-clock gray inline marginRight5"></i><%= request.status %></height0>
@@ -183,14 +186,18 @@
                             <height0 class="size12 upperCase str500 bgTint8 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                             <% if (request.status === 'For Pickup') { %>
-                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i><%= request.status %></height0>
+                            <height0 class="size12 upperCase str500 bgTint8 padding5 borderRadius5"><i class="fas fa-check-square green inline marginRight5"></i>
+                                <% if ( request.status === 'For Pickup' ) { %>
+                                    For Print
+                                <% } %>
+                            </height0>
                             <% } %>
                             <% if (request.status === 'Pending') { %>
                             <height0 class="size12 upperCase str500 gnav padding5 borderRadius5"><i class="fas fa-hourglass white inline marginRight5"></i><%= request.status %></height0>
                             <% } %>
                         </div>
                         <div class="height0 width10 justifyEnd">
-                            <a href="/srvView/<%= request._id %>" class="nav cnav" style="background-color: transparent;"><i class="fas fa-arrow-right"></i></a>
+                            <a href="/srvViewW/<%= request._id %>" class="nav cnav" style="background-color: transparent;"><i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>

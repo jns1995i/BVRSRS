@@ -298,11 +298,12 @@
                 <p class="size14 str400"> <i class="fas fa-thumbs-up inline green"  style="transform: rotate(-8deg);"></i> The request has been marked claimed successfully!</p>
         </div>
     
-                <div class="height0 justifyStart absolute width33" style="z-index: 15 !important; left: 12px; top: 15px;">                    
-                    <a href="/srv" class="nav" onclick="">
+                <div class="height0 justifyBetween absolute width33" style="z-index: 15 !important; left: 12px; top: 15px;">                    
+                    <a href="/ipr" class="nav" onclick="">
                         <i class="fas fa-chevron-left"></i>
                         Previous
                     </a>
+                    <p class="size16 str400 marginRight30"><i class="fas fa-landmark inline green"></i> Walk-In Request</p>
                 </div>
                 <div class="absolute height0 width30 borderRadius10 bgWhite darkShadow col gap10" style="z-index: 10 !important; left: 22px; top: 65px;">
                     <br>
@@ -424,7 +425,7 @@
                 </div>
     <div class="blockX overflow-y1 relative borderRadius10">
 
-        <div id="caseCard7" class="hidden height100 absolute top0 left0 index50 overflow-y1 alignStart padding30"  style="z-index: 100;">
+        <div id="caseCard7" class="hidden height100 absolute top0 left0 index50 overflow-y1 alignStart padding30" style="z-index: 100;">
             <div class="width60 darkShadow height0 heightMin100 bgWhite padding20 borderRadius15 relative col justifyStart">
                 <a href="javascript:void()" class="nav absolute top20 right20" id="close7"><i class="fas fa-xmark"></i> Close</a>
                 
@@ -550,7 +551,13 @@
                                     : "Unreleased" 
                                 %>
                             </p>
-                            <a href="" class="nav disabled borderRadius10 transparent white absolute right15 top15">Status: <%= request.status %></a>
+                            <a href="" class="nav disabled borderRadius10 transparent white absolute right15 top15">Status: 
+                                <% if ( request.status === 'For Pickup' ) { %>
+                                    For Print
+                                <% } else { %>
+                                    <%= request.status %>
+                                <% } %>
+                            </a>
                         </div>
                         <% if ( request.status !== 'Declined' && request.status !== 'Pending' && request.status !== 'Processing'  && request.status !== 'Cancelled' ) { %>
                             <div class="height0 gap10 paddingBlock10">
@@ -574,16 +581,16 @@
                                             bgWhite softShadow
                                             <% } %>
                                     ">
-                                        <div class="height0 alignStart col gap5 width25">
+                                        <div class="height0 alignStart col gap5 width30">
                                             <p class="size12 str500"><%= doc.type %></p>
                                         </div>  
-                                        <div class="height0 alignStart col gap5 width25">
+                                        <div class="height0 alignStart col gap5 width30">
                                                 <p class="size12 str400"><%= doc.purpose %></p>
                                         </div>  
-                                        <div class="height0 alignStart col gap5 width15">
+                                        <div class="height0 alignStart col gap5 width25">
                                                 <p class="size12 str400"><%= doc.qty == 1 ? doc.qty + " Copy" : doc.qty + " Copies" %></p>
                                         </div>  
-                                        <div class="height0 alignStart col gap5 width15">
+                                        <div class="height0 alignEnd col gap5 width15">
                                             <% if (request.status === 'Cancelled') { %>
                                                 <height0 class="size12 upperCase str500 red padding5 borderRadius5"><i class="fas fa-xmark-square red inline marginRight5"></i>Cancelled</height0>
                                             <% } else  { %>
@@ -598,12 +605,12 @@
                                                 <% } %>
                                             <% } %>
                                         </div>    
-                                        <div class="height0 justifyEnd gap5 paddingInline10 width20">                                         
+                                        <div class="height0 justifyEnd gap5 paddingInline10 width20 hidden">
                                         <% if (doc.status === 'Pending' && request.status !== 'Cancelled') { %>
                                             <a href="javascript:void(0)" onclick="showNoCard('<%= doc._id %>')" class="nav dnav">Decline</a>                          
                                             <a href="javascript:void(0)" class="nav pnav borderPrimary str400" onclick="approveDocument('<%= doc._id %>')">Approve</a>
                                         <% } else { %>
-                                            <p class="size12 str400 gray">Approval Done</p>
+                                            <p class="size12 str400 gray"><a href="javascript:void(0)" class="nav pnav borderPrimary str400" onclick="approveDocument('<%= doc._id %>')">Cancel</a></p>
                                             <% 
                                             const updatedAt = new Date(request.updatedAt);
                                             const elapsed = Date.now() - updatedAt.getTime();
@@ -631,7 +638,7 @@
                                     <p class="size14 str400">Next Action <i class="fas fa-arrow-right inline"></i></p>
                                 <% } else { %>
                                     <p class="size14 str500">
-                                        Claimed at
+                                        Released at
                                         <%= request.successAt 
                                             ? new Date(request.successAt).toLocaleString("en-US", { 
                                                 year: "numeric", 

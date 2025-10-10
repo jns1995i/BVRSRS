@@ -96,6 +96,13 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage });
 
+import { Resend } from 'resend';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const isLogin = async (req, res, next) => {
     try {
         // ✅ 1. Check session
@@ -234,17 +241,6 @@ const sumDoc = async (req, res, next) => {
     next();
 };
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'johnniebre1995@gmail.com',
-        pass: 'gswplydselmqjysq',
-    },
-    tls: {
-      rejectUnauthorized: false, // 👈 this line tells Node.js to ignore self-signed cert errors
-    },
-  });
-  
 
 const sumReq = async (req, res, next) => {
     try {
@@ -368,7 +364,56 @@ const isReq = async (req, res, next) => {
 
         // Fetch requests from the 'request' collection where archive is 0
         const requests = await db.collection("request")
-            .find({ archive: { $in: [0, "0"] } })
+            .find({ archive: { $in: [0, "0"] }, mode: { $in: [0, "0"]} })
+            .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
+            .toArray();
+
+        // Fetch the corresponding resident data for each request
+        for (let request of requests) {
+            const resident = await db.collection("resident")
+                .findOne({ _id: new ObjectId(request.requestBy) }); // Fetch resident data by matching requestBy with resident ID
+            request.resident = resident; // Attach the resident data to the request object
+
+            if (resident) {
+                // Fetch household data using resident.householdId
+                const household = await db.collection("household")
+                    .findOne({ _id: new ObjectId(resident.householdId) });
+                request.household = household; // Attach the household data to the request object
+            }
+        }
+
+        // Fetch corresponding documents for each request
+        for (let request of requests) {
+            const documents = await db.collection("document")
+                .find({ reqId: request._id }) // Fetch documents where reqId matches request._id
+                .toArray();
+            request.documents = documents; // Attach the document data to the request object
+        }
+
+        // Attach the combined data to the request object
+        req.requests = requests;
+
+        // Set request as a global variable for all views (accessible via res.locals.requests)
+        res.locals.requests = requests;
+
+        // Proceed to the next middleware or route handler
+        next();
+    } catch (err) {
+        console.error("Error in myReq middleware:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error!"); window.location="/";</script>');
+    }
+};
+
+const isReqi = async (req, res, next) => {
+    try {
+        // Ensure the user is logged in by checking session
+        if (!req.session.userId) {
+            return res.redirect("/"); // Redirect if not logged in
+        }
+
+        // Fetch requests from the 'request' collection where archive is 0
+        const requests = await db.collection("request")
+            .find({ archive: { $in: [0, "0"] }, mode: { $in: [1, "1"]} })
             .sort({ updatedAt: -1 }) // Sort by updatedAt in descending order
             .toArray();
 
@@ -767,25 +812,33 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
     // Fetch all resident emails
     const residents = await db.collection("resident").find({ email: { $exists: true, $ne: null } }).toArray();
 
-    // Send emails using Nodemailer
-    const emailPromises = residents.map(resident => {
-      const mailOptions = {
-        from: 'johnniebre1995@gmail.com',
+    const emailPromises = residents.map(async (resident) => {
+    try {
+        const { data, error } = await resend.emails.send({
+        from: 'onboarding@resend.dev', // or your verified domain
         to: resident.email,
         subject: `New Announcement: ${title}`,
-        text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
         html: `
-          <p>Dear Resident,</p>
-          <p>We have a new announcement:</p>
-          <p><strong>Title:</strong> ${title}</p>
-          <p><strong>Description:</strong> ${description}</p>
-          <p>Thank you.</p>
-        `
-      };
+            <p>Dear Resident,</p>
+            <p>We have a new announcement:</p>
+            <p><strong>Title:</strong> ${title}</p>
+            <p><strong>Description:</strong> ${description}</p>
+            <p>Thank you.</p>
+        `,
+        text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
+        });
 
-      return transporter.sendMail(mailOptions)
-        .then(() => console.log(`📧 Email sent to ${resident.email}`))
-        .catch(err => console.error(`❌ Failed to send email to ${resident.email}:`, err.message));
+        if (error) {
+        console.error(`❌ Failed to send email to ${resident.email}:`, error.message);
+        return { success: false, email: resident.email, error };
+        }
+
+        console.log(`📧 Email sent to ${resident.email}`);
+        return { success: true, email: resident.email, data };
+    } catch (err) {
+        console.error(`⚠️ Unexpected error sending to ${resident.email}:`, err.message);
+        return { success: false, email: resident.email, error: err };
+    }
     });
 
     await Promise.all(emailPromises);
@@ -3158,52 +3211,78 @@ app.get("/reqM", isLogin, isAnn, myReq, async (req, res) => {
 });
 
 app.get("/mainReq", isLogin, isAnn, myReq, isRsd, async (req, res) => {
-    console.log("🔐 User Access Level:", req.session.access);
-    console.log("📌 Session Data:", req.session);
+  console.log("🔐 User Access Level:", req.session.access);
+  console.log("📌 Session Data:", req.session);
 
-    if (req.session.access !== 1) return res.redirect("/");
+  if (req.session.access !== 1) return res.redirect("/");
 
-    try {
-        const userId = req.session.userId;
-        if (!userId) throw new Error("User ID not found in session.");
+  try {
+    const userId = req.session.userId;
+    if (!userId) throw new Error("User ID not found in session.");
 
-        // Convert userId to ObjectId if valid
-        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+    // Convert userId to ObjectId if valid
+    const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
 
-        console.log("👤 Logged-in User ID:", userObjectId);
+    console.log("👤 Logged-in User ID:", userObjectId);
 
-        // Fetch Complainee Cases where logged-in user is in the "name" array
-        const complaineeCases = await db.collection("complainees").find({ 
-            name: { $in: [userObjectId, userId] }  // ✅ Matches either ObjectId or string
-        }).toArray();
+    // Fetch Complainee Cases where logged-in user is in the "name" array
+    const complaineeCases = await db.collection("complainees").find({
+      name: { $in: [userObjectId, userId] } // ✅ Matches either ObjectId or string
+    }).toArray();
 
-        console.log("📌 Complainee Cases Found:", complaineeCases.length);
+    console.log("📌 Complainee Cases Found:", complaineeCases.length);
 
-        // Collect unique case IDs
-        const caseObjectIds = [...new Set(complaineeCases.map(c => c.caseId))]
-            .filter(id => ObjectId.isValid(id))
-            .map(id => new ObjectId(id));
+    // Collect unique case IDs
+    const caseObjectIds = [...new Set(complaineeCases.map(c => c.caseId))]
+      .filter(id => ObjectId.isValid(id))
+      .map(id => new ObjectId(id));
 
-        console.log("⚖️ Matched Case IDs:", caseObjectIds);
+    console.log("⚖️ Matched Case IDs:", caseObjectIds);
 
-        // Fetch 'Pending' cases
-        const pendingCases = caseObjectIds.length
-            ? await db.collection("cases").countDocuments({ _id: { $in: caseObjectIds }, status: { $regex: /^pending$/i } })
-            : 0;
+    // Fetch 'Pending' cases
+    const pendingCases = caseObjectIds.length
+      ? await db.collection("cases").countDocuments({
+          _id: { $in: caseObjectIds },
+          status: { $regex: /^pending$/i }
+        })
+      : 0;
 
-        console.log("📌 Pending Cases Count:", pendingCases);
+    console.log("📌 Pending Cases Count:", pendingCases);
 
-        res.render("mainReq", {
-            layout: "layout",
-            title: "Home",
-            activePage: "home",
-            pendingCases,
-        });
+    // ✅ Fetch all active (non-archived) residents
+    const residents = await db.collection("resident").find({
+      $or: [{ archive: 0 }, { archive: "0" }]
+    }).toArray();
 
-    } catch (error) {
-        console.error("❌ Error fetching pending cases:", error.message);
-        res.status(500).send("Internal Server Error");
-    }
+    console.log("👥 Active Residents Found:", residents.length);
+
+    // ✅ Render page with resident list
+    res.render("mainReq", {
+      layout: "layout",
+      title: "Home",
+      activePage: "home",
+      pendingCases,
+      residents, // ← Pass the resident data to EJS
+    });
+
+  } catch (error) {
+    console.error("❌ Error fetching pending cases or residents:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/getResidents", async (req, res) => {
+  try {
+    const residents = await db.collection("resident")
+      .find({ archive: { $in: [0, "0"] } }) // exclude archived
+      .project({ firstName: 1, middleName: 1, lastName: 1 }) // return only needed fields
+      .toArray();
+
+    res.json(residents);
+  } catch (err) {
+    console.error("Error fetching residents:", err);
+    res.status(500).json({ error: "Failed to fetch residents" });
+  }
 });
 
 app.get("/terms", isLogin, isAnn, myReq, async (req, res) => {
@@ -3309,6 +3388,7 @@ app.post("/reqDocument", isLogin, async (req, res) => {
             status: "Pending",
             requestBy: new ObjectId(sessionUserId),
             archive: 0,
+            mode: 0,
             remarkMain: remarkMain // Store remarkMain in request
         };
 
@@ -3402,6 +3482,141 @@ app.post("/reqDocument", isLogin, async (req, res) => {
     }
 });
 
+app.post("/reqDocumentW", isLogin, async (req, res) => {
+    const sessionUserId = req.user._id; // Getting the logged-in user ID
+    const requestBy = req.body.requestBy; // 🟢 value sent from frontend
+
+    try {
+        console.log("Request Body: ", req.body);
+
+        // Ensure all values are arrays, even if only one item is submitted
+        let { type, qty, purpose, remarks, remarkMain } = req.body;
+
+        type = [].concat(type);
+        qty = [].concat(qty).map(Number);
+        purpose = [].concat(purpose);
+        remarks = [].concat(remarks || ""); // Default to empty string if undefined
+        remarkMain = remarkMain || ""; // Default to empty string if not provided
+
+        console.log("Extracted Data - type:", type, "qty:", qty, "purpose:", purpose, "remarks:", remarks, "remarkMain:", remarkMain);
+
+        // Validate array lengths
+        if (type.length !== qty.length || type.length !== purpose.length) {
+            return res.status(400).send('<script>alert("Mismatch in document fields! Please try again."); window.location="/hom";</script>');
+        }
+
+        // Ensure required fields are filled
+        if (!type.length || !qty.length || !purpose.length) {
+            return res.status(400).send('<script>alert("Please fill out all required fields."); window.location="/hom";</script>');
+        }
+
+        // Generate tracking reference (TR) components
+        const year = new Date().getFullYear().toString().slice(-2); // Last two digits of the year
+        const month = String(new Date().getMonth() + 1).padStart(2, "0"); // Two-digit month
+        const requestByLastTwo = sessionUserId.toString().slice(-2); // Last two characters of requestBy _id
+
+        // Create a new request entry with remarkMain
+        const newRequest = {
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "For Pickup",
+            mode: 1,
+            requestBy: new ObjectId(requestBy),
+            archive: 0,
+            remarkMain: remarkMain // Store remarkMain in request
+        };
+
+        const result = await db.collection("request").insertOne(newRequest);
+        const reqId = result.insertedId;
+        const requestIdLastTwo = reqId.toString().slice(-2); // Last two characters of request._id
+
+        // Generate 'tr' (tracking reference)
+        const tr = `${year}${month}${requestByLastTwo}${requestIdLastTwo}`;
+
+        // Update the request with 'tr'
+        await db.collection("request").updateOne(
+            { _id: reqId },
+            { $set: { tr } }
+        );
+
+        // Fetch resident's data
+        const resident = await db.collection("resident").findOne({ _id: new ObjectId(sessionUserId) });
+        const residentIndigent = resident ? resident.indigent : "";
+
+        // ✅ Insert each document as a separate record with the correct status
+        let allApproved = true; // Track if all documents are "Approved"
+
+        const documentPromises = type.map((docType, index) => {
+            let status = "Approved";
+
+            if (docType === "Barangay Clearance" || docType === "Good Moral") {
+                status = "Approved";
+            } else if (docType === "Barangay Indigency") {
+                status = (residentIndigent === "YES") ? "Approved" : "Approved";
+            }
+
+            // Check if all documents are "Approved"
+            if (status !== "Approved") {
+                allApproved = false;
+            }
+
+            return db.collection("document").insertOne({
+                reqId: reqId,
+                remarks: remarks[index] || "",
+                type: docType,
+                qty: qty[index] || 1,
+                purpose: purpose[index] || "",
+                status: status,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                requestBy: new ObjectId(requestBy)
+            });
+        });
+
+        await Promise.all(documentPromises);
+
+        // ✅ If all documents are "Approved", update request.status to "Processing"
+        if (allApproved) {
+            await db.collection("request").updateOne(
+                { _id: reqId },
+                { $set: { status: "For Pickup" } }
+            );
+        }
+        
+        // Redirect to success page
+        res.redirect("/reqWSuccess");
+
+        // Send email notification if resident has an email
+        if (resident && resident.email) {
+        const mailOptions = {
+            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            to: resident.email,
+            subject: 'Document Request Submitted Successfully',
+            html: `
+            <p style="font-size: 24px; font-weight: 500; color: green;">AWESOME</p>
+            <p style="font-size: 18px; margin: 0; text-align: center;">Your request has been submitted successfully!</p>
+            <br>
+            <div style="font-size: 14px; text-align: center; font-weight: 500;">
+                The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
+            </div>
+            `,
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log('Email sent to:', resident.email);
+        } catch (emailError) {
+            console.error('Error sending email:', emailError);
+        }
+        }
+
+    } catch (err) {
+        console.error("Error inserting request or document:", err);
+        res.status(500).send('<script>alert("Error inserting request or document! Please try again."); window.location="/hom";</script>');
+    }
+});
+
+
 app.get("/api/residents", async (req, res) => {
     try {
         const residents = await db.collection("resident").find({}).toArray();
@@ -3414,6 +3629,8 @@ app.get("/api/residents", async (req, res) => {
 
 
 app.get("/srv", isLogin, isReq, (req, res) => res.render("srv", { layout: "layout", title: "Services", activePage: "srv" }));
+app.get("/reqWSuccess", isLogin, (req, res) => res.render("reqWSuccess", { layout: "layout", title: "Services", activePage: "ipr" }));
+app.get("/ipr", isLogin, isReqi, (req, res) => res.render("ipr", { layout: "layout", title: "Services", activePage: "ipr" }));
 app.get("/ovv", isLogin, isReq, (req, res) => res.render("ovv", { layout: "layout", title: "Overview", activePage: "ovv" }));
 app.get("/ovvB", isLogin, isReq, (req, res) => res.render("ovvB", { layout: "layout", title: "Clearance", activePage: "ovvB" }));
 app.get("/ovvI", isLogin, isReq, (req, res) => res.render("ovvI", { layout: "layout", title: "Indigency", activePage: "ovvI" }));
@@ -3423,6 +3640,7 @@ app.get("/ovvC", isLogin, isReq, isRsd, (req, res) => res.render("ovvC", { layou
 
 
 app.get("/srvAll", isLogin, isReq, (req, res) => res.render("srvAll", { layout: "layout", title: "Services", activePage: "srv" }));
+
 app.get('/srvView/:id', isLogin, async (req, res) => {
     try {
         const requestId = req.params.id;
@@ -3511,6 +3729,97 @@ app.get('/srvView/:id', isLogin, async (req, res) => {
         res.status(500).send('<script>alert("Internal Server Error!"); window.location="/";</script>');
     }
 });
+
+
+app.get('/srvViewW/:id', isLogin, async (req, res) => {
+    try {
+        const requestId = req.params.id;
+
+        if (!ObjectId.isValid(requestId)) {
+            return res.status(400).send("Invalid Request ID");
+        }
+
+        const request = await db.collection("request")
+            .findOne({ _id: new ObjectId(requestId), archive: { $in: [0, "0"] } });
+
+        if (!request) {
+            return res.status(404).send("Request not found");
+        }
+
+        const resident = await db.collection("resident")
+            .findOne({ _id: new ObjectId(request.requestBy) });
+
+        if (!resident) {
+            return res.status(404).send("Resident not found");
+        }
+
+        // ✅ Fetch household using resident.householdId
+        const household = await db.collection("household")
+            .findOne({ _id: new ObjectId(resident.householdId) });
+
+        // ✅ Fetch family using resident.familyId
+        const family = await db.collection("family")
+            .findOne({ _id: new ObjectId(resident.familyId) });
+
+        // ✅ Fetch cases where the resident is either a complainant or a respondent
+        const cases = await db.collection("cases").find({
+            $or: [
+                { respondents: new ObjectId(resident._id), archive: { $in: [0, "0"]}  },
+                { complainants: new ObjectId(resident._id), archive: { $in: [0, "0"]}  }
+            ]
+        }).toArray();
+
+        console.log("🔍 Cases Retrieved:", cases);
+
+        // ✅ Extract all unique complainant & respondent IDs
+        const allPersonIds = [...new Set(cases.flatMap(c => [...c.respondents,...c.complainants]))];
+
+        // ✅ Fetch complainant & respondent details
+        const persons = await db.collection("resident").find({
+            _id: { $in: allPersonIds.map(id => new ObjectId(id)) }
+        }).toArray();
+
+        // ✅ Map resident details to case complainants/respondents
+        cases.forEach(c => {
+            c.respondents = c.respondents.map(rid => persons.find(p => p._id.equals(rid)) || {});
+            c.complainants = c.complainants.map(rid => persons.find(p => p._id.equals(rid)) || {});
+        });
+
+        // ✅ Extract case IDs for fetching schedules
+        const caseIds = cases.map(c => new ObjectId(c._id));
+
+        const schedules = caseIds.length > 0
+            ? await db.collection("schedule").find({ caseId: { $in: caseIds.map(id => id.toString()) } }).toArray()
+            : [];
+
+        // ✅ Fetch documents linked to the request
+        const documents = await db.collection("document")
+            .find({ reqId: request._id })
+            .toArray();
+
+        // ✅ Attach data to request
+        request.resident = resident;
+        request.resident.household = household; // Add household details
+        request.resident.family = family; // Add family details
+        request.documents = documents;
+        request.cases = cases;
+        request.schedules = schedules;
+
+        const message = req.query.message || "";
+
+        res.render('srvViewW', {
+            request,
+            layout: "layout",
+            title: "View Request",
+            activePage: "srv",
+            message
+        });
+    } catch (err) {
+        console.error("❌ Error in srvView route:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error!"); window.location="/";</script>');
+    }
+});
+
 
 app.post("/yesDoc/:id", async (req, res) => {
     try {
@@ -13632,7 +13941,7 @@ app.get("/ovr", isLogin, async (req, res) => {
     // Get query params for filtering
     const { start, end, filter, specificDate } = req.query;
 
-    let matchFilter = { archive: { $in: [0, "0"] } }; // default filter
+    let matchFilter = { archive: { $in: [0, "0"] }, mode: { $in: [0,"0"]} }; // default filter
     const now = new Date();
 
     if (filter === "today") {

@@ -59,18 +59,15 @@
             <a href="/dsb" class="nav mnav <%= activePage === 'dsb' ? 'active' : '' %>"><i class="bi bi-grid-fill"></i> Dashboard</a>
             <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
             <div class="height0 col menu gap0 padding0" style="padding-inline: 0.15rem;">
-                <a href="#" class="width95 nav mnav relative <%= (['ovv', 'ovvB', 'ovvI', 'ovvR', 'ovvG', 'ovvC', 'srv', 'srvAll'].includes(activePage)) ? 'active' : '' %>" id="menu">
+                <a href="#" class="width95 nav mnav relative <%= (['ovv', 'ovvB', 'ovvI', 'ovvR', 'ovvG', 'ovvC', 'srv', 'srvAll','ipr','srv'].includes(activePage)) ? 'active' : '' %>" id="menu">
                     <i class="fas fa-file-alt"></i> Services
                     <i class="fas fa-chevron-down absolute right5"></i>
                 </a>                
-                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['ovv','ovr', 'trs', 'ovvB', 'ovvI', 'ovvR', 'ovvG', 'ovvC', 'srv'].includes(activePage) ? '' : 'hidden' %>  justifyStart padding15" id="subMenu">
+                <div class="height0 alignStart col colorPrimary borderRadius10 gap5 <%= ['ovv','ovr', 'trs', 'ovvB', 'ovvI', 'ovvR', 'ovvG', 'ovvC', 'srv', 'ipr'].includes(activePage) ? '' : 'hidden' %>  justifyStart padding15" id="subMenu">
                     <a href="/ovr" class="nav2 mnav <%= activePage === 'ovr' ? 'active' : '' %>"><i class="fas fa-chart-line"></i>Analytics</a>
                     <a href="/ovv" class="nav2 mnav hidden <%= activePage === 'ovv' ? 'active' : '' %>"><i class="fas fa-bar-chart"></i>Overview</a>
-                    <a href="/srv" class="nav2 mnav <%= activePage === 'trs' ? 'active' : '' %>"><i class="fas fa-receipt"></i>Transactions</a>
-                    <a href="/ovvB" class="nav2 mnav hidden <%= activePage === 'ovvB' ? 'active' : '' %>"><i class="fas fa-file"></i> Clearance</a>
-                    <a href="/ovvI" class="nav2 mnav hidden <%= activePage === 'ovvI' ? 'active' : '' %>"><i class="fas fa-hands-helping"></i> Indigency</a>
-                    <a href="/ovvR" class="nav2 mnav hidden <%= activePage === 'ovvR' ? 'active' : '' %>"><i class="fas fa-location-dot"></i> Residency</a>
-                    <a href="/ovvG" class="nav2 mnav hidden <%= activePage === 'ovvG' ? 'active' : '' %>"><i class="fas fa-user"></i> Good Moral</a>
+                    <a href="/srv" class="nav2 mnav <%= activePage === 'srv' ? 'active' : '' %>"><i class="fas fa-receipt"></i>Transactions</a>
+                    <a href="/ipr" class="nav2 mnav <%= activePage === 'ipr' ? 'active' : '' %>"><i class="fas fa-landmark"></i>Walk-In Requests</a>
                     <a href="/ovvC" class="nav2 mnav hidden <%= activePage === 'ovvC' ? 'active' : '' %>"><i class="fas fa-edit"></i> Certification</a>
                 </div>
             </div>            
