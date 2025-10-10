@@ -13009,120 +13009,123 @@ app.get("/nonRes", isLogin, async (req, res) => {
 });
 
 app.post("/add-member", async (req, res) => {
-    try {
-        const residents = db.collection("resident");
-        const families = db.collection("family");
+  try {
+    const residents = db.collection("resident");
+    const families = db.collection("family");
 
-        const { 
-            firstName, middleName, lastName, extName, birthPlace, 
-            bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email, 
-            soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome, position, 
-            householdId, familyId,
-            birthHeight, birthWeight, healthCenter,
-            rel,
-            headId // ✅ pass this if available for email fallback
-        } = req.body;
+    const { 
+      firstName, middleName, lastName, extName, birthPlace, 
+      bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email, 
+      soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome, position, 
+      householdId, familyId,
+      birthHeight, birthWeight, healthCenter,
+      rel,
+      headId
+    } = req.body;
 
-        if (!ObjectId.isValid(familyId) || !ObjectId.isValid(householdId)) {
-            return res.status(400).json({ message: "Invalid householdId or familyId" });
-        }
-
-        const familyObjectId = new ObjectId(familyId);
-        const householdObjectId = new ObjectId(householdId);
-
-        // ✅ Calculate age
-        const birthDate = new Date(`${bYear}-${bMonth}-${bDay}`);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        if (today.getMonth() < birthDate.getMonth() || 
-           (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-
-        // ✅ Generate credentials only if applicable
-        let username = null;
-        let password = null;
-        let shouldSendEmail = false;
-        if (age >= 15 && age <= 59) {
-            username = generateUsername(firstName, middleName, lastName, bDay, bYear);
-            password = generateRandomPassword();
-            shouldSendEmail = true;
-        }
-
-        const privilegedPositions = ["Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"];
-        const access = privilegedPositions.includes(position) ? 1 : 0;
-
-        const income = monthlyIncome ? parseFloat(monthlyIncome) : 0;
-
-        // ✅ Insert resident
-        const newResident = {
-            firstName, middleName, lastName, extName, birthPlace,
-            bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email,
-            soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome: income, position,
-            birthHeight, birthWeight, healthCenter,
-            rel,
-            archive: 0,
-            reset: 0,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            successAt: null,
-            username,
-            password,
-            role: "Member",
-            familyId: familyObjectId,
-            householdId: householdObjectId,
-            access,
-        };
-
-        await residents.insertOne(newResident);
-
-        // ✅ Update family income
-        await families.updateOne(
-            { _id: familyObjectId },
-            { $inc: { familyIncome: income } }
-        );
-
-        // ✅ Redirect first (fast UX)
-        res.redirect(`/hshView/${householdObjectId}`);
-
-      // ✅ Email sending logic (background)
-if (shouldSendEmail) {
-  (async () => {
-    try {
-      let recipientEmail = email;
-
-      // Fallback to family head email if resident email is missing
-      if (!recipientEmail && headId) {
-        const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
-        recipientEmail = headResident?.email || null;
-      }
-
-      if (!recipientEmail) {
-        console.warn("⚠️ No email found for resident or family head. Skipping account email.");
-        return;
-      }
-
-      const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
-        to: recipientEmail,
-        subject: "Your Resident Account Details",
-        text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
-        html: `<p>Dear <strong>${firstName}</strong>,</p>
-               <p>Your resident account has been created.</p>
-               <p><strong>Username:</strong> ${username}</p>
-               <p><strong>Password:</strong> ${password}</p>
-               <p>Please keep your credentials secure.</p>
-               <p>Thank you.</p>`,
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(`📧 Account email sent to ${recipientEmail}`);
-    } catch (err) {
-      console.error("❌ Error sending account email:", err);
+    if (!ObjectId.isValid(familyId) || !ObjectId.isValid(householdId)) {
+      return res.status(400).json({ message: "Invalid householdId or familyId" });
     }
-  })();
-}
 
+    const familyObjectId = new ObjectId(familyId);
+    const householdObjectId = new ObjectId(householdId);
+
+    // Calculate age
+    const birthDate = new Date(`${bYear}-${bMonth}-${bDay}`);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    if (today.getMonth() < birthDate.getMonth() || 
+       (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    // Generate credentials only if applicable
+    let username = null;
+    let password = null;
+    let shouldSendEmail = false;
+    if (age >= 15 && age <= 59) {
+      username = generateUsername(firstName, middleName, lastName, bDay, bYear);
+      password = generateRandomPassword();
+      shouldSendEmail = true;
+    }
+
+    const privilegedPositions = ["Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"];
+    const access = privilegedPositions.includes(position) ? 1 : 0;
+    const income = monthlyIncome ? parseFloat(monthlyIncome) : 0;
+
+    // Insert resident
+    const newResident = {
+      firstName, middleName, lastName, extName, birthPlace,
+      bMonth, bDay, bYear, gender, civilStatus, pregnant, precinct, phone, email,
+      soloParent, pwd, pwdType, employmentStatus, work, monthlyIncome: income, position,
+      birthHeight, birthWeight, healthCenter,
+      rel,
+      archive: 0,
+      reset: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      successAt: null,
+      username,
+      password,
+      role: "Member",
+      familyId: familyObjectId,
+      householdId: householdObjectId,
+      access,
+    };
+
+    await residents.insertOne(newResident);
+
+    // Update family income
+    await families.updateOne(
+      { _id: familyObjectId },
+      { $inc: { familyIncome: income } }
+    );
+
+    // Redirect first (fast UX)
+    res.redirect(`/hshView/${householdObjectId}`);
+
+    // Email sending (background)
+    if (shouldSendEmail) {
+      (async () => {
+        try {
+          let recipientEmail = email;
+
+          // Fallback to family head
+          if (!recipientEmail && headId) {
+            const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
+            recipientEmail = headResident?.email || null;
+          }
+
+          if (!recipientEmail) {
+            console.warn("⚠️ No email found for resident or family head. Skipping account email.");
+            return;
+          }
+
+          const mailOptions = {
+            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            to: recipientEmail,
+            subject: "Your Resident Account Details",
+            text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+            html: `<p>Dear <strong>${firstName}</strong>,</p>
+                   <p>Your resident account has been created.</p>
+                   <p><strong>Username:</strong> ${username}</p>
+                   <p><strong>Password:</strong> ${password}</p>
+                   <p>Please keep your credentials secure.</p>
+                   <p>Thank you.</p>`,
+          };
+
+          await transporter.sendMail(mailOptions);
+          console.log(`📧 Account email sent to ${recipientEmail}`);
+        } catch (err) {
+          console.error("❌ Error sending account email:", err);
+        }
+      })();
+    }
+
+  } catch (error) {
+    console.error("Error adding resident:", error);
+    res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
+  }
 });
 
 
