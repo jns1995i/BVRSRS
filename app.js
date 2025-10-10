@@ -1,5 +1,4 @@
 require("dotenv").config();
-console.log("DEBUG → RESEND_API_KEY:", process.env.RESEND_API_KEY);
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const bodyParser = require("body-parser");
@@ -14,14 +13,6 @@ const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-
-if (!resend) {
-  console.warn("⚠️ RESEND_API_KEY is missing. Emails will not be sent.");
-} else {
-  console.log("✅ RESEND_API_KEY detected.");
-}
 
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
@@ -744,7 +735,7 @@ app.get("/logout", (req, res) => {
 });
 
 // app.js (routes)
-app.get("/ann", isLogin, async (req, res) => {
+app.get("/ann", isLogin, isAnn, async (req, res) => {
   try {
     const announcements = await db
       .collection("announcements")
@@ -810,6 +801,7 @@ async function getWeatherCode() {
     return 0;
   }
 }
+
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
