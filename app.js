@@ -827,7 +827,7 @@ app.post("/newAnn", isLogin, upload.single("image"), async (req, res) => {
       layout: "layout",
       title: "Announcements",
       activePage: "ann",
-      message: "✅ Announcement added successfully! Emails are being sent in the background.",
+      message: "✅ Announcement added successfully! Emails are being sent to residents",
       announcements,
       weatherCode,
     });
@@ -1090,33 +1090,52 @@ app.post("/add-resident", async (req, res) => {
         await db.collection("resident").insertOne(newResident);
 
         if (shouldSendEmail) {
+        (async () => {
+            try {
             let recipientEmail = email;
 
-            if (!email && headId) {
+            // Fallback to household head if no email
+            if (!recipientEmail && headId) {
                 const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
                 if (headResident && headResident.email) {
-                    recipientEmail = headResident.email;
+                recipientEmail = headResident.email;
                 }
             }
 
-            if (recipientEmail) {
-                const mailOptions = {
-                    from: 'johnniebre1995@gmail.com',
-                    to: recipientEmail,
-                    subject: "Your Resident Account Details",
-                    text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
-                    html: `<p>Dear <strong>${firstName}</strong>,</p>
-                           <p>Your resident account has been created.</p>
-                           <p><strong>Username:</strong> ${username}</p>
-                           <p><strong>Password:</strong> ${password}</p>
-                           <p>Please keep your credentials secure.</p>
-                           <p>Thank you.</p>`,
-                };
-
-                await transporter.sendMail(mailOptions);
-                console.log(`Email sent to ${recipientEmail}`);
+            if (!recipientEmail) {
+                console.log("❌ No email available for this resident or head. Skipping.");
+                return;
             }
+
+            // Use test email in development
+            const recipient = process.env.NODE_ENV === "production"
+                                ? recipientEmail
+                                : "blck4est@gmail.com"; // your verified test email
+
+            const mailOptions = {
+                from: 'johnniebre1995@gmail.com', // must be verified in your email provider
+                to: recipient,
+                subject: "Your Resident Account Details",
+                text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+                html: `<p>Dear <strong>${firstName}</strong>,</p>
+                    <p>Your resident account has been created.</p>
+                    <p><strong>Username:</strong> ${username}</p>
+                    <p><strong>Password:</strong> ${password}</p>
+                    <p>Please keep your credentials secure.</p>
+                    <p>Thank you.</p>`,
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log(`📧 Email sent to ${recipient}`);
+
+            // Throttle for safety if sending multiple emails
+            await new Promise((r) => setTimeout(r, 300));
+            } catch (err) {
+            console.error(`❌ Failed to send resident account email:`, err.message);
+            }
+        })();
         }
+
 
         res.send('<script>alert("Resident added successfully!"); window.location="/rsd";</script>');
 
@@ -1774,30 +1793,59 @@ app.get("/rsdH", isLogin, async (req, res) => {
     }
 });
 
+// Utility function for sending emails in the background
+async function sendResidentEmail(resident, subject, textContent, htmlContent) {
+  if (!resident) return;
 
-app.post("/reset-resident/:id", async (req, res) => {
-  if (!db) {
-    return res.status(500).json({ success: false, message: "Database not connected" });
+  try {
+    let recipientEmail = resident.email;
+
+    // Fallback to family head email if resident email is missing
+    if (!recipientEmail && resident.headId) {
+      const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+      recipientEmail = familyHead ? familyHead.email : null;
+    }
+
+    if (!recipientEmail) {
+      console.warn("⚠️ No email found for resident or family head. Skipping email send.");
+      return;
+    }
+
+    // Use test email in development
+    const recipient = process.env.NODE_ENV === "production"
+                      ? recipientEmail
+                      : "blck4est@gmail.com";
+
+    const mailOptions = {
+      from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+      to: recipient,
+      subject,
+      text: textContent,
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`📧 Email sent to ${recipient} | Subject: ${subject}`);
+  } catch (error) {
+    console.error("❌ Failed to send email:", error.message);
   }
+}
 
+// Reset resident password
+app.post("/reset-resident/:id", async (req, res) => {
   const residentId = req.params.id;
+  if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
 
   function generateRandomPassword() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
-    let password = "";
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
+    return Array.from({ length: 12 }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
   }
 
   const newPassword = generateRandomPassword();
 
   try {
     const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
-    if (!resident) {
-      return res.status(404).json({ success: false, message: "Resident not found" });
-    }
+    if (!resident) return res.status(404).json({ success: false, message: "Resident not found" });
 
     const result = await db.collection("resident").updateOne(
       { _id: new ObjectId(residentId) },
@@ -1805,238 +1853,156 @@ app.post("/reset-resident/:id", async (req, res) => {
     );
 
     if (result.modifiedCount === 1) {
-      // ✅ Respond success immediately
       res.json({ success: true, newPassword });
 
-      // 📧 Handle email sending in the background
-      let emailToSend = resident.email;
-      if (!emailToSend && resident.headId) {
-        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
-        emailToSend = familyHead ? familyHead.email : null;
-      }
-
-      if (emailToSend) {
-        const mailOptions = {
-          from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
-          to: emailToSend,
-          subject: 'Password Reset',
-          text: `Your new password is: ${newPassword}`,
-          html: `<strong>Your new password is: ${newPassword}</strong>`,
-        };
-
-        transporter.sendMail(mailOptions).catch((emailError) => {
-          console.error("Error sending email:", emailError);
-        });
-      } else {
-        console.warn("No email found for resident or family head, skipping email send.");
-      }
-    } else {
-      res.status(404).json({ success: false, message: "Resident not found or password not updated" });
+      // 📧 Background email
+      sendResidentEmail(
+        resident,
+        "Password Reset",
+        `Dear ${resident.firstName},\n\nYour new password is: ${newPassword}\n\nPlease keep it secure.`,
+        `<p>Dear <strong>${resident.firstName}</strong>,</p>
+         <p>Your new password is: <strong>${newPassword}</strong></p>
+         <p>Please keep it secure.</p>`
+      );
     }
   } catch (error) {
-    console.error("Error resetting password:", error);
+    console.error("❌ Error resetting password:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 
+// Suspend resident
 app.post("/suspend-resident/:id", async (req, res) => {
-    if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  const residentId = req.params.id.trim();
+  if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  if (!ObjectId.isValid(residentId)) return res.status(400).json({ success: false, message: "Invalid resident ID" });
 
-    const residentId = req.params.id.trim();
+  try {
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!resident) return res.status(404).json({ success: false, message: "Resident not found" });
 
-    if (!ObjectId.isValid(residentId)) {
-        return res.status(400).json({ success: false, message: "Invalid resident ID" });
+    const result = await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: { suspend: 1 } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.json({ success: true, message: "Resident suspended successfully." });
+
+      sendResidentEmail(
+        resident,
+        "Account Suspension Notification",
+        `Dear ${resident.firstName},\n\nWe regret to inform you that your account has been suspended.\n\nIf you believe this was an error, please contact your barangay office.\n\nThank you.`,
+        `<p>Dear <strong>${resident.firstName}</strong>,</p>
+         <p>We regret to inform you that your account has been <strong>suspended</strong>.</p>
+         <p>If you believe this was an error, please contact your barangay office.</p>
+         <p>Thank you.</p>`
+      );
     }
-
-    try {
-        const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
-
-        if (!resident) {
-            return res.status(404).json({ success: false, message: "Resident not found" });
-        }
-
-        const result = await db.collection("resident").updateOne(
-            { _id: new ObjectId(residentId) },
-            { $set: { suspend: 1 } }
-        );
-
-        if (result.modifiedCount === 1) {
-            // ✅ Respond success immediately
-            res.json({ success: true, message: "Resident suspended successfully." });
-
-            // 📧 Send email in the background
-            if (resident.email) {
-                const mailOptions = {
-                    from: "johnniebre1995@gmail.com",
-                    to: resident.email,
-                    subject: "Account Suspension Notification",
-                    text: `Dear ${resident.firstName},\n\nWe regret to inform you that your account has been suspended.\n\nThank you.`,
-                    html: `<p>Dear <strong>${resident.firstName}</strong>,</p>
-                           <p>We regret to inform you that your account has been <strong>suspended</strong>.</p>
-                           <p>If you believe this was an error, please contact your barangay office.</p>
-                           <p>Thank you.</p>`,
-                };
-
-                transporter.sendMail(mailOptions)
-                    .then(() => console.log("Suspension email sent to:", resident.email))
-                    .catch((emailError) => console.error("Failed to send suspension email:", emailError.message));
-            }
-        } else {
-            res.status(404).json({ success: false, message: "Resident not found." });
-        }
-    } catch (error) {
-        console.error("Error suspending resident:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+  } catch (error) {
+    console.error("❌ Error suspending resident:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
 
+// Unsuspend resident
 app.post("/suspend2-resident/:id", async (req, res) => {
-    if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  const residentId = req.params.id.trim();
+  if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  if (!ObjectId.isValid(residentId)) return res.status(400).json({ success: false, message: "Invalid resident ID" });
 
-    const residentId = req.params.id.trim();
+  try {
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!resident) return res.status(404).json({ success: false, message: "Resident not found" });
 
-    if (!ObjectId.isValid(residentId)) {
-        return res.status(400).json({ success: false, message: "Invalid resident ID" });
+    const result = await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: { suspend: 0 } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.json({ success: true, message: "Resident unsuspended successfully." });
+
+      sendResidentEmail(
+        resident,
+        "Account Unsuspension Notification",
+        `Dear ${resident.firstName},\n\nWe are happy to inform you that your account has been unsuspended.\n\nThank you.`,
+        `<p>Dear <strong>${resident.firstName}</strong>,</p>
+         <p>We are happy to inform you that your account has been <strong>unsuspended</strong>.</p>
+         <p>Thank you.</p>`
+      );
     }
-
-    try {
-        const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
-
-        if (!resident) {
-            return res.status(404).json({ success: false, message: "Resident not found" });
-        }
-
-        const result = await db.collection("resident").updateOne(
-            { _id: new ObjectId(residentId) },
-            { $set: { suspend: 0 } }
-        );
-
-        if (result.modifiedCount === 1) {
-            // ✅ Respond success immediately
-            res.json({ success: true, message: "Resident suspended successfully." });
-
-            // 📧 Send email in the background
-            if (resident.email) {
-                const mailOptions = {
-                    from: "johnniebre1995@gmail.com",
-                    to: resident.email,
-                    subject: "Account Unsuspension Notification",
-                    text: `Dear ${resident.firstName},\n\nWe are happy to inform you that your account has been unsuspended.\n\nThank you.`,
-                    html: `<p>Dear <strong>${resident.firstName}</strong>,</p>
-                           <p>We are happy to inform you that your account has been <strong>unsuspended</strong>.</p>`,
-                };
-
-                transporter.sendMail(mailOptions)
-                    .then(() => console.log("Suspension email sent to:", resident.email))
-                    .catch((emailError) => console.error("Failed to send suspension email:", emailError.message));
-            }
-        } else {
-            res.status(404).json({ success: false, message: "Resident not found." });
-        }
-    } catch (error) {
-        console.error("Error suspending resident:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+  } catch (error) {
+    console.error("❌ Error unsuspending resident:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
+
+// Archive + Suspend resident
 app.post("/archive-resident/:id", async (req, res) => {
-    if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  const residentId = req.params.id.trim();
+  if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  if (!ObjectId.isValid(residentId)) return res.status(400).json({ success: false, message: "Invalid resident ID" });
 
-    const residentId = req.params.id.trim();
+  try {
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!resident) return res.status(404).json({ success: false, message: "Resident not found" });
 
-    if (!ObjectId.isValid(residentId)) {
-        return res.status(400).json({ success: false, message: "Invalid resident ID" });
+    const result = await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: { archive: 1, suspend: 1 } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.json({ success: true, message: "Resident archived & suspended successfully." });
+
+      sendResidentEmail(
+        resident,
+        "Account Archived & Suspended",
+        `Dear ${resident.firstName},\n\nWe regret to inform you that your account has been archived and suspended.\n\nIf you believe this was an error, please contact your barangay office.\n\nThank you.`,
+        `<p>Dear <strong>${resident.firstName}</strong>,</p>
+         <p>We regret to inform you that your account has been <strong>archived and suspended</strong>.</p>
+         <p>If you believe this was an error, please contact your barangay office.</p>
+         <p>Thank you.</p>`
+      );
     }
-
-    try {
-        const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
-
-        if (!resident) {
-            return res.status(404).json({ success: false, message: "Resident not found" });
-        }
-
-        const result = await db.collection("resident").updateOne(
-            { _id: new ObjectId(residentId) },
-            { $set: { archive: 1, suspend: 1 } }   // ✅ archive + suspend
-        );
-
-        if (result.modifiedCount === 1) {
-            // ✅ Respond success immediately
-            res.json({ success: true, message: "Resident archived & suspended successfully." });
-
-            // 📧 Send email in the background
-            if (resident.email) {
-                const mailOptions = {
-                    from: "johnniebre1995@gmail.com",
-                    to: resident.email,
-                    subject: "Account Archived & Suspended",
-                    text: `Dear ${resident.firstName},\n\nWe regret to inform you that your account has been archived and suspended.\n\nThank you.`,
-                    html: `<p>Dear <strong>${resident.firstName}</strong>,</p>
-                           <p>We regret to inform you that your account has been <strong>archived and suspended</strong>.</p>
-                           <p>If you believe this was an error, please contact your barangay office.</p>
-                           <p>Thank you.</p>`,
-                };
-
-                transporter.sendMail(mailOptions)
-                    .then(() => console.log("Archive + Suspension email sent to:", resident.email))
-                    .catch((emailError) => console.error("Failed to send email:", emailError.message));
-            }
-        } else {
-            res.status(404).json({ success: false, message: "Resident not found." });
-        }
-    } catch (error) {
-        console.error("Error archiving resident:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+  } catch (error) {
+    console.error("❌ Error archiving resident:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
+
+// Unarchive + Unsuspend resident
 app.post("/archive2-resident/:id", async (req, res) => {
-    if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  const residentId = req.params.id.trim();
+  if (!db) return res.status(500).json({ success: false, message: "Database not connected" });
+  if (!ObjectId.isValid(residentId)) return res.status(400).json({ success: false, message: "Invalid resident ID" });
 
-    const residentId = req.params.id.trim();
+  try {
+    const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
+    if (!resident) return res.status(404).json({ success: false, message: "Resident not found" });
 
-    if (!ObjectId.isValid(residentId)) {
-        return res.status(400).json({ success: false, message: "Invalid resident ID" });
+    const result = await db.collection("resident").updateOne(
+      { _id: new ObjectId(residentId) },
+      { $set: { archive: 0, suspend: 0 } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.json({ success: true, message: "Resident unarchived & unsuspended successfully." });
+
+      sendResidentEmail(
+        resident,
+        "Account Restored",
+        `Dear ${resident.firstName},\n\nWe are happy to inform you that your account has been restored.\n\nThank you.`,
+        `<p>Dear <strong>${resident.firstName}</strong>,</p>
+         <p>We are happy to inform you that your account has been <strong>restored</strong>.</p>
+         <p>Thank you.</p>`
+      );
     }
-
-    try {
-        const resident = await db.collection("resident").findOne({ _id: new ObjectId(residentId) });
-
-        if (!resident) {
-            return res.status(404).json({ success: false, message: "Resident not found" });
-        }
-
-        const result = await db.collection("resident").updateOne(
-            { _id: new ObjectId(residentId) },
-            { $set: { archive: 0, suspend: 0 } }   // ✅ archive + suspend
-        );
-
-        if (result.modifiedCount === 1) {
-            // ✅ Respond success immediately
-            res.json({ success: true, message: "Resident archived & suspended successfully." });
-
-            // 📧 Send email in the background
-            if (resident.email) {
-                const mailOptions = {
-                    from: "johnniebre1995@gmail.com",
-                    to: resident.email,
-                    subject: "Account Archived & Suspended",
-                    text: `Dear ${resident.firstName},\n\nWe regret to inform you that your account has been archived and suspended.\n\nThank you.`,
-                    html: `<p>Dear <strong>${resident.firstName}</strong>,</p>
-                           <p>We regret to inform you that your account has been <strong>archived and suspended</strong>.</p>
-                           <p>If you believe this was an error, please contact your barangay office.</p>
-                           <p>Thank you.</p>`,
-                };
-
-                transporter.sendMail(mailOptions)
-                    .then(() => console.log("Archive + Suspension email sent to:", resident.email))
-                    .catch((emailError) => console.error("Failed to send email:", emailError.message));
-            }
-        } else {
-            res.status(404).json({ success: false, message: "Resident not found." });
-        }
-    } catch (error) {
-        console.error("Error archiving resident:", error);
-        res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
+  } catch (error) {
+    console.error("❌ Error unarchiving resident:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
 });
 
 app.get("/updateRsd/:id", isLogin, async (req, res) => {
@@ -3470,29 +3436,48 @@ app.post("/reqDocument", isLogin, async (req, res) => {
         // Redirect to success page
         res.redirect("/reqSuccess");
 
-        // Send email notification if resident has an email
-        if (resident && resident.email) {
-        const mailOptions = {
-            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
-            to: resident.email,
-            subject: 'Document Request Submitted Successfully',
-            html: `
-            <p style="font-size: 24px; font-weight: 500; color: green;">AWESOME</p>
-            <p style="font-size: 18px; margin: 0; text-align: center;">Your request has been submitted successfully!</p>
-            <br>
-            <div style="font-size: 14px; text-align: center; font-weight: 500;">
-                The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
-            </div>
-            `,
-        };
+      if (resident) {
+  (async () => {
+    try {
+      let recipientEmail = resident.email;
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent to:', resident.email);
-        } catch (emailError) {
-            console.error('Error sending email:', emailError);
-        }
-        }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && resident.headId) {
+        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+        recipientEmail = familyHead ? familyHead.email : null;
+      }
+
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping document request notification.");
+        return;
+      }
+
+      // Use test email in development
+      const recipient = process.env.NODE_ENV === "production"
+                        ? recipientEmail
+                        : "blck4est@gmail.com"; // verified test email
+
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipient,
+        subject: 'Document Request Submitted Successfully',
+        html: `
+          <p style="font-size: 24px; font-weight: 500; color: green;">AWESOME</p>
+          <p style="font-size: 18px; margin: 0; text-align: center;">Your request has been submitted successfully!</p>
+          <br>
+          <div style="font-size: 14px; text-align: center; font-weight: 500;">
+            The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Document request email sent to ${recipient}`);
+    } catch (emailError) {
+      console.error("❌ Failed to send document request email:", emailError.message);
+    }
+  })();
+}
 
     } catch (err) {
         console.error("Error inserting request or document:", err);
@@ -3604,30 +3589,49 @@ app.post("/reqDocumentW", isLogin, async (req, res) => {
         // Redirect to success page
         res.redirect("/reqWSuccess");
 
-        // Send email notification if resident has an email
-        if (resident && resident.email) {
-        const mailOptions = {
-            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
-            to: resident.email,
-            subject: 'Document Request Submitted Successfully',
-            html: `
-            <p style="font-size: 24px; font-weight: 500; color: green;">AWESOME</p>
-            <p style="font-size: 18px; margin: 0; text-align: center;">Your request has been submitted successfully!</p>
-            <br>
-            <div style="font-size: 14px; text-align: center; font-weight: 500;">
-                The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
-            </div>
-            `,
-        };
+      // 📧 Send document request notification in the background
+if (resident) {
+  (async () => {
+    try {
+      let recipientEmail = resident.email;
 
-        try {
-            await transporter.sendMail(mailOptions);
-            console.log('Email sent to:', resident.email);
-        } catch (emailError) {
-            console.error('Error sending email:', emailError);
-        }
-        }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && resident.headId) {
+        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+        recipientEmail = familyHead ? familyHead.email : null;
+      }
 
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping document request email.");
+        return;
+      }
+
+      // Use test email in development
+      const recipient = process.env.NODE_ENV === "production"
+                        ? recipientEmail
+                        : "blck4est@gmail.com"; // verified test email
+
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipient,
+        subject: 'Document Request Submitted Successfully',
+        html: `
+          <p style="font-size: 24px; font-weight: 500; color: green;">AWESOME</p>
+          <p style="font-size: 18px; margin: 0; text-align: center;">Your request has been submitted successfully!</p>
+          <br>
+          <div style="font-size: 14px; text-align: center; font-weight: 500;">
+            The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Document request email sent to ${recipient}`);
+    } catch (emailError) {
+      console.error("❌ Failed to send document request email:", emailError.message);
+    }
+  })();
+}
     } catch (err) {
         console.error("Error inserting request or document:", err);
         res.status(500).send('<script>alert("Error inserting request or document! Please try again."); window.location="/hom";</script>');
@@ -4151,27 +4155,48 @@ app.post("/release/:id", async (req, res) => {
         
         res.json({ success: true, message });
 
-        if (resident?.email) {
-            const mailOptions = {
-                from: 'johnniebre1995@gmail.com',
-                to: resident.email,
-                subject: "Your Document has been Claimed",
-                html: `
-                    <p>Dear <strong>${resident.firstName} ${resident.lastName}</strong>,</p>
-                    <p>Your requested document has been <strong>claimed!</strong>.</p>
-                    <p>Thank you.</p>
-                `
-            };
+       // 📧 Send document claimed notification in the background
+if (resident) {
+  (async () => {
+    try {
+      let recipientEmail = resident.email;
 
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`Email sent to ${resident.email}`);
-                message += " Email notification sent.";
-            } catch (emailError) {
-                console.error("Error sending email:", emailError);
-                message += " However, the email notification could not be sent.";
-            }
-        }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && resident.headId) {
+        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+        recipientEmail = familyHead ? familyHead.email : null;
+      }
+
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping claimed document email.");
+        return;
+      }
+
+      // Use test email in development
+      const recipient = process.env.NODE_ENV === "production"
+                        ? recipientEmail
+                        : "blck4est@gmail.com"; // verified test email
+
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipient,
+        subject: "Your Document has been Claimed",
+        html: `
+          <p>Dear <strong>${resident.firstName} ${resident.lastName}</strong>,</p>
+          <p>Your requested document has been <strong>claimed!</strong></p>
+          <p>Thank you.</p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Claimed document email sent to ${recipient}`);
+      message += " Email notification sent.";
+    } catch (emailError) {
+      console.error("❌ Failed to send claimed document email:", emailError.message);
+      message += " However, the email notification could not be sent.";
+    }
+  })();
+}
 
 
     } catch (error) {
@@ -4210,26 +4235,47 @@ app.post("/cancel/:id", async (req, res) => {
         
         res.json({ success: true, message });
 
-        if (resident?.email) {
-            const mailOptions = {
-                from: 'johnniebre1995@gmail.com',
-                to: resident.email,
-                subject: "Request Cancelled",
-                html: `
-                    <p>Dear <strong>${resident.firstName} ${resident.lastName}</strong>,</p>
-                    <p>You have successfully<strong>cancelled</strong> your request.</p>
-                `
-            };
+      // 📧 Send request cancelled notification in the background
+if (resident) {
+  (async () => {
+    try {
+      let recipientEmail = resident.email;
 
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`Email sent to ${resident.email}`);
-                message += " Email notification sent.";
-            } catch (emailError) {
-                console.error("Error sending email:", emailError);
-                message += " However, the email notification could not be sent.";
-            }
-        }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && resident.headId) {
+        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+        recipientEmail = familyHead ? familyHead.email : null;
+      }
+
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping request cancelled email.");
+        return;
+      }
+
+      // Use test email in development
+      const recipient = process.env.NODE_ENV === "production"
+                        ? recipientEmail
+                        : "blck4est@gmail.com"; // verified test email
+
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipient,
+        subject: "Request Cancelled",
+        html: `
+          <p>Dear <strong>${resident.firstName} ${resident.lastName}</strong>,</p>
+          <p>You have successfully <strong>cancelled</strong> your request.</p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Request cancelled email sent to ${recipient}`);
+      message += " Email notification sent.";
+    } catch (emailError) {
+      console.error("❌ Failed to send request cancelled email:", emailError.message);
+      message += " However, the email notification could not be sent.";
+    }
+  })();
+}
 
 
     } catch (error) {
@@ -11160,28 +11206,48 @@ app.post("/rqtDocument", isLogin, async (req, res) => {
 
         const resident = await db.collection("resident").findOne({ _id: new ObjectId(sessionUserId) });
 
-        if (resident && resident.email) {
-            const mailOptions = {
-                from: "johnniebre1995@gmail.com",
-                to: resident.email,
-                subject: "Document Request Submitted Successfully",
-                html: `
-                    <p style="font-size: 20px; margin: 0;">Your request has been submitted successfully!</p>
-                    <br>
-                    <div style="font-size: 13px; text-align: center; font-weight: 500;">
-                        The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
-                    </div>
-                `
-            };
+       // 📧 Send document request confirmation in the background
+if (resident) {
+  (async () => {
+    try {
+      let recipientEmail = resident.email;
 
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log("Confirmation email sent to:", resident.email);
-            } catch (emailError) {
-                console.error("Failed to send confirmation email:", emailError.message);
-            }
-        }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && resident.headId) {
+        const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(resident.headId) });
+        recipientEmail = familyHead ? familyHead.email : null;
+      }
 
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping document request confirmation email.");
+        return;
+      }
+
+      // Use test email in development
+      const recipient = process.env.NODE_ENV === "production"
+                        ? recipientEmail
+                        : "blck4est@gmail.com"; // verified test email
+
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipient,
+        subject: "Document Request Submitted Successfully",
+        html: `
+          <p style="font-size: 20px; margin: 0;">Your request has been submitted successfully!</p>
+          <br>
+          <div style="font-size: 13px; text-align: center; font-weight: 500;">
+            The Barangay Secretary will review your request within 24 hours on business days and will notify you via email regarding its status. Weekends are excluded.
+          </div>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Document request confirmation email sent to ${recipient}`);
+    } catch (emailError) {
+      console.error("❌ Failed to send document request confirmation email:", emailError.message);
+    }
+  })();
+}
         res.redirect("/rqtSuccess");
 
     } catch (err) {
@@ -11266,67 +11332,76 @@ const generateRandomPassword = () => {
     }
     return password;
 };
-
 app.post("/forgotX", async (req, res) => {
-    try {
-        const { username, email } = req.body;
+  try {
+    const { username, email } = req.body;
 
-        if (!username) {
-            return res.redirect("/forgot?error=" + encodeURIComponent("Username is required"));
-        }
+    if (!username) {
+      return res.redirect("/forgot?error=" + encodeURIComponent("Username is required"));
+    }
 
-        const query = { username };
-        if (email) query.email = email;
+    // Build query
+    const query = { username };
+    if (email) query.email = email;
 
-        const user = await db.collection("resident").findOne(query);
+    const user = await db.collection("resident").findOne(query);
 
-        if (!user) {
-            return res.redirect("/forgot?error=" + encodeURIComponent("Invalid Credentials, Try Again!"));
-        }
+    if (!user) {
+      return res.redirect("/forgot?error=" + encodeURIComponent("Invalid Credentials, Try Again!"));
+    }
 
-        const newPassword = generateRandomPassword();
+    // Generate new temporary password
+    const newPassword = generateRandomPassword();
 
-        await db.collection("resident").updateOne(
-            { _id: user._id },
-            { $set: { password: newPassword, reset: 1 } }
-        );
+    // Update password and mark as reset
+    await db.collection("resident").updateOne(
+      { _id: user._id },
+      { $set: { password: newPassword, reset: 1 } }
+    );
 
-        let emailToSend = user.email;
+    // Determine recipient email (resident or family head)
+    let recipientEmail = user.email;
+    if (!recipientEmail && user.headId) {
+      const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(user.headId) });
+      recipientEmail = familyHead ? familyHead.email : null;
+    }
 
-        if (!emailToSend && user.headId) {
-            const familyHead = await db.collection("resident").findOne({ _id: new ObjectId(user.headId) });
-            emailToSend = familyHead ? familyHead.email : null;
-        }
+    if (!recipientEmail) {
+      return res.redirect("/forgot?error=" + encodeURIComponent("No email found for user or family head"));
+    }
 
-        if (!emailToSend) {
-            return res.redirect("/forgot?error=" + encodeURIComponent("No email found for user or family head"));
-        }
+    // Send email in the background
+    (async () => {
+      try {
+        const recipient = process.env.NODE_ENV === "production"
+                          ? recipientEmail
+                          : "blck4est@gmail.com"; // test email in development
 
-        // ✅ Nodemailer email content
         const mailOptions = {
-            from: '"Barangay System" <yourgmail@gmail.com>',
-            to: emailToSend,
-            subject: 'Password Reset Request',
-            html: `
-                <p>A temporary password has been generated for your account:</p>
-                <p style="font-size: 18px; font-weight: bold;">🔑 ${newPassword}</p>
-                <p>Please log in and change your password immediately for security reasons.</p>
-            `,
+          from: '"Barangay System" <johnniebre1995@gmail.com>',
+          to: recipient,
+          subject: 'Password Reset Request',
+          html: `
+            <p>A temporary password has been generated for your account:</p>
+            <p style="font-size: 18px; font-weight: bold;">🔑 ${newPassword}</p>
+            <p>Please log in and change your password immediately for security reasons.</p>
+          `,
         };
 
-        try {
-            await transporter.sendMail(mailOptions);
-        } catch (error) {
-            console.error('Error sending email:', error);
-            return res.redirect("/forgot?error=" + encodeURIComponent("Failed to send email"));
-        }
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Password reset email sent to ${recipient}`);
+      } catch (emailError) {
+        console.error("❌ Failed to send password reset email:", emailError.message);
+      }
+    })();
 
-        res.render("passSuccess", { username, email: emailToSend, error : "Password Reset Successfully!" });
+    // Respond immediately to user
+    res.render("passSuccess", { username, email: recipientEmail, error: "Password Reset Successfully!" });
 
-    } catch (error) {
-        console.error("Error resetting password:", error);
-        res.redirect("/forgot?error=" + encodeURIComponent("Internal Server Error"));
-    }
+  } catch (error) {
+    console.error("❌ Error resetting password:", error);
+    res.redirect("/forgot?error=" + encodeURIComponent("Internal Server Error"));
+  }
 });
 
 
@@ -12813,12 +12888,12 @@ app.post("/add-family", async (req, res) => {
       return res.status(400).json({ message: "Family Head can't be a minor" });
     }
 
-    // ✅ Always generate credentials for family head
+    // ✅ Generate credentials for family head
     const username = generateUsername(firstName, middleName, lastName, bDay, bYear);
     const password = generateRandomPassword();
     const shouldSendEmail = true;
 
-    // ✅ Determine access
+    // ✅ Determine access level
     const privilegedPositions = [
       "Barangay Secretary", "Punong Barangay", "Barangay Worker", "BWDO", "Barangay Clerk"
     ];
@@ -12862,45 +12937,48 @@ app.post("/add-family", async (req, res) => {
 
     await residents.insertOne(newResident);
 
-    // ✅ Redirect first (avoid delay)
+    // ✅ Redirect immediately
     res.redirect(`/hshView/${householdId}`);
 
-    // ✅ Email sending (your consistent pattern)
+    // ✅ Send account details email asynchronously
     if (shouldSendEmail) {
-      let recipientEmail = email;
-
-      // (For consistency — though family head is usually the recipient)
-      if (!recipientEmail) {
-        const headResident = await residents.findOne({ _id: newResident._id });
-        if (headResident && headResident.email) {
-          recipientEmail = headResident.email;
-        }
-      }
-
-      if (recipientEmail) {
-        const mailOptions = {
-          from: "johnniebre1995@gmail.com",
-          to: recipientEmail,
-          subject: "Your Resident Account Details",
-          text: `Dear ${firstName},\n\nYour family head account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
-          html: `<p>Dear <strong>${firstName}</strong>,</p>
-                 <p>Your family head account has been created.</p>
-                 <p><strong>Username:</strong> ${username}</p>
-                 <p><strong>Password:</strong> ${password}</p>
-                 <p>Please keep your credentials secure.</p>
-                 <p>Thank you.</p>`,
-        };
-
+      (async () => {
         try {
+          let recipientEmail = email || newResident.email;
+
+          if (!recipientEmail) {
+            const headResident = await residents.findOne({ _id: newResident._id });
+            recipientEmail = headResident?.email || null;
+          }
+
+          if (!recipientEmail) {
+            console.warn("⚠️ No email found for family head. Skipping account email.");
+            return;
+          }
+
+          const mailOptions = {
+            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            to: recipientEmail,
+            subject: "Your Resident Account Details",
+            text: `Dear ${firstName},\n\nYour family head account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+            html: `<p>Dear <strong>${firstName}</strong>,</p>
+                   <p>Your family head account has been created.</p>
+                   <p><strong>Username:</strong> ${username}</p>
+                   <p><strong>Password:</strong> ${password}</p>
+                   <p>Please keep your credentials secure.</p>
+                   <p>Thank you.</p>`,
+          };
+
           await transporter.sendMail(mailOptions);
-          console.log(`📧 Email sent to ${recipientEmail}`);
-        } catch (err) {
-          console.error("❌ Error sending email:", err);
+          console.log(`📧 Account email sent to ${recipientEmail}`);
+        } catch (emailError) {
+          console.error("❌ Error sending account email:", emailError);
         }
-      }
+      })();
     }
+
   } catch (error) {
-    console.error("Error adding resident:", error);
+    console.error("❌ Error adding family/resident:", error);
     res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
   }
 });
@@ -13007,43 +13085,44 @@ app.post("/add-member", async (req, res) => {
         // ✅ Redirect first (fast UX)
         res.redirect(`/hshView/${householdObjectId}`);
 
-        // ✅ Email sending logic (your format)
-        if (shouldSendEmail) {
-            let recipientEmail = email;
+      // ✅ Email sending logic (background)
+if (shouldSendEmail) {
+  (async () => {
+    try {
+      let recipientEmail = email;
 
-            if (!recipientEmail && headId) {
-                const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
-                if (headResident && headResident.email) {
-                    recipientEmail = headResident.email;
-                }
-            }
+      // Fallback to family head email if resident email is missing
+      if (!recipientEmail && headId) {
+        const headResident = await db.collection("resident").findOne({ _id: new ObjectId(headId) });
+        recipientEmail = headResident?.email || null;
+      }
 
-            if (recipientEmail) {
-                const mailOptions = {
-                    from: "johnniebre1995@gmail.com",
-                    to: recipientEmail,
-                    subject: "Your Resident Account Details",
-                    text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
-                    html: `<p>Dear <strong>${firstName}</strong>,</p>
-                           <p>Your resident account has been created.</p>
-                           <p><strong>Username:</strong> ${username}</p>
-                           <p><strong>Password:</strong> ${password}</p>
-                           <p>Please keep your credentials secure.</p>
-                           <p>Thank you.</p>`,
-                };
+      if (!recipientEmail) {
+        console.warn("⚠️ No email found for resident or family head. Skipping account email.");
+        return;
+      }
 
-                try {
-                    await transporter.sendMail(mailOptions);
-                    console.log(`📧 Email sent to ${recipientEmail}`);
-                } catch (err) {
-                    console.error("❌ Error sending email:", err);
-                }
-            }
-        }
-    } catch (error) {
-        console.error("Error adding resident:", error);
-        res.status(500).send('<script>alert("Error adding resident"); window.location="/";</script>');
+      const mailOptions = {
+        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        to: recipientEmail,
+        subject: "Your Resident Account Details",
+        text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
+        html: `<p>Dear <strong>${firstName}</strong>,</p>
+               <p>Your resident account has been created.</p>
+               <p><strong>Username:</strong> ${username}</p>
+               <p><strong>Password:</strong> ${password}</p>
+               <p>Please keep your credentials secure.</p>
+               <p>Thank you.</p>`,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`📧 Account email sent to ${recipientEmail}`);
+    } catch (err) {
+      console.error("❌ Error sending account email:", err);
     }
+  })();
+}
+
 });
 
 
