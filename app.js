@@ -1,4 +1,5 @@
 require("dotenv").config();
+console.log("DEBUG → RESEND_API_KEY:", process.env.RESEND_API_KEY);
 const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const bodyParser = require("body-parser");
@@ -13,6 +14,14 @@ const ExcelJS = require("exceljs");
 const PDFDocument = require("pdfkit");
 const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+
+if (!resend) {
+  console.warn("⚠️ RESEND_API_KEY is missing. Emails will not be sent.");
+} else {
+  console.log("✅ RESEND_API_KEY detected.");
+}
 
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
@@ -98,8 +107,6 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-dotenv.config();
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const isLogin = async (req, res, next) => {
     try {
@@ -777,20 +784,16 @@ async function getWeatherCode() {
   }
 }
 
+// Inside your route
 app.post("/newAnn", upload.single("image"), async (req, res) => {
   try {
     const { title, description } = req.body;
     const imagePath = req.file ? req.file.path : null;
     const weatherCode = await getWeatherCode();
 
-    // ✅ Validate required fields
+    // Validate required fields
     if (!title || !description) {
-      const announcements = await db
-        .collection("announcements")
-        .find()
-        .sort({ createdAt: -1 })
-        .toArray();
-
+      const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
       return res.render("ann", {
         layout: "layout",
         title: "Announcements",
@@ -801,22 +804,12 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
       });
     }
 
-    // ✅ Insert new announcement
-    const newAnnouncement = {
-      title,
-      description,
-      image: imagePath,
-      createdAt: new Date(),
-    };
+    // Insert new announcement
+    const newAnnouncement = { title, description, image: imagePath, createdAt: new Date() };
     await db.collection("announcements").insertOne(newAnnouncement);
 
-    // ✅ Respond to client immediately (don’t wait for emails)
-    const announcements = await db
-      .collection("announcements")
-      .find()
-      .sort({ createdAt: -1 })
-      .toArray();
-
+    // Respond immediately
+    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
     res.render("ann", {
       layout: "layout",
       title: "Announcements",
@@ -826,62 +819,53 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
       weatherCode,
     });
 
-    // 🔄 Send announcement emails in background (non-blocking)
-    (async () => {
-      try {
-        const residents = await db
-          .collection("resident")
-          .find({ email: { $exists: true, $ne: null } })
-          .project({ email: 1 })
-          .toArray();
+    // Background email sending (non-blocking)
+    if (resend) { // Only send if API key exists
+      (async () => {
+        try {
+          const residents = await db.collection("resident")
+            .find({ email: { $exists: true, $ne: null } })
+            .project({ email: 1 })
+            .toArray();
 
-        console.log(`📨 Sending ${residents.length} announcement emails in background...`);
+          console.log(`📨 Sending ${residents.length} emails in background...`);
 
-        for (const resident of residents) {
-          if (!resident.email) continue;
+          for (const resident of residents) {
+            if (!resident.email) continue;
 
-          try {
-            const { error } = await resend.emails.send({
-              from: "onboarding@resend.dev", // or your verified domain
-              to: resident.email,
-              subject: `New Announcement: ${title}`,
-              html: `
-                <p>Dear Resident,</p>
-                <p>We have a new announcement:</p>
-                <p><strong>Title:</strong> ${title}</p>
-                <p><strong>Description:</strong> ${description}</p>
-                <p>Thank you.</p>
-              `,
-              text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
-            });
-
-            if (error) {
-              console.error(`❌ Failed to send email to ${resident.email}:`, error.message);
-            } else {
+            try {
+              await resend.emails.send({
+                from: "onboarding@resend.dev",
+                to: resident.email,
+                subject: `New Announcement: ${title}`,
+                html: `
+                  <p>Dear Resident,</p>
+                  <p>We have a new announcement:</p>
+                  <p><strong>Title:</strong> ${title}</p>
+                  <p><strong>Description:</strong> ${description}</p>
+                  <p>Thank you.</p>
+                `,
+                text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
+              });
               console.log(`📧 Email sent to ${resident.email}`);
+            } catch (err) {
+              console.error(`❌ Failed to send email to ${resident.email}:`, err.message);
             }
 
-            await new Promise((resolve) => setTimeout(resolve, 300)); // throttle
-          } catch (err) {
-            console.error(`⚠️ Unexpected error for ${resident.email}:`, err.message);
+            await new Promise(resolve => setTimeout(resolve, 300)); // throttle
           }
-        }
 
-        console.log("✅ Background email sending completed successfully.");
-      } catch (emailErr) {
-        console.error("🚨 Error in background email process:", emailErr.stack);
-      }
-    })(); // Immediately Invoked Async Function Expression (IIFE)
+          console.log("✅ Background email sending completed.");
+        } catch (err) {
+          console.error("🚨 Error in background email process:", err.stack);
+        }
+      })();
+    }
 
   } catch (err) {
     console.error("❌ Error adding announcement:", err.stack);
 
-    const announcements = await db
-      .collection("announcements")
-      .find()
-      .sort({ createdAt: -1 })
-      .toArray();
-
+    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
     const weatherCode = await getWeatherCode();
 
     res.render("ann", {
