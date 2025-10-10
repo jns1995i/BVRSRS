@@ -5167,14 +5167,6 @@ const povertyCounts = {
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
 
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
-
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
 let highFam = 0, highIncome = 0;
@@ -5680,14 +5672,6 @@ const povertyCounts = {
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
 
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
-
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
 let highFam = 0, highIncome = 0;
@@ -6171,13 +6155,6 @@ const povertyCounts = {
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
 
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
 
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
@@ -6662,14 +6639,6 @@ const povertyCounts = {
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
 
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
-
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
 let highFam = 0, highIncome = 0;
@@ -7153,13 +7122,6 @@ const povertyCounts = {
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
 
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
 
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
@@ -7643,14 +7605,6 @@ const povertyCounts = {
   "7-8": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 },
   "9 & above": { Indigent: 0, "Non-Indigent": 0, "Low Income": 0 }
 };
-
-function getFamilySizeRange(size) {
-  if (size <= 2) return "1-2";
-  if (size <= 4) return "3-4";
-  if (size <= 6) return "5-6";
-  if (size <= 8) return "7-8";
-  return "9 & above";
-}
 
 // Variables for averages and extremes
 let totalFamSize = 0, totalIncome = 0, count = 0;
