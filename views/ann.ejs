@@ -347,7 +347,7 @@ document.getElementById("weatherLabel").innerText = weather.label;
 
         // Show loading message when submitting
         if (newForm && loadingMsg) {
-            newForm.addEventListener("submit", () => (loadingMsg.style.display = "block"));
+            newForm.addEventListener("submit", () => (loadingMsg.style.display = "flex"));
         }
 
         // Show new announcement form

@@ -848,12 +848,12 @@ app.post("/newAnn", isLogin, upload.single("image"), async (req, res) => {
           // Only send to your email in test mode
           const recipient = process.env.NODE_ENV === "production" 
                             ? resident.email 
-                            : "your-email@gmail.com"; // your verified email
+                            : "blck4est@gmail.com"; // your verified email
 
           try {
             await sgMail.send({
               to: recipient,
-              from: 'no-reply@bvrsrsv25.onrender.com', // any verified sender in SendGrid
+              from: 'blck4est@gmail.com', // any verified sender in SendGrid
               subject: `New Announcement: ${title}`,
               text: `Dear Resident,\n\n${description}\n\nThank you.`,
               html: `<p>Dear Resident,</p><p>${description}</p>`,
