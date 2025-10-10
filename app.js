@@ -744,7 +744,6 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
 
     const weatherCode = await getWeatherCode();
 
-    // Use req.user (set by isLogin)
     const user = req.user;
 
     res.render("ann", {
@@ -754,7 +753,7 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
       message: null,
       weatherCode,
       announcements,
-      user, // pass user to template
+      user,
     });
   } catch (err) {
     console.error("❌ Error fetching announcements:", err.message);
@@ -766,7 +765,7 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
       .toArray();
 
     const weatherCode = await getWeatherCode();
-    const user = req.user; // still use req.user
+    const user = req.user;
 
     res.render("ann", {
       layout: "layout",
@@ -797,7 +796,7 @@ async function getWeatherCode() {
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-app.post("/newAnn", upload.single("image"), async (req, res) => {
+app.post("/newAnn", isLogin, upload.single("image"), async (req, res) => {
   try {
     const { title, description } = req.body;
     const imagePath = req.file ? req.file.path : null;
