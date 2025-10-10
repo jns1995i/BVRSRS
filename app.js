@@ -94,6 +94,7 @@ const storage = new CloudinaryStorage({
     allowed_formats: ["jpg", "png", "jpeg", "webp"],
   },
 });
+
 const upload = multer({ storage });
 
 import { Resend } from 'resend';
@@ -764,6 +765,7 @@ app.get("/ann", isLogin, async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
 async function getWeatherCode() {
   try {
     const lat = 15.4869;
@@ -782,90 +784,116 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
   try {
     const { title, description } = req.body;
     const imagePath = req.file ? req.file.path : null;
-
-    // Fetch weather first (for consistency)
     const weatherCode = await getWeatherCode();
 
-    // Validate required fields
+    // ✅ Validate required fields
     if (!title || !description) {
-      const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
-      return res.render("ann", { 
+      const announcements = await db
+        .collection("announcements")
+        .find()
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      return res.render("ann", {
         layout: "layout",
         title: "Announcements",
         activePage: "ann",
-        message: "Title and Description are required!",
+        message: "⚠️ Title and Description are required!",
         announcements,
-        weatherCode
+        weatherCode,
       });
     }
 
-    // Insert new announcement
+    // ✅ Insert new announcement
     const newAnnouncement = {
       title,
       description,
       image: imagePath,
       createdAt: new Date(),
     };
-
     await db.collection("announcements").insertOne(newAnnouncement);
 
-    // Fetch all resident emails
-    const residents = await db.collection("resident").find({ email: { $exists: true, $ne: null } }).toArray();
-
-    const emailPromises = residents.map(async (resident) => {
-    try {
-        const { data, error } = await resend.emails.send({
-        from: 'onboarding@resend.dev', // or your verified domain
-        to: resident.email,
-        subject: `New Announcement: ${title}`,
-        html: `
-            <p>Dear Resident,</p>
-            <p>We have a new announcement:</p>
-            <p><strong>Title:</strong> ${title}</p>
-            <p><strong>Description:</strong> ${description}</p>
-            <p>Thank you.</p>
-        `,
-        text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
-        });
-
-        if (error) {
-        console.error(`❌ Failed to send email to ${resident.email}:`, error.message);
-        return { success: false, email: resident.email, error };
-        }
-
-        console.log(`📧 Email sent to ${resident.email}`);
-        return { success: true, email: resident.email, data };
-    } catch (err) {
-        console.error(`⚠️ Unexpected error sending to ${resident.email}:`, err.message);
-        return { success: false, email: resident.email, error: err };
-    }
-    });
-
-    await Promise.all(emailPromises);
-
-    // Fetch updated announcements
-    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+    // ✅ Respond to client immediately (don’t wait for emails)
+    const announcements = await db
+      .collection("announcements")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
 
     res.render("ann", {
       layout: "layout",
       title: "Announcements",
       activePage: "ann",
-      message: "✅ Announcement added successfully and sent to all residents!",
+      message: "✅ Announcement added successfully! Emails are being sent in the background.",
       announcements,
-      weatherCode
+      weatherCode,
     });
+
+    // 🔄 Send announcement emails in background (non-blocking)
+    (async () => {
+      try {
+        const residents = await db
+          .collection("resident")
+          .find({ email: { $exists: true, $ne: null } })
+          .project({ email: 1 })
+          .toArray();
+
+        console.log(`📨 Sending ${residents.length} announcement emails in background...`);
+
+        for (const resident of residents) {
+          if (!resident.email) continue;
+
+          try {
+            const { error } = await resend.emails.send({
+              from: "onboarding@resend.dev", // or your verified domain
+              to: resident.email,
+              subject: `New Announcement: ${title}`,
+              html: `
+                <p>Dear Resident,</p>
+                <p>We have a new announcement:</p>
+                <p><strong>Title:</strong> ${title}</p>
+                <p><strong>Description:</strong> ${description}</p>
+                <p>Thank you.</p>
+              `,
+              text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
+            });
+
+            if (error) {
+              console.error(`❌ Failed to send email to ${resident.email}:`, error.message);
+            } else {
+              console.log(`📧 Email sent to ${resident.email}`);
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 300)); // throttle
+          } catch (err) {
+            console.error(`⚠️ Unexpected error for ${resident.email}:`, err.message);
+          }
+        }
+
+        console.log("✅ Background email sending completed successfully.");
+      } catch (emailErr) {
+        console.error("🚨 Error in background email process:", emailErr.stack);
+      }
+    })(); // Immediately Invoked Async Function Expression (IIFE)
 
   } catch (err) {
     console.error("❌ Error adding announcement:", err.stack);
-    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+
+    const announcements = await db
+      .collection("announcements")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
     const weatherCode = await getWeatherCode();
-    res.render("ann", { 
+
+    res.render("ann", {
       layout: "layout",
       title: "Announcements",
       activePage: "ann",
       message: "⚠️ Internal Server Error while adding announcement!",
       announcements,
-      weatherCode
+      weatherCode,
     });
   }
 });
