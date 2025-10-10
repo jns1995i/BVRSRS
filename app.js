@@ -734,7 +734,6 @@ app.get("/logout", (req, res) => {
     });
 });
 
-// app.js (routes)
 app.get("/ann", isLogin, isAnn, async (req, res) => {
   try {
     const announcements = await db
@@ -745,7 +744,8 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
 
     const weatherCode = await getWeatherCode();
 
-    const user = req.session.user; // get logged-in user
+    // Use req.user (set by isLogin)
+    const user = req.user;
 
     res.render("ann", {
       layout: "layout",
@@ -759,22 +759,15 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
   } catch (err) {
     console.error("❌ Error fetching announcements:", err.message);
 
-    // Fetch announcements anyway (fallback)
-    let announcements = [];
-    try {
-      announcements = await db
-        .collection("announcements")
-        .find()
-        .sort({ createdAt: -1 })
-        .toArray();
-    } catch (e) {
-      console.error("⚠️ Failed to fetch announcements in error handler:", e.message);
-    }
+    const announcements = await db
+      .collection("announcements")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
 
     const weatherCode = await getWeatherCode();
-    const user = req.session.user;
+    const user = req.user; // still use req.user
 
-    // Render the same template with an error message
     res.render("ann", {
       layout: "layout",
       title: "Announcements",
@@ -786,7 +779,6 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
     });
   }
 });
-
 
 async function getWeatherCode() {
   try {
