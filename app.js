@@ -745,30 +745,57 @@ app.get("/logout", (req, res) => {
 
 // app.js (routes)
 app.get("/ann", isLogin, async (req, res) => {
+  try {
+    const announcements = await db
+      .collection("announcements")
+      .find()
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const weatherCode = await getWeatherCode();
+
+    const user = req.session.user; // get logged-in user
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: null,
+      weatherCode,
+      announcements,
+      user, // pass user to template
+    });
+  } catch (err) {
+    console.error("❌ Error fetching announcements:", err.message);
+
+    // Fetch announcements anyway (fallback)
+    let announcements = [];
     try {
-        // Fetch all announcements sorted by createdAt
-        const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
-        
-  const lat = 15.4869;   // Cabanatuan latitude
-  const lon = 120.9730;  // Cabanatuan longitude
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-
-  const response = await fetch(url);
-  const weather = await response.json();
-
-        res.render("ann", { 
-            layout: "layout", 
-            title: "Announcements", 
-            activePage: "ann", 
-            message: null,
-                weatherCode: weather.current_weather.weathercode,
-            announcements: announcements // Pass the announcements to the EJS template
-        });
-    } catch (err) {
-        console.error("❌ Error fetching announcements:", err.message);
-        res.status(500).send("Internal Server Error");
+      announcements = await db
+        .collection("announcements")
+        .find()
+        .sort({ createdAt: -1 })
+        .toArray();
+    } catch (e) {
+      console.error("⚠️ Failed to fetch announcements in error handler:", e.message);
     }
+
+    const weatherCode = await getWeatherCode();
+    const user = req.session.user;
+
+    // Render the same template with an error message
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "⚠️ Failed to load announcements. Please try again later.",
+      weatherCode,
+      announcements,
+      user,
+    });
+  }
 });
+
 
 async function getWeatherCode() {
   try {
@@ -783,17 +810,19 @@ async function getWeatherCode() {
     return 0;
   }
 }
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Inside your route
 app.post("/newAnn", upload.single("image"), async (req, res) => {
   try {
     const { title, description } = req.body;
     const imagePath = req.file ? req.file.path : null;
     const weatherCode = await getWeatherCode();
 
-    // Validate required fields
     if (!title || !description) {
-      const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+      const announcements = await db.collection("announcements")
+        .find().sort({ createdAt: -1 }).toArray();
+
       return res.render("ann", {
         layout: "layout",
         title: "Announcements",
@@ -804,12 +833,13 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
       });
     }
 
-    // Insert new announcement
+    // Insert announcement
     const newAnnouncement = { title, description, image: imagePath, createdAt: new Date() };
     await db.collection("announcements").insertOne(newAnnouncement);
 
-    // Respond immediately
-    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
+    const announcements = await db.collection("announcements")
+      .find().sort({ createdAt: -1 }).toArray();
+
     res.render("ann", {
       layout: "layout",
       title: "Announcements",
@@ -819,53 +849,50 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
       weatherCode,
     });
 
-    // Background email sending (non-blocking)
-    if (resend) { // Only send if API key exists
-      (async () => {
-        try {
-          const residents = await db.collection("resident")
-            .find({ email: { $exists: true, $ne: null } })
-            .project({ email: 1 })
-            .toArray();
+    // Send emails in background
+    (async () => {
+      try {
+        const residents = await db.collection("resident")
+          .find({ email: { $exists: true, $ne: null } })
+          .project({ email: 1 })
+          .toArray();
 
-          console.log(`📨 Sending ${residents.length} emails in background...`);
+        console.log(`📨 Sending ${residents.length} emails via SendGrid...`);
 
-          for (const resident of residents) {
-            if (!resident.email) continue;
+        for (const resident of residents) {
+          if (!resident.email) continue;
 
-            try {
-              await resend.emails.send({
-                from: "onboarding@resend.dev",
-                to: resident.email,
-                subject: `New Announcement: ${title}`,
-                html: `
-                  <p>Dear Resident,</p>
-                  <p>We have a new announcement:</p>
-                  <p><strong>Title:</strong> ${title}</p>
-                  <p><strong>Description:</strong> ${description}</p>
-                  <p>Thank you.</p>
-                `,
-                text: `Dear Resident,\n\nWe have a new announcement:\n\nTitle: ${title}\nDescription: ${description}\n\nThank you.`,
-              });
-              console.log(`📧 Email sent to ${resident.email}`);
-            } catch (err) {
-              console.error(`❌ Failed to send email to ${resident.email}:`, err.message);
-            }
+          // Only send to your email in test mode
+          const recipient = process.env.NODE_ENV === "production" 
+                            ? resident.email 
+                            : "your-email@gmail.com"; // your verified email
 
-            await new Promise(resolve => setTimeout(resolve, 300)); // throttle
+          try {
+            await sgMail.send({
+              to: recipient,
+              from: 'no-reply@bvrsrsv25.onrender.com', // any verified sender in SendGrid
+              subject: `New Announcement: ${title}`,
+              text: `Dear Resident,\n\n${description}\n\nThank you.`,
+              html: `<p>Dear Resident,</p><p>${description}</p>`,
+            });
+            console.log(`📧 Email sent to ${recipient}`);
+            await new Promise((r) => setTimeout(r, 300)); // throttle
+          } catch (err) {
+            console.error(`❌ Failed to send to ${recipient}:`, err.message);
           }
-
-          console.log("✅ Background email sending completed.");
-        } catch (err) {
-          console.error("🚨 Error in background email process:", err.stack);
         }
-      })();
-    }
+
+        console.log("✅ Background email sending completed.");
+      } catch (err) {
+        console.error("🚨 Error in background email sending:", err.stack);
+      }
+    })();
 
   } catch (err) {
     console.error("❌ Error adding announcement:", err.stack);
+    const announcements = await db.collection("announcements")
+      .find().sort({ createdAt: -1 }).toArray();
 
-    const announcements = await db.collection("announcements").find().sort({ createdAt: -1 }).toArray();
     const weatherCode = await getWeatherCode();
 
     res.render("ann", {
@@ -878,7 +905,6 @@ app.post("/newAnn", upload.single("image"), async (req, res) => {
     });
   }
 });
-
 
 app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
   try {
