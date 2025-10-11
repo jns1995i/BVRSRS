@@ -186,7 +186,7 @@
   <br><hr><br>
 
   <div class="height0 gap10 alignStart">
-    <div class="card padding30 shadowNone alignStart col gap15 h320 justifyStart">
+    <div class="card padding30 shadowNone alignStart col gap15 h350 justifyStart">
       <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Top Requester</p>
       <hr>
       <% requestsPerResident.forEach((r,index) => { %>
@@ -200,23 +200,33 @@
       </div>
       <% }) %>
     </div>
-    <div class="card padding30 shadowNone alignStart col gap15 h320 justifyStart">
-      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Weekly Quick Repeats</p>
+    <div class="card padding30 shadowNone alignStart col gap15 h350 justifyStart">
+      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Top Request Purpose</p>
       <hr>
-      <% repeatShortInterval.forEach((r,index) => { %>
-      <div class="height0 justifyBetween size16 str500">
-        <div class="height0 gap5 justifyStart">
-          <p class="gray textCenter w20"><%= index + 1 %></p>
-          <img src="<%= r.photo ? r.photo : '/images/default.png' %>" alt="<%= r.fullName %>" class="h25 w25 inline borderRadius500">
-          <p><%= r.fullName %></p>
-        </div>
-        <p class="green str500"><%= r.repeats %></p>
-      </div>
-      <% }) %>
+        <% purposes.slice(0,5).forEach((p,index) => { %>
+          <div class="height0 justifyBetween size16 str500">
+            <div class="height0 gap5 justifyStart">
+              <p class="gray textCenter w20"><%= index + 1 %> &nbsp;</p>
+              <p><%= p._id %></p>
+            </div>
+            <p class="green str500"><%= p.count %></p>
+          </div>
+        <% }) %>
     </div>   
-    <div class="borderRadius10 bgWhite padding20 col justifyAround h320">
-      <p class="size20 str500 marginBottom5"><i class="fas fa-hourglass inline w15"></i> Request Status</p>
-      <canvas id="reqStatusChart"></canvas>
+    <div class="borderRadius10 bgWhite padding20 col justifyAround h350">
+      <p class="size24 str500"><i class="fas fa-crown inline size24"></i> Top Household</p>
+      <table class="table shadowNone">
+        <thead><tr><th class="textCenter width10">#</th><th class="">Address</th><th class="textCenter">Requests</th></tr></thead>
+        <tbody>
+          <% topHouseholds.forEach((h,i) => { %>
+            <tr>
+              <td class="textCenter"><%= i+1 %></td>
+              <td class=""><%= h.houseNo || '-' %> <%= h.purok || '-' %></td>
+              <td class="textCenter"><%= h.count %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
     </div>
   </div>
 
@@ -242,20 +252,19 @@
       </select>
     </div> 
 
-    <div class="height0 col width30 padding5 h320 bgWhite borderRadius10">
-      <p class="size24 str500">Top Household</p>
-      <table class="table shadowNone">
-        <thead><tr><th class="textCenter width10">#</th><th class="">Address</th><th class="textCenter">Requests</th></tr></thead>
-        <tbody>
-          <% topHouseholds.forEach((h,i) => { %>
-            <tr>
-              <td class="textCenter"><%= i+1 %></td>
-              <td class=""><%= h.houseNo || '-' %> <%= h.purok || '-' %></td>
-              <td class="textCenter"><%= h.count %></td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
+    <div class="height0 col width30 padding20 gap5 h320 bgWhite borderRadius10 justifyStart">
+      <p class="size20 str500"><i class="fas fa-crown inline size24"></i> Weekly Quick Repeats</p>
+      <hr>
+      <% repeatShortInterval.forEach((r,index) => { %>
+      <div class="height0 justifyBetween size16 str500">
+        <div class="height0 gap5 justifyStart">
+          <p class="gray textCenter w20"><%= index + 1 %></p>
+          <img src="<%= r.photo ? r.photo : '/images/default.png' %>" alt="<%= r.fullName %>" class="h25 w25 inline borderRadius500">
+          <p><%= r.fullName %></p>
+        </div>
+        <p class="green str500"><%= r.repeats %></p>
+      </div>
+      <% }) %>
     </div>
 
     <div class="borderRadius10 abstractBG witch bgWhite padding20 h320 col justifyAround alignStart paddingTop30 chartC" style="flex: 1 1 48%;">
@@ -310,18 +319,9 @@
           </div>
         <% }) %>
     </div>  
-    <div class="card padding30 shadowNone alignStart col gap15 h300 justifyStart width35">
-      <p class="size26 str500"><i class="fas fa-crown inline size24"></i> Top Request Purpose</p>
-      <hr>
-        <% purposes.slice(0,5).forEach((p,index) => { %>
-          <div class="height0 justifyBetween size16 str500">
-            <div class="height0 gap5 justifyStart">
-              <p class="gray textCenter w20"><%= index + 1 %> &nbsp;</p>
-              <p><%= p._id %></p>
-            </div>
-            <p class="green str500"><%= p.count %></p>
-          </div>
-        <% }) %>
+    <div class="card shadowNone alignStart col h300 width35">
+      <p class="size20 str500 marginBottom5"><i class="fas fa-hourglass inline w15"></i> Request Status</p>
+      <canvas id="reqStatusChart"></canvas>
     </div>
     <div class="borderRadius10 abstractBG witch bgWhite padding20 h300 col justifyStart paddingTop30 width25">
         <p class="size20 str400">Request Per</p>

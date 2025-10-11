@@ -15,7 +15,24 @@
 
     <div class="head">
         <div class="ctrl left">
-            <p class="title">Pending Case Records</p>
+            <a href="/cmp" class="nav"><i class="fas fa-chevron-left"></i> Go Back</a>
+            <div class="searchBar">
+                <input type="search" id="univ" placeholder="Search here ..">
+                <i class="fas fa-search"></i>
+            </div>
+            <a href="/export-business" class="nav hidden">
+                <i class="fa-solid fa-download"></i>
+                Export Report
+            </a>
+            <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
+            <a href="/cmpNew" class="nav pnav hidden" id="newBtn">
+                <i class="fa fa-plus"></i>
+                Add Record
+            </a>
+            <% } %>
+        </div>
+        <div class="ctrl right">
+            <p class="title">Archived Pending Case Records</p>
             <div class="selectBar hidden">
                 <select name="" id="">
                     <option value="">Filter by Purok</option>
@@ -27,26 +44,6 @@
                     <option value="">Perigola</option>
                 </select>
             </div>
-        </div>
-        <div class="ctrl right">
-            <div class="searchBar">
-                <input type="search" id="univ">
-                <i class="fas fa-search"></i>
-            </div>
-            <a href="/export-business" class="nav hidden">
-                <i class="fa-solid fa-download"></i>
-                Export Report
-            </a>
-            <% if (user.position === "Punong Barangay" || user.position === "Barangay Secretary" || user.position === "Barangay Clerk") { %>
-            <a href="/cmp2" class="nav" id="">
-                <i class="fa fa-archive"></i>
-                Archive
-            </a>
-            <a href="/cmpNew" class="nav pnav" id="newBtn">
-                <i class="fa fa-plus"></i>
-                Add Record
-            </a>
-            <% } %>
         </div>
     </div>
 

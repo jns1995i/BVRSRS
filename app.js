@@ -64,7 +64,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "your_secret_key",
     resave: false,
     saveUninitialized: false,
-    store: store, // New: Use the MongoDB store
+    store: store,
     cookie: {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true
@@ -10707,6 +10707,72 @@ app.get("/cmp", isLogin, isRsd, isHr, async (req, res) => {
 
         // Render the 'cmp' view with all data
         res.render("cmp", { 
+            layout: "layout", 
+            title: "Complaints", 
+            activePage: "cmp",
+            cases,
+            complainantsByCase,
+            respondentsByCase,
+            schedulesByCase
+        });
+    } catch (error) {
+        console.error("Error fetching cases:", error);
+        res.status(500).send("An error occurred while retrieving cases.");
+    }
+});
+
+app.get("/cmp2", isLogin, isRsd, isHr, async (req, res) => {
+    try {
+        // Fetch all cases, ordered by createdAt (latest first)
+        const cases = await db.collection("cases")
+        .find({ archive: { $in: ["1", 1] } }) // Filters only archive: 0
+        .sort({ createdAt: -1 })
+        .toArray();
+
+        // Extract resident IDs from cases (complainants and respondents)
+        const residentIds = cases.flatMap(c => [...c.complainants, ...c.respondents])
+            .filter(id => id) // Remove empty or undefined values
+            .map(id => ObjectId.isValid(id) ? new ObjectId(id) : id);
+
+        console.log("Resident IDs for lookup:", residentIds); // Debugging log
+
+        // Fetch residents using `_id` (Check both ObjectId and String formats)
+        const residentsData = await db.collection("resident").find({
+            _id: { $in: residentIds }
+        }).toArray();
+
+        console.log("Residents found:", residentsData); // Debugging log
+
+        // Map resident IDs to full names
+        const residentsMap = {};
+        residentsData.forEach(resident => {
+            const residentIdStr = resident._id.toString(); // Convert `_id` to string
+            residentsMap[residentIdStr] = `${resident.firstName} ${resident.middleName || ''} ${resident.lastName} ${resident.extName || ''}`.trim();
+        });
+
+        console.log("Residents Map:", residentsMap); // Debugging log
+
+        // Organize complainants and respondents by caseId
+        const complainantsByCase = {};
+        const respondentsByCase = {};
+        cases.forEach(c => {
+            complainantsByCase[c._id] = c.complainants.map(id => residentsMap[id] || "Unknown");
+            respondentsByCase[c._id] = c.respondents.map(id => residentsMap[id] || "Unknown");
+        });
+
+        console.log("Final Complainants by Case:", complainantsByCase); // Debugging log
+        console.log("Final Respondents by Case:", respondentsByCase); // Debugging log
+
+        // Fetch all schedules and group them by caseId
+        const schedules = await db.collection("schedule").find().toArray();
+        const schedulesByCase = {};
+        schedules.forEach(s => {
+            if (!schedulesByCase[s.caseId]) schedulesByCase[s.caseId] = [];
+            schedulesByCase[s.caseId].push(s);
+        });
+
+        // Render the 'cmp' view with all data
+        res.render("cmp2", { 
             layout: "layout", 
             title: "Complaints", 
             activePage: "cmp",
