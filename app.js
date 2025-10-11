@@ -14,6 +14,14 @@ const PDFDocument = require("pdfkit");
 const nodemailer = require('nodemailer');
 const { Resend } = require('resend');
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "johnniebre1995@gmail.com", // your Gmail address
+    pass: "your_app_password", // use a Gmail App Password, NOT your regular password
+  },
+});
+
 const SECRET_KEY = "6LflzO4qAAAAAF4n0ABQ2YyHGPSA3RDjvtvFt1AQ";
 
 const { v2: cloudinary } = require("cloudinary");
@@ -1125,7 +1133,7 @@ app.post("/add-resident", async (req, res) => {
                     <p>Thank you.</p>`,
             };
 
-            await transporter.sendMail(mailOptions);
+            await sgMail.sendMail(mailOptions);
             console.log(`📧 Email sent to ${recipient}`);
 
             // Throttle for safety if sending multiple emails
@@ -1824,7 +1832,7 @@ async function sendResidentEmail(resident, subject, textContent, htmlContent) {
       html: htmlContent,
     };
 
-    await transporter.sendMail(mailOptions);
+    await sgMail.sendMail(mailOptions);
     console.log(`📧 Email sent to ${recipient} | Subject: ${subject}`);
   } catch (error) {
     console.error("❌ Failed to send email:", error.message);
@@ -3471,7 +3479,7 @@ app.post("/reqDocument", isLogin, async (req, res) => {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
+      await sgMail.sendMail(mailOptions);
       console.log(`📧 Document request email sent to ${recipient}`);
     } catch (emailError) {
       console.error("❌ Failed to send document request email:", emailError.message);
@@ -3625,7 +3633,7 @@ if (resident) {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
+      await sgMail.sendMail(mailOptions);
       console.log(`📧 Document request email sent to ${recipient}`);
     } catch (emailError) {
       console.error("❌ Failed to send document request email:", emailError.message);
@@ -3921,7 +3929,7 @@ app.post("/yesDoc/:id", async (req, res) => {
         // Send approval email
         if (emailRecipient) {
             try {
-                await transporter.sendMail({
+                await sgMail.sendMail({
                     from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
                     to: emailRecipient,
                     subject: emailDetails.subject,
@@ -3948,7 +3956,7 @@ app.post("/yesDoc/:id", async (req, res) => {
             };
 
             try {
-                await transporter.sendMail(pickupEmailDetails);
+                await sgMail.sendMail(pickupEmailDetails);
                 console.log('Pickup Email sent to:', emailRecipient);
             } catch (emailError) {
                 console.error('Error sending pickup email:', emailError);
@@ -4022,7 +4030,7 @@ app.post("/appStat/:id", async (req, res) => {
         };
 
         // Send email
-        await transporter.sendMail(emailDetails);
+        await sgMail.sendMail(emailDetails);
         console.log('Approval Email sent to:', emailRecipient);
 
     } catch (error) {
@@ -4106,7 +4114,7 @@ app.post("/noDoc/:id", async (req, res) => {
                     return;
                 }
 
-                await transporter.sendMail({
+                await sgMail.sendMail({
                     from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
                     to: emailTo,
                     subject: "Document Status Update - Declined",
@@ -4188,7 +4196,7 @@ if (resident) {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
+      await sgMail.sendMail(mailOptions);
       console.log(`📧 Claimed document email sent to ${recipient}`);
       message += " Email notification sent.";
     } catch (emailError) {
@@ -4267,7 +4275,7 @@ if (resident) {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
+      await sgMail.sendMail(mailOptions);
       console.log(`📧 Request cancelled email sent to ${recipient}`);
       message += " Email notification sent.";
     } catch (emailError) {
@@ -11307,7 +11315,7 @@ if (resident) {
         `,
       };
 
-      await transporter.sendMail(mailOptions);
+      await sgMail.sendMail(mailOptions);
       console.log(`📧 Document request confirmation email sent to ${recipient}`);
     } catch (emailError) {
       console.error("❌ Failed to send document request confirmation email:", emailError.message);
@@ -11454,7 +11462,7 @@ app.post("/forgotX", async (req, res) => {
           `,
         };
 
-        await transporter.sendMail(mailOptions);
+        await sgMail.sendMail(mailOptions);
         console.log(`📧 Password reset email sent to ${recipient}`);
       } catch (emailError) {
         console.error("❌ Failed to send password reset email:", emailError.message);
@@ -13035,7 +13043,7 @@ app.post("/add-family", async (req, res) => {
                    <p>Thank you.</p>`,
           };
 
-          await transporter.sendMail(mailOptions);
+          await sgMail.sendMail(mailOptions);
           console.log(`📧 Account email sent to ${recipientEmail}`);
         } catch (emailError) {
           console.error("❌ Error sending account email:", emailError);
@@ -13180,7 +13188,7 @@ app.post("/add-member", async (req, res) => {
                    <p>Thank you.</p>`,
           };
 
-          await transporter.sendMail(mailOptions);
+          await sgMail.sendMail(mailOptions);
           console.log(`📧 Account email sent to ${recipientEmail}`);
         } catch (err) {
           console.error("❌ Error sending account email:", err);
