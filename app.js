@@ -17,7 +17,7 @@ const { Resend } = require('resend');
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "johnniebre1995@gmail.com", // your Gmail address
+    user: "blck4est@gmail.com", // your Gmail address
     pass: "your_app_password", // use a Gmail App Password, NOT your regular password
   },
 });
@@ -1121,7 +1121,7 @@ app.post("/add-resident", async (req, res) => {
                                 : "blck4est@gmail.com"; // your verified test email
 
             const mailOptions = {
-                from: 'johnniebre1995@gmail.com', // must be verified in your email provider
+                from: 'blck4est@gmail.com', // must be verified in your email provider
                 to: recipient,
                 subject: "Your Resident Account Details",
                 text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
@@ -1825,7 +1825,7 @@ async function sendResidentEmail(resident, subject, textContent, htmlContent) {
                       : "blck4est@gmail.com";
 
     const mailOptions = {
-      from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+      from: '"Barangay Valdefuente" <blck4est@gmail.com>',
       to: recipient,
       subject,
       text: textContent,
@@ -3466,7 +3466,7 @@ app.post("/reqDocument", isLogin, async (req, res) => {
                         : "blck4est@gmail.com"; // verified test email
 
       const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        from: '"Barangay Valdefuente" <blck4est@gmail.com>',
         to: recipient,
         subject: 'Document Request Submitted Successfully',
         html: `
@@ -3620,7 +3620,7 @@ if (resident) {
                         : "blck4est@gmail.com"; // verified test email
 
       const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        from: '"Barangay Valdefuente" <blck4est@gmail.com>',
         to: recipient,
         subject: 'Document Request Submitted Successfully',
         html: `
@@ -3930,7 +3930,7 @@ app.post("/yesDoc/:id", async (req, res) => {
         if (emailRecipient) {
             try {
                 await sgMail.send({
-                    from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+                    from: '"Barangay Valdefuente" <blck4est@gmail.com>',
                     to: emailRecipient,
                     subject: emailDetails.subject,
                     html: emailDetails.html
@@ -3944,7 +3944,7 @@ app.post("/yesDoc/:id", async (req, res) => {
         // Send pickup notification if status is "For Pickup"
         if (newStatus === "For Pickup" && emailRecipient) {
             const pickupEmailDetails = {
-                from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+                from: '"Barangay Valdefuente" <blck4est@gmail.com>',
                 to: emailRecipient,
                 subject: "Your Documents Are Ready for Pickup",
                 html: `<p>Dear ${resident ? `${resident.extName || resident.name}` : "Requester"},</p>
@@ -4023,7 +4023,7 @@ app.post("/appStat/:id", async (req, res) => {
         }
 
         const emailDetails = {
-            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            from: '"Barangay Valdefuente" <blck4est@gmail.com>',
             to: emailRecipient,
             subject: "Request Status Update - Approved",
             html: emailHTML
@@ -4115,7 +4115,7 @@ app.post("/noDoc/:id", async (req, res) => {
                 }
 
                 await sgMail.send({
-                    from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+                    from: '"Barangay Valdefuente" <blck4est@gmail.com>',
                     to: emailTo,
                     subject: "Document Status Update - Declined",
                     html: emailHTML
@@ -4186,7 +4186,7 @@ if (resident) {
                         : "blck4est@gmail.com"; // verified test email
 
       const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        from: '"Barangay Valdefuente" <blck4est@gmail.com>',
         to: recipient,
         subject: "Your Document has been Claimed",
         html: `
@@ -4266,7 +4266,7 @@ if (resident) {
                         : "blck4est@gmail.com"; // verified test email
 
       const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        from: '"Barangay Valdefuente" <blck4est@gmail.com>',
         to: recipient,
         subject: "Request Cancelled",
         html: `
@@ -11303,7 +11303,7 @@ if (resident) {
                         : "blck4est@gmail.com"; // verified test email
 
       const mailOptions = {
-        from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+        from: '"Barangay Valdefuente" <blck4est@gmail.com>',
         to: recipient,
         subject: "Document Request Submitted Successfully",
         html: `
@@ -11452,7 +11452,7 @@ app.post("/forgotX", async (req, res) => {
                           : "blck4est@gmail.com"; // test email in development
 
         const mailOptions = {
-          from: '"Barangay System" <johnniebre1995@gmail.com>',
+          from: '"Barangay System" <blck4est@gmail.com>',
           to: recipient,
           subject: 'Password Reset Request',
           html: `
@@ -13031,7 +13031,7 @@ app.post("/add-family", async (req, res) => {
           }
 
           const mailOptions = {
-            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            from: '"Barangay Valdefuente" <blck4est@gmail.com>',
             to: recipientEmail,
             subject: "Your Resident Account Details",
             text: `Dear ${firstName},\n\nYour family head account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
@@ -13176,7 +13176,7 @@ app.post("/add-member", async (req, res) => {
           }
 
           const mailOptions = {
-            from: '"Barangay Valdefuente" <johnniebre1995@gmail.com>',
+            from: '"Barangay Valdefuente" <blck4est@gmail.com>',
             to: recipientEmail,
             subject: "Your Resident Account Details",
             text: `Dear ${firstName},\n\nYour resident account has been created.\nUsername: ${username}\nPassword: ${password}\n\nPlease keep your credentials secure.\n\nThank you.`,
