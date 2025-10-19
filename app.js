@@ -275,7 +275,7 @@ const sumReq = async (req, res, next) => {
 const isAnn = async (req, res, next) => {
     try {
         const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 3); // Get date 1 month ago
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 6); // Get date 1 month ago
 
         // Fetch announcements created within the last month
         const announcements = await db.collection("announcements")
@@ -3320,6 +3320,7 @@ app.get("/archive-htl/:id", isLogin, async (req, res) => {
         res.status(500).send('<script>alert("Error archiving the hotline! Please try again."); window.location="/htl";</script>');
     }
 });
+
 app.get("/hom", isLogin, isAnn, myReq, async (req, res) => {
     console.log("🔐 User Access Level:", req.session.access);
     console.log("📌 Session Data:", req.session);

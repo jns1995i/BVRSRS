@@ -689,6 +689,7 @@ document.getElementById('tcBtn').addEventListener('click', () => {
             } %>
     
             <% announcements.forEach(announcement => { %>
+                <% if (announcement.archive === 0 && announcement.verify === 0) { %>
                 <div class="card height0 col alignStart gap0 marginBottom30 newsCard darkShadow padding0 annCrd" id="newsCard" id="announcement-<%= announcement.id %>">
                     
                     <div class="height0 paddingInline20 col alignStart">
@@ -721,6 +722,7 @@ document.getElementById('tcBtn').addEventListener('click', () => {
                     <% } %>
                     
                 </div>
+                <% } %>
             <% }) %>
         </div>
         <div class="width26 col gap0 absolute right15 top0 padding10 justifyStart responsive searchHide">
