@@ -48,8 +48,52 @@
             <a href="/dsb" class="nav hidden"><i class="fas fa-chevron-left"></i>Go Back</a>
             <p class="size26 white str400">Filter Records</p>
             <div class="height0 justifyEnd width0 index50">
-                <button class="nav" onclick="exportPDF()"><i class="fas fa-download"></i>Export PDF</button>
-                <button class="nav" onclick="exportExcel()"><i class="fas fa-download"></i>Export Excel</button>
+                <button class="nav" id="exportPDFBtn"><i class="fas fa-download"></i> Export PDF</button>
+                <button class="nav" id="exportExcelBtn"><i class="fas fa-download"></i> Export Excel</button>
+
+                <script>
+                async function verifyPasswordAndProceed(callback) {
+                    const password = prompt("Enter your password to proceed:");
+
+                    if (!password) return; // user canceled
+
+                    try {
+                        // Send password to server for verification
+                        const res = await fetch("/verify-passwordX", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ password })
+                        });
+
+                        const data = await res.json();
+
+                        if (data.success) {
+                            // Password correct → call the provided callback function
+                            callback();
+                        } else {
+                            alert("❌ Incorrect password!");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert("❌ Error verifying password!");
+                    }
+                }
+
+                // Attach to PDF button
+                document.getElementById("exportPDFBtn").addEventListener("click", function(e) {
+                    e.preventDefault();
+                    verifyPasswordAndProceed(exportPDF);
+                });
+
+                // Attach to Excel button
+                document.getElementById("exportExcelBtn").addEventListener("click", function(e) {
+                    e.preventDefault();
+                    verifyPasswordAndProceed(exportExcel);
+                });
+                </script>
+
             </div>
         </div>
         <br>

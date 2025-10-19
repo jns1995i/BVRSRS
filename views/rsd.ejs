@@ -574,7 +574,7 @@
            
         <div class="height0">
             <div class="ctrl left gap10">
-                <div class="selectBar">
+                <div class="selectBar hidden">
                     <i class="fas fa-filter inline w15"></i>
                     <select id="purokSelector" class="">
                         <option value="" disabled selected>Filter by Purok</option>
@@ -591,10 +591,42 @@
                     <i class="fa-solid fa-file"></i>
                     Generate Report
                 </a>
-                <a href="/export-residents" class="nav borderNone paddingBlock12 borderRadius10">
+                <a href="javascript:void(0)" class="nav borderNone paddingBlock12 borderRadius10"  id="exportRecords">
                     <i class="fa-solid fa-download"></i>
                     Export Excel File
                 </a>
+                <script>
+                document.getElementById("exportRecords").addEventListener("click", async function(e) {
+                    e.preventDefault();
+
+                    const password = prompt("Enter your password to proceed:");
+
+                    if (!password) return; // user canceled
+
+                    try {
+                        // Send password to server for verification
+                        const res = await fetch("/verify-passwordX", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ password })
+                        });
+
+                        const data = await res.json();
+
+                        if (data.success) {
+                            // Password correct → proceed to export
+                            window.location.href = "/export-residents";
+                        } else {
+                            alert("❌ Incorrect password!");
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert("❌ Error verifying password!");
+                    }
+                });
+                </script>
                 |       
                 <a href="/arcRsd" class="nav borderNone paddingBlock12 borderRadius10">
                     <i class="fa-solid fa-archive"></i>

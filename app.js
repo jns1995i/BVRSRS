@@ -15113,5 +15113,22 @@ app.post("/delete-archived-families2", async (req, res) => {
     }
 });
 
+app.post("/verify-passwordX", isLogin, async (req, res) => {
+    try {
+        const { password } = req.body;
+        const user = req.user; // logged-in user info
+
+        // Replace with your real password check logic
+        if (user.password === password) { // or use bcrypt.compare if hashed
+            res.json({ success: true });
+        } else {
+            res.json({ success: false });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false });
+    }
+});
+
 // Start Server
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
