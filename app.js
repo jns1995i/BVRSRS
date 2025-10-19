@@ -3,7 +3,7 @@ const express = require("express");
 const { MongoClient, ObjectId } = require("mongodb");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const MongoDBStore = require("connect-mongodb-session")(session); // Fix: Pass the session object
+const MongoDBStore = require("connect-mongodb-session")(session);
 const engine = require("ejs-mate");
 const multer = require("multer");
 const path = require("path");
@@ -17,8 +17,8 @@ const { Resend } = require('resend');
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "blck4est@gmail.com", // your Gmail address
-    pass: "your_app_password", // use a Gmail App Password, NOT your regular password
+    user: "blck4est@gmail.com",
+    pass: "your_app_password",
   },
 });
 
@@ -39,7 +39,6 @@ const uploadDir = 'public/uploads';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
-// Use the file upload middleware
 
 
 const app = express();
@@ -55,13 +54,11 @@ app.use(express.static("public"));
 app.use('/uploads', express.static('public/uploads'));
 
 
-// New: Configure MongoDB session store
 const store = new MongoDBStore({
     uri: process.env.MONGO_URI,
     collection: "sessions"
 });
 
-// New: Catch session store errors
 store.on("error", function(error) {
     console.error("Session Store Error:", error);
 });
@@ -746,15 +743,69 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
   try {
     const announcements = await db
       .collection("announcements")
-      .find()
+      .find({ archive: 0, verify: 0 }) // filter for active & unverified
+      .sort({ createdAt: -1 })
+      .toArray();
+    
+    const totalVer = await db
+    .collection("announcements")
+    .countDocuments({ verify: 1 });
+
+    const weatherCode = await getWeatherCode();
+    const user = req.user;
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: null,
+      weatherCode,
+      announcements,
+      user,
+      totalVer,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching announcements:", err.message);
+
+    const announcements = await db
+      .collection("announcements")
+      .find({ archive: 0, verify: 0 }) // same filter for fallback
+      .sort({ createdAt: -1 })
+      .toArray();
+    
+    const totalVer = await db
+    .collection("announcements")
+    .countDocuments({ verify: 1 });
+
+    const weatherCode = await getWeatherCode();
+    const user = req.user;
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "⚠️ Failed to load announcements. Please try again later.",
+      weatherCode,
+      announcements,
+      user,
+      totalVer,
+    });
+  }
+});
+
+
+app.get("/annVer", isLogin, isAnn, async (req, res) => {
+  try {
+    const announcements = await db
+      .collection("announcements")
+      .find({ archive: 0, verify: 1 }) // filter for active & unverified
       .sort({ createdAt: -1 })
       .toArray();
 
     const weatherCode = await getWeatherCode();
-
     const user = req.user;
 
-    res.render("ann", {
+    res.render("annVer", {
       layout: "layout",
       title: "Announcements",
       activePage: "ann",
@@ -768,14 +819,14 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
 
     const announcements = await db
       .collection("announcements")
-      .find()
+      .find({ archive: 0, verify: 0 }) // same filter for fallback
       .sort({ createdAt: -1 })
       .toArray();
 
     const weatherCode = await getWeatherCode();
     const user = req.user;
 
-    res.render("ann", {
+    res.render("annVer", {
       layout: "layout",
       title: "Announcements",
       activePage: "ann",
@@ -786,6 +837,52 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
     });
   }
 });
+
+
+app.get("/annArc", isLogin, isAnn, async (req, res) => {
+  try {
+    const announcements = await db
+      .collection("announcements")
+      .find({ archive: 1, verify: 0 })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const weatherCode = await getWeatherCode();
+    const user = req.user;
+
+    res.render("annArc", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: null,
+      weatherCode,
+      announcements,
+      user,
+    });
+  } catch (err) {
+    console.error("❌ Error fetching announcements:", err.message);
+
+    const announcements = await db
+      .collection("announcements")
+      .find({ archive: 0, verify: 0 }) // same filter for fallback
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    const weatherCode = await getWeatherCode();
+    const user = req.user;
+
+    res.render("annArc", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "⚠️ Failed to load announcements. Please try again later.",
+      weatherCode,
+      announcements,
+      user,
+    });
+  }
+});
+
 
 async function getWeatherCode() {
   try {
@@ -825,7 +922,7 @@ app.post("/newAnn", isLogin, upload.single("image"), async (req, res) => {
     }
 
     // Insert announcement
-    const newAnnouncement = { title, description, image: imagePath, createdAt: new Date() };
+    const newAnnouncement = { title, description, image: imagePath, createdAt: new Date(), archive: 0, verify: 0 };
     await db.collection("announcements").insertOne(newAnnouncement);
 
     const announcements = await db.collection("announcements")
@@ -841,6 +938,98 @@ app.post("/newAnn", isLogin, upload.single("image"), async (req, res) => {
     });
 
     // Send emails in background
+    (async () => {
+      try {
+        const residents = await db.collection("resident")
+          .find({ email: { $exists: true, $ne: null } })
+          .project({ email: 1 })
+          .toArray();
+
+        console.log(`📨 Sending ${residents.length} emails via SendGrid...`);
+
+        for (const resident of residents) {
+          if (!resident.email) continue;
+
+          // Only send to your email in test mode
+          const recipient = process.env.NODE_ENV === "production" 
+                            ? resident.email 
+                            : "blck4est@gmail.com"; // your verified email
+
+          try {
+            await sgMail.send({
+              to: recipient,
+              from: 'blck4est@gmail.com', // any verified sender in SendGrid
+              subject: `New Announcement: ${title}`,
+              text: `Dear Resident,\n\n${description}\n\nThank you.`,
+              html: `<p>Dear Resident,</p><p>${description}</p>`,
+            });
+            console.log(`📧 Email sent to ${recipient}`);
+            await new Promise((r) => setTimeout(r, 300)); // throttle
+          } catch (err) {
+            console.error(`❌ Failed to send to ${recipient}:`, err.message);
+          }
+        }
+
+        console.log("✅ Background email sending completed.");
+      } catch (err) {
+        console.error("🚨 Error in background email sending:", err.stack);
+      }
+    })();
+
+  } catch (err) {
+    console.error("❌ Error adding announcement:", err.stack);
+    const announcements = await db.collection("announcements")
+      .find().sort({ createdAt: -1 }).toArray();
+
+    const weatherCode = await getWeatherCode();
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "⚠️ Internal Server Error while adding announcement!",
+      announcements,
+      weatherCode,
+    });
+  }
+});
+
+
+app.post("/newAnn2", isLogin, upload.single("image"), async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const imagePath = req.file ? req.file.path : null;
+    const weatherCode = await getWeatherCode();
+
+    if (!title || !description) {
+      const announcements = await db.collection("announcements")
+        .find().sort({ createdAt: -1 }).toArray();
+
+      return res.render("ann", {
+        layout: "layout",
+        title: "Announcements",
+        activePage: "ann",
+        message: "⚠️ Title and Description are required!",
+        announcements,
+        weatherCode,
+      });
+    }
+
+    const newAnnouncement = { title, description, image: imagePath, createdAt: new Date(), verify: 1, archive: 0 };
+    await db.collection("announcements").insertOne(newAnnouncement);
+
+    const announcements = await db.collection("announcements")
+      .find().sort({ createdAt: -1 }).toArray();
+
+    res.render("ann", {
+      layout: "layout",
+      title: "Announcements",
+      activePage: "ann",
+      message: "✅ Announcement added successfully! Emails are being sent to residents",
+      announcements,
+      weatherCode,
+    });
+
     (async () => {
       try {
         const residents = await db.collection("resident")
@@ -996,17 +1185,51 @@ app.post("/editAnn/:id", isLogin, upload.single("image"), async (req, res) => {
 });
 
 
-
-// Delete an announcement
 app.post("/deleteAnn/:id", async (req, res) => {
     try {
-        // Delete the announcement from the database using ObjectId
-        await db.collection("announcements").deleteOne({ _id: new ObjectId(req.params.id) });
-        
-        // Redirect to the announcements page after deletion
+        // Update the announcement to set archive = 1 instead of deleting
+        await db.collection("announcements").updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { archive: 1 } }
+        );
+
+        // Redirect to the announcements page after updating
         res.redirect("/ann");
     } catch (err) {
-        console.error("❌ Error deleting announcement:", err.message);
+        console.error("❌ Error archiving announcement:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error!"); window.location="/ann";</script>');
+    }
+});
+
+
+app.post("/restoreAnn/:id", async (req, res) => {
+    try {
+        // Update the announcement to set archive = 1 instead of deleting
+        await db.collection("announcements").updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { archive: 0 } }
+        );
+
+        // Redirect to the announcements page after updating
+        res.redirect("/annArc");
+    } catch (err) {
+        console.error("❌ Error archiving announcement:", err.message);
+        res.status(500).send('<script>alert("Internal Server Error!"); window.location="/ann";</script>');
+    }
+});
+
+app.post("/verifyAnn/:id", async (req, res) => {
+    try {
+        // Update the announcement to set archive = 1 instead of deleting
+        await db.collection("announcements").updateOne(
+            { _id: new ObjectId(req.params.id) },
+            { $set: { verify: 0 } }
+        );
+
+        // Redirect to the announcements page after updating
+        res.redirect("/ann");
+    } catch (err) {
+        console.error("❌ Error archiving announcement:", err.message);
         res.status(500).send('<script>alert("Internal Server Error!"); window.location="/ann";</script>');
     }
 });

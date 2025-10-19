@@ -17,7 +17,7 @@
         .annCard .section { justify-content: start; padding: 5px; }
         .annDate { position: absolute; top: 10px; right: 10px; width: auto; height: auto; margin-bottom: 10px; font-size: 0.8vw; }
         .annPhoto { width: 100%; height: auto; }
-        .annPhoto img { width: 100%; height: 100%; border-radius: 0.5vw; }
+        .annPhoto img { width: 50%; height: 100%; border-radius: 0.5vw; }
 
         .unseen {
             max-width: 0;
@@ -73,7 +73,7 @@
 
 <!-- New Announcement Form -->
 <div class="height100 unseen borderRadius20 abstractBG" id="newCard">
-    <form class="annCard" method="POST" action="/newAnn2" enctype="multipart/form-data">
+    <form class="annCard" method="POST" action="/newAnn" enctype="multipart/form-data">
         <div class="height0 justifyEnd">
             <a href="javascript:void(0);" class="nav" id="closeBtn"><i class="fas fa-times"></i> Close</a>
         </div>
@@ -147,8 +147,8 @@
 
 
 <div class="height0 padding10 bgWhite borderRadius15 col fixed darkShadow alignStart" style="left: 17%; width: 33%; top: 27px;">
-
-    <div class="height0 justifyStart alignStart padding30 col relative">
+    <a href="" class="nav cnav disabled absolute left80 top70"  style="transform: rotate(-10deg) scale(8);"><i class="fas fa-check-circle"></i></a>
+    <div class="height0 justifyStart alignEnd padding30 col relative">
                     <% 
                     const today = new Date(); 
                     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -160,33 +160,20 @@
                 <input type="search" id="univ">
                 <i class="fas fa-search"></i>
             </div>
+            <a href="/ann" class="nav borderRadius10 "><i class="fas fa-chevron-left"></i>Go Back</a>
         </div>
-      <br><br>
+      <br><br><br>
       <p class="size14 str400 colorPrimary hidden"><i class="fas fa-exclamation-circle inline w15"></i></p>
-      <img src="/images/sun2.png" id="weatherIcon" alt="" class="absolute bottom0 h200" style="left: 20px; transform: rotate(-10deg);">
-        <div class="height0 padding20 borderRadius15 bgTint8 col justifyStart alignEnd">
-          <p class="size14 str400">
-                Awesome! Today Is
+        <div class="height0 padding20 darkShadow borderRadius15 bgTint9 col justifyStart alignEnd width80">
+          <p class="size24 str400">
+                For Verification
           </p>
-          <p class="size34 str500 upperCase colorPrimary"><%= dayName %></p>
-          <div class="height0 width0 col alignStart bgTint7 colorPrimary padding5 borderRadius5">
-            <span class="height0 inline width0" id="weatherLabel"></span></p>
-          </div>
+          <p class="size30 str500 upperCase colorPrimary">Announcements</p>
       </div>
     </div>
-    <div class="height0 paddingInline30 paddingBottom30 col alignStart">
-      <p class="size38 str400">Announcements</p>
-            <div class="h50 justifyStart alignCenter padding5 gap10">
-                <% if (user.position === 'Barangay Secretary') { %>
-                <a href="javascript:void(0);" class="nav pnav borderRadius15" id="newBtn">
-                    <i class="fa-solid fa-paper-plane"></i> Post New Announcement
-                </a>
-                <% } else if (user.position === 'Punong Barangay') { %>
-                <a href="/annVer" class="nav relative borderPrimary"><i class="fas fa-bell"></i>For Verifications<p class="size14 str500 marginRight30"></p><span id="pendingCount" class="abstractBG borderRadius500 white h25 w25 flex justifyCenter alignCenter marginLeft5 size12 padding0 absolute right10 aqua"><%= totalVer %></span></a>
-                <a href="/annArc" class="nav borderPrimary"><i class="fas fa-archive"></i>Archive Records</a>
-                <% } else { %>
-                <% } %>
-            </div>
+    <div class="height0 paddingInline30 paddingBottom30 col alignEnd transparent">
+      <p class="size40 str400 upperCase"></p>
+      <p class="size34 str400"></p>
     </div>
   </div>
 
@@ -249,27 +236,22 @@ document.getElementById("weatherLabel").innerText = weather.label;
                 </div>
                 <div class="section annPhoto">
                     <% if (ann.image) { %>
-                        <img src="<%= ann.image %>" alt="Announcement Image" width="100px" height="100px">
+                        <img src="<%= ann.image %>" alt="Announcement Image" width="80px" height="80px">
                     <% } else { %>
                         <p>No Image Available</p>
                     <% } %>
                 </div>
-                <div class="height0 right gap10">
-                    <a href="javascript:void(0)" class="nav"
-                    onclick="editAnnouncement(
-                        '<%= ann._id %>',
-                        <%= JSON.stringify(ann.title) %>,
-                        <%= JSON.stringify(ann.description) %>,
-                        <%= JSON.stringify(ann.image || '/images/default.jpg') %>
-                    )">
-                        <i class="fas fa-edit"></i> Modify
-                    </a>                         
-                    <form action="/deleteAnn/<%= ann._id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this?');" class="width0 height0 transparent vers">
-                        <button type="submit" class="nav dnav-fill">
-                            <i class="fas fa-trash"></i> Delete
+                <div class="height0 width0 gap10 absolute bottom10 right10">                        
+                    <form action="/deleteAnn/<%= ann._id %>" method="POST" onsubmit="return confirm('Are you sure you want to decline this?');" class="width0 height0 transparent vers">
+                        <button type="submit" class="nav dnav">
+                            <i class="fas fa-xmark-circle w15"></i> Decline
+                        </button>
+                    </form>                        
+                    <form action="/verifyAnn/<%= ann._id %>" method="POST" class="width0 height0 transparent vers">
+                        <button type="submit" class="nav pnav">
+                            <i class="fas fa-check-circle w15"></i> Approve
                         </button>
                     </form>
-                    
                 </div>
             </div>
         <% }); %>
