@@ -749,7 +749,7 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
     
     const totalVer = await db
     .collection("announcements")
-    .countDocuments({ verify: 1 });
+    .countDocuments({ verify: 1, archive: 0 });
 
     const weatherCode = await getWeatherCode();
     const user = req.user;
@@ -769,13 +769,13 @@ app.get("/ann", isLogin, isAnn, async (req, res) => {
 
     const announcements = await db
       .collection("announcements")
-      .find({ archive: 0, verify: 0 }) // same filter for fallback
+      .find({ archive: 0, verify: 0 })
       .sort({ createdAt: -1 })
       .toArray();
     
     const totalVer = await db
     .collection("announcements")
-    .countDocuments({ verify: 1 });
+    .countDocuments({ verify: 1, archive: 0 });
 
     const weatherCode = await getWeatherCode();
     const user = req.user;
