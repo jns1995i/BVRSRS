@@ -8557,33 +8557,32 @@ worksheet.getCell("A4").alignment = { vertical: "middle", horizontal: "left" };
 
 
 // 🟢 Add a subtitle row
-worksheet.mergeCells("A4:T4");
-worksheet.getCell("A4").value = `Barangay Secretary`;
-worksheet.getCell("A4").font = { size: 14, italic: true, bold: true };
-worksheet.getCell("A4").alignment = { vertical: "middle", horizontal: "left" };
+worksheet.mergeCells("A5:T5");
+worksheet.getCell("A5").value = `Barangay Secretary`;
+worksheet.getCell("A5").font = { size: 14, italic: true, bold: true };
+worksheet.getCell("A5").alignment = { vertical: "middle", horizontal: "left" };
 
 // 🟢 Leave one empty row
 worksheet.addRow([]);
 
-
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A6:T6");
-worksheet.getCell("A6").value = `Noted By:`;
-worksheet.getCell("A6").font = { size: 12, italic: true };
-worksheet.getCell("A6").alignment = { vertical: "middle", horizontal: "left" };
-
 // 🟢 Add a subtitle row
 worksheet.mergeCells("A7:T7");
-worksheet.getCell("A7").value = `Francisco Velasquez`;
+worksheet.getCell("A7").value = `Noted By:`;
 worksheet.getCell("A7").font = { size: 12, italic: true };
 worksheet.getCell("A7").alignment = { vertical: "middle", horizontal: "left" };
 
-
 // 🟢 Add a subtitle row
 worksheet.mergeCells("A8:T8");
-worksheet.getCell("A8").value = `Punong Barangay`;
-worksheet.getCell("A8").font = { size: 14, italic: true, bold: true };
+worksheet.getCell("A8").value = `Francisco Velasquez`;
+worksheet.getCell("A8").font = { size: 12, italic: true };
 worksheet.getCell("A8").alignment = { vertical: "middle", horizontal: "left" };
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A9:T9");
+worksheet.getCell("A9").value = `Punong Barangay`;
+worksheet.getCell("A9").font = { size: 14, italic: true, bold: true };
+worksheet.getCell("A9").alignment = { vertical: "middle", horizontal: "left" };
+
 
 worksheet.addRow([]);
 
