@@ -8543,7 +8543,48 @@ worksheet.getCell("A2").value = `Generated on: ${new Date().toLocaleDateString()
 worksheet.getCell("A2").font = { size: 12, italic: true };
 worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
 
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A3:T3");
+worksheet.getCell("A3").value = `Prepared By:`;
+worksheet.getCell("A3").font = { size: 12, italic: true };
+worksheet.getCell("A3").alignment = { vertical: "middle", horizontal: "left" };
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A4:T4");
+worksheet.getCell("A4").value = `Arnold Apan`;
+worksheet.getCell("A4").font = { size: 12, italic: true };
+worksheet.getCell("A4").alignment = { vertical: "middle", horizontal: "left" };
+
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A4:T4");
+worksheet.getCell("A4").value = `Barangay Secretary`;
+worksheet.getCell("A4").font = { size: 14, italic: true, bold: true };
+worksheet.getCell("A4").alignment = { vertical: "middle", horizontal: "left" };
+
 // 🟢 Leave one empty row
+worksheet.addRow([]);
+
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A6:T6");
+worksheet.getCell("A6").value = `Noted By:`;
+worksheet.getCell("A6").font = { size: 12, italic: true };
+worksheet.getCell("A6").alignment = { vertical: "middle", horizontal: "left" };
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A7:T7");
+worksheet.getCell("A7").value = `Francisco Velasquez`;
+worksheet.getCell("A7").font = { size: 12, italic: true };
+worksheet.getCell("A7").alignment = { vertical: "middle", horizontal: "left" };
+
+
+// 🟢 Add a subtitle row
+worksheet.mergeCells("A8:T8");
+worksheet.getCell("A8").value = `Punong Barangay`;
+worksheet.getCell("A8").font = { size: 14, italic: true, bold: true };
+worksheet.getCell("A8").alignment = { vertical: "middle", horizontal: "left" };
+
 worksheet.addRow([]);
 
 // 🟢 Define columns without auto header row
