@@ -8657,30 +8657,39 @@ const lastRow = worksheet.lastRow.number + 1;
 worksheet.mergeCells(`A${lastRow}:C${lastRow}`);
 worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
 worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
+worksheet.getCell(`A${lastRow}`).alignment = { horizontal: "center" };
 
 worksheet.mergeCells(`D${lastRow}:F${lastRow}`);
 worksheet.getCell(`D${lastRow}`).value = `Noted By:`;
 worksheet.getCell(`D${lastRow}`).font = { size: 12, italic: true };
-
-worksheet.addRow([]);
+worksheet.getCell(`D${lastRow}`).alignment = { horizontal: "center" };
 
 // Row 2: Names
 worksheet.mergeCells(`A${lastRow + 1}:C${lastRow + 1}`);
 worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
 worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, bold: true };
+worksheet.getCell(`A${lastRow + 1}`).alignment = { horizontal: "center" };
 
 worksheet.mergeCells(`D${lastRow + 1}:F${lastRow + 1}`);
 worksheet.getCell(`D${lastRow + 1}`).value = `Francisco Velasquez`;
 worksheet.getCell(`D${lastRow + 1}`).font = { size: 12, bold: true };
+worksheet.getCell(`D${lastRow + 1}`).alignment = { horizontal: "center" };
 
-// Row 3: Positions
-worksheet.mergeCells(`A${lastRow + 2}:C${lastRow + 2}`);
-worksheet.getCell(`A${lastRow + 2}`).value = `Barangay Secretary`;
-worksheet.getCell(`A${lastRow + 2}`).font = { size: 12, italic: true };
+// Row 3: Blank row for signature
+worksheet.addRow([]); // This will be the space for signature
 
-worksheet.mergeCells(`D${lastRow + 2}:F${lastRow + 2}`);
-worksheet.getCell(`D${lastRow + 2}`).value = `Punong Barangay`;
-worksheet.getCell(`D${lastRow + 2}`).font = { size: 12, italic: true };
+// Row 4: Positions
+const posRow = lastRow + 3; // Adjust after adding blank row
+worksheet.mergeCells(`A${posRow}:C${posRow}`);
+worksheet.getCell(`A${posRow}`).value = `Barangay Secretary`;
+worksheet.getCell(`A${posRow}`).font = { size: 12, italic: true };
+worksheet.getCell(`A${posRow}`).alignment = { horizontal: "center" };
+
+worksheet.mergeCells(`D${posRow}:F${posRow}`);
+worksheet.getCell(`D${posRow}`).value = `Punong Barangay`;
+worksheet.getCell(`D${posRow}`).font = { size: 12, italic: true };
+worksheet.getCell(`D${posRow}`).alignment = { horizontal: "center" };
+
 
 // Align everything nicely
 for (let i = 0; i < 3; i++) {
