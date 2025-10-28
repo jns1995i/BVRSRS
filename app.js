@@ -8647,38 +8647,44 @@ app.get("/download-residents2", isLogin, async (req, res) => {
     // 🟢 Add data rows
     worksheet.addRows(formattedData);
 
-    // 🟢 Leave one blank row after data
-    worksheet.addRow([]);
-    worksheet.addRow([]);
+   worksheet.addRow([]);
+worksheet.addRow([]);
 
-    // 🟢 Add footer signatures AFTER data
-    const lastRow = worksheet.lastRow.number + 1;
+// 🟢 Add footer signatures (side by side, 3 rows)
+const lastRow = worksheet.lastRow.number + 1;
 
-    worksheet.mergeCells(`A${lastRow}:T${lastRow}`);
-    worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
-    worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
+// Row 1: Labels
+worksheet.mergeCells(`A${lastRow}:J${lastRow}`);
+worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
+worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
 
-    worksheet.mergeCells(`A${lastRow + 1}:T${lastRow + 1}`);
-    worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
-    worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, italic: true, bold: true };
+worksheet.mergeCells(`K${lastRow}:T${lastRow}`);
+worksheet.getCell(`K${lastRow}`).value = `Noted By:`;
+worksheet.getCell(`K${lastRow}`).font = { size: 12, italic: true };
 
-    worksheet.mergeCells(`A${lastRow + 2}:T${lastRow + 2}`);
-    worksheet.getCell(`A${lastRow + 2}`).value = `Barangay Secretary`;
-    worksheet.getCell(`A${lastRow + 2}`).font = { size: 14, italic: true };
+// Row 2: Names
+worksheet.mergeCells(`A${lastRow + 1}:J${lastRow + 1}`);
+worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
+worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, bold: true };
 
-    worksheet.addRow([]);
+worksheet.mergeCells(`K${lastRow + 1}:T${lastRow + 1}`);
+worksheet.getCell(`K${lastRow + 1}`).value = `Francisco Velasquez`;
+worksheet.getCell(`K${lastRow + 1}`).font = { size: 12, bold: true };
 
-    worksheet.mergeCells(`A${lastRow + 4}:T${lastRow + 4}`);
-    worksheet.getCell(`A${lastRow + 4}`).value = `Noted By:`;
-    worksheet.getCell(`A${lastRow + 4}`).font = { size: 12, italic: true };
+// Row 3: Positions
+worksheet.mergeCells(`A${lastRow + 2}:J${lastRow + 2}`);
+worksheet.getCell(`A${lastRow + 2}`).value = `Barangay Secretary`;
+worksheet.getCell(`A${lastRow + 2}`).font = { size: 12, italic: true };
 
-    worksheet.mergeCells(`A${lastRow + 5}:T${lastRow + 5}`);
-    worksheet.getCell(`A${lastRow + 5}`).value = `Francisco Velasquez`;
-    worksheet.getCell(`A${lastRow + 5}`).font = { size: 12, italic: true, bold: true };
+worksheet.mergeCells(`K${lastRow + 2}:T${lastRow + 2}`);
+worksheet.getCell(`K${lastRow + 2}`).value = `Punong Barangay`;
+worksheet.getCell(`K${lastRow + 2}`).font = { size: 12, italic: true };
 
-    worksheet.mergeCells(`A${lastRow + 6}:T${lastRow + 6}`);
-    worksheet.getCell(`A${lastRow + 6}`).value = `Punong Barangay`;
-    worksheet.getCell(`A${lastRow + 6}`).font = { size: 14, italic: true };
+// Align everything nicely
+for (let i = 0; i < 3; i++) {
+  worksheet.getRow(lastRow + i).alignment = { vertical: "middle", horizontal: "center" };
+}
+
 
     // 🟢 Send as downloadable Excel
     const buffer = await workbook.xlsx.writeBuffer();
