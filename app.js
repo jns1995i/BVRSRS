@@ -8525,176 +8525,171 @@ app.get("/export-residents2", isLogin, (req, res) => {
 });
 
 app.get("/download-residents2", isLogin, async (req, res) => {
-    try {
-        const residents = await db.collection("resident").find().toArray();
+  try {
+    const residents = await db.collection("resident").find().toArray();
 
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("Residents");
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Residents");
 
-// 🟢 Add a title row
-worksheet.mergeCells("A1:T1"); // adjust range according to last column
-worksheet.getCell("A1").value = "Barangay Valdefuente - Residents List";
-worksheet.getCell("A1").font = { size: 16, bold: true };
-worksheet.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
+    // 🟢 Add title row
+    worksheet.mergeCells("A1:T1");
+    worksheet.getCell("A1").value = "Barangay Valdefuente - Residents List";
+    worksheet.getCell("A1").font = { size: 16, bold: true };
+    worksheet.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
 
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A2:T2");
-worksheet.getCell("A2").value = `Generated on: ${new Date().toLocaleDateString()}`;
-worksheet.getCell("A2").font = { size: 12, italic: true };
-worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
+    // 🟢 Subtitle row (date generated)
+    worksheet.mergeCells("A2:T2");
+    worksheet.getCell("A2").value = `Generated on: ${new Date().toLocaleDateString()}`;
+    worksheet.getCell("A2").font = { size: 12, italic: true };
+    worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
 
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A3:T3");
-worksheet.getCell("A3").value = `Prepared By:`;
-worksheet.getCell("A3").font = { size: 12, italic: true };
-worksheet.getCell("A3").alignment = { vertical: "middle", horizontal: "left" };
+    // 🟢 Leave a gap before table
+    worksheet.addRow([]);
 
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A4:T4");
-worksheet.getCell("A4").value = `Arnold Apan`;
-worksheet.getCell("A4").font = { size: 12, italic: true };
-worksheet.getCell("A4").alignment = { vertical: "middle", horizontal: "left" };
+    // 🟢 Define columns
+    worksheet.columns = [
+      { key: "completeName", width: 25 },
+      { key: "address", width: 25 },
+      { key: "birthday", width: 20 },
+      { key: "birthPlace", width: 20 },
+      { key: "phone", width: 15 },
+      { key: "email", width: 25 },
+      { key: "gender", width: 10 },
+      { key: "civilStatus", width: 15 },
+      { key: "precinct", width: 15 },
+      { key: "role", width: 15 },
+      { key: "priority", width: 15 },
+      { key: "priorityType", width: 20 },
+      { key: "pregnant", width: 12 },
+      { key: "soloParent", width: 15 },
+      { key: "pwd", width: 10 },
+      { key: "pwdType", width: 15 },
+      { key: "employmentStatus", width: 20 },
+      { key: "work", width: 20 },
+      { key: "monthlyIncome", width: 15 },
+      { key: "position", width: 20 }
+    ];
 
+    // 🟢 Add header row
+    worksheet.addRow([
+      "Complete Name", "Address", "Birthday", "Birth Place", "Phone", "Email",
+      "Gender", "Civil Status", "Precinct", "Role", "Priority", "Priority Type",
+      "Pregnant", "Solo Parent", "PWD", "PWD Type", "Employment Status", "Work",
+      "Monthly Income", "Position"
+    ]);
 
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A5:T5");
-worksheet.getCell("A5").value = `Barangay Secretary`;
-worksheet.getCell("A5").font = { size: 14, italic: true, bold: true };
-worksheet.getCell("A5").alignment = { vertical: "middle", horizontal: "left" };
-
-// 🟢 Leave one empty row
-worksheet.addRow([]);
-
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A7:T7");
-worksheet.getCell("A7").value = `Noted By:`;
-worksheet.getCell("A7").font = { size: 12, italic: true };
-worksheet.getCell("A7").alignment = { vertical: "middle", horizontal: "left" };
-
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A8:T8");
-worksheet.getCell("A8").value = `Francisco Velasquez`;
-worksheet.getCell("A8").font = { size: 12, italic: true };
-worksheet.getCell("A8").alignment = { vertical: "middle", horizontal: "left" };
-
-// 🟢 Add a subtitle row
-worksheet.mergeCells("A9:T9");
-worksheet.getCell("A9").value = `Punong Barangay`;
-worksheet.getCell("A9").font = { size: 14, italic: true, bold: true };
-worksheet.getCell("A9").alignment = { vertical: "middle", horizontal: "left" };
-
-
-worksheet.addRow([]);
-
-// 🟢 Define columns without auto header row
-worksheet.columns = [
-    { key: "completeName", width: 25 },
-    { key: "address", width: 25 },
-    { key: "birthday", width: 20 },
-    { key: "birthPlace", width: 20 },
-    { key: "phone", width: 15 },
-    { key: "email", width: 25 },
-    { key: "gender", width: 10 },
-    { key: "civilStatus", width: 15 },
-    { key: "precinct", width: 15 },
-    { key: "role", width: 15 },
-    { key: "priority", width: 15 },
-    { key: "priorityType", width: 20 },
-    { key: "pregnant", width: 12 },
-    { key: "soloParent", width: 15 },
-    { key: "pwd", width: 10 },
-    { key: "pwdType", width: 15 },
-    { key: "employmentStatus", width: 20 },
-    { key: "work", width: 20 },
-    { key: "monthlyIncome", width: 15 },
-    { key: "position", width: 20 }
-];
-
-// 🟢 Manually add header row
-worksheet.addRow([
-    "Complete Name", "Address", "Birthday", "Birth Place", "Phone", "Email",
-    "Gender", "Civil Status", "Precinct", "Role", "Priority", "Priority Type",
-    "Pregnant", "Solo Parent", "PWD", "PWD Type", "Employment Status", "Work",
-    "Monthly Income", "Position"
-]);
-
-// Style header row
-const headerRow = worksheet.lastRow;
-headerRow.font = { bold: true };
-headerRow.alignment = { vertical: "center", horizontal: "center" };
-headerRow.eachCell(cell => {
-    cell.fill = {
+    // 🟢 Style header row
+    const headerRow = worksheet.lastRow;
+    headerRow.font = { bold: true };
+    headerRow.alignment = { vertical: "center", horizontal: "center" };
+    headerRow.eachCell(cell => {
+      cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FFD9D9D9" } // light gray background
-    };
-    cell.border = {
+        fgColor: { argb: "FFD9D9D9" }
+      };
+      cell.border = {
         top: { style: "thin" },
         left: { style: "thin" },
         bottom: { style: "thin" },
         right: { style: "thin" }
-    };
-});
-        const monthNames = [
-            "", "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ];
+      };
+    });
 
-        const formattedData = [];
+    const monthNames = [
+      "", "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
 
-        for (const resident of residents) {
-            let houseNo = "";
-            let purok = "";
+    const formattedData = [];
 
-            if (resident.householdId) {
-                const household = await db.collection("household").findOne({ _id: new ObjectId(resident.householdId) });
-                if (household) {
-                    houseNo = household.houseNo || "";
-                    purok = household.purok || "";
-                }
-            }
+    for (const resident of residents) {
+      let houseNo = "";
+      let purok = "";
 
-            const monthIndex = parseInt(resident.bMonth); // Convert to number
-            const monthName = !isNaN(monthIndex) && monthIndex >= 1 && monthIndex <= 12 ? monthNames[monthIndex] : "";
-            const birthday = `${monthName} ${resident.bDay || ""}, ${resident.bYear || ""}`;
-
-            const formatSwitch = (val) => val === "on" ? "Yes" : val === "off" ? "No" : "";
-
-            formattedData.push({
-                completeName: `${resident.firstName} ${resident.middleName || ""} ${resident.lastName} ${resident.extName || ""}`.trim(),
-                address: `${houseNo}, Purok ${purok}`,
-                birthday,
-                birthPlace: resident.birthPlace || "",
-                phone: resident.phone || "",
-                email: resident.email || "",
-                gender: resident.gender || "",
-                civilStatus: resident.civilStatus || "",
-                precinct: resident.precinct || "",
-                role: resident.role || "",
-                pwd: formatSwitch(resident.pwd),
-                pwdType: resident.pwdType || "",
-                pregnant: formatSwitch(resident.pregnant),
-                soloParent: formatSwitch(resident.soloParent),
-                priorityType: resident.priorityType || "",
-                employmentStatus: resident.employmentStatus || "",
-                work: resident.work || "",
-                monthlyIncome: resident.monthlyIncome || "",
-                position: resident.position || ""
-            });
+      if (resident.householdId) {
+        const household = await db.collection("household").findOne({ _id: new ObjectId(resident.householdId) });
+        if (household) {
+          houseNo = household.houseNo || "";
+          purok = household.purok || "";
         }
+      }
 
-        worksheet.addRows(formattedData);
+      const monthIndex = parseInt(resident.bMonth);
+      const monthName = !isNaN(monthIndex) && monthIndex >= 1 && monthIndex <= 12 ? monthNames[monthIndex] : "";
+      const birthday = `${monthName} ${resident.bDay || ""}, ${resident.bYear || ""}`;
 
-        const buffer = await workbook.xlsx.writeBuffer();
+      const formatSwitch = (val) => val === "on" ? "Yes" : val === "off" ? "No" : "";
 
-        res.setHeader("Content-Disposition", "attachment; filename=residents.xlsx");
-        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        res.send(Buffer.from(buffer));
-
-    } catch (error) {
-        console.error("❌ Error exporting residents:", error);
-        res.status(500).json({ message: "Error exporting residents data." });
+      formattedData.push({
+        completeName: `${resident.firstName} ${resident.middleName || ""} ${resident.lastName} ${resident.extName || ""}`.trim(),
+        address: `${houseNo}, Purok ${purok}`,
+        birthday,
+        birthPlace: resident.birthPlace || "",
+        phone: resident.phone || "",
+        email: resident.email || "",
+        gender: resident.gender || "",
+        civilStatus: resident.civilStatus || "",
+        precinct: resident.precinct || "",
+        role: resident.role || "",
+        pwd: formatSwitch(resident.pwd),
+        pwdType: resident.pwdType || "",
+        pregnant: formatSwitch(resident.pregnant),
+        soloParent: formatSwitch(resident.soloParent),
+        priorityType: resident.priorityType || "",
+        employmentStatus: resident.employmentStatus || "",
+        work: resident.work || "",
+        monthlyIncome: resident.monthlyIncome || "",
+        position: resident.position || ""
+      });
     }
+
+    // 🟢 Add data rows
+    worksheet.addRows(formattedData);
+
+    // 🟢 Leave one blank row after data
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+
+    // 🟢 Add footer signatures AFTER data
+    const lastRow = worksheet.lastRow.number + 1;
+
+    worksheet.mergeCells(`A${lastRow}:T${lastRow}`);
+    worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
+    worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
+
+    worksheet.mergeCells(`A${lastRow + 1}:T${lastRow + 1}`);
+    worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
+    worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, italic: true, bold: true };
+
+    worksheet.mergeCells(`A${lastRow + 2}:T${lastRow + 2}`);
+    worksheet.getCell(`A${lastRow + 2}`).value = `Barangay Secretary`;
+    worksheet.getCell(`A${lastRow + 2}`).font = { size: 14, italic: true };
+
+    worksheet.addRow([]);
+
+    worksheet.mergeCells(`A${lastRow + 4}:T${lastRow + 4}`);
+    worksheet.getCell(`A${lastRow + 4}`).value = `Noted By:`;
+    worksheet.getCell(`A${lastRow + 4}`).font = { size: 12, italic: true };
+
+    worksheet.mergeCells(`A${lastRow + 5}:T${lastRow + 5}`);
+    worksheet.getCell(`A${lastRow + 5}`).value = `Francisco Velasquez`;
+    worksheet.getCell(`A${lastRow + 5}`).font = { size: 12, italic: true, bold: true };
+
+    worksheet.mergeCells(`A${lastRow + 6}:T${lastRow + 6}`);
+    worksheet.getCell(`A${lastRow + 6}`).value = `Punong Barangay`;
+    worksheet.getCell(`A${lastRow + 6}`).font = { size: 14, italic: true };
+
+    // 🟢 Send as downloadable Excel
+    const buffer = await workbook.xlsx.writeBuffer();
+    res.setHeader("Content-Disposition", "attachment; filename=residents.xlsx");
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.send(Buffer.from(buffer));
+
+  } catch (error) {
+    console.error("❌ Error exporting residents:", error);
+    res.status(500).json({ message: "Error exporting residents data." });
+  }
 });
 
 app.get("/export-business", isLogin, (req, res) => {
