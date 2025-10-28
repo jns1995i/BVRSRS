@@ -8654,29 +8654,29 @@ worksheet.addRow([]);
 const lastRow = worksheet.lastRow.number + 1;
 
 // Row 1: Labels
-worksheet.mergeCells(`A${lastRow}:J${lastRow}`);
+worksheet.mergeCells(`A${lastRow}:C${lastRow}`);
 worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
 worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
 
-worksheet.mergeCells(`K${lastRow}:T${lastRow}`);
+worksheet.mergeCells(`D${lastRow}:F${lastRow}`);
 worksheet.getCell(`K${lastRow}`).value = `Noted By:`;
 worksheet.getCell(`K${lastRow}`).font = { size: 12, italic: true };
 
 // Row 2: Names
-worksheet.mergeCells(`A${lastRow + 1}:J${lastRow + 1}`);
+worksheet.mergeCells(`A${lastRow + 1}:C${lastRow + 1}`);
 worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
 worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, bold: true };
 
-worksheet.mergeCells(`K${lastRow + 1}:T${lastRow + 1}`);
+worksheet.mergeCells(`D${lastRow + 1}:F${lastRow + 1}`);
 worksheet.getCell(`K${lastRow + 1}`).value = `Francisco Velasquez`;
 worksheet.getCell(`K${lastRow + 1}`).font = { size: 12, bold: true };
 
 // Row 3: Positions
-worksheet.mergeCells(`A${lastRow + 2}:J${lastRow + 2}`);
+worksheet.mergeCells(`A${lastRow + 2}:C${lastRow + 2}`);
 worksheet.getCell(`A${lastRow + 2}`).value = `Barangay Secretary`;
 worksheet.getCell(`A${lastRow + 2}`).font = { size: 12, italic: true };
 
-worksheet.mergeCells(`K${lastRow + 2}:T${lastRow + 2}`);
+worksheet.mergeCells(`D${lastRow + 2}:F${lastRow + 2}`);
 worksheet.getCell(`K${lastRow + 2}`).value = `Punong Barangay`;
 worksheet.getCell(`K${lastRow + 2}`).font = { size: 12, italic: true };
 
