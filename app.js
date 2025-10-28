@@ -8521,7 +8521,7 @@ headerRow.eachCell(cell => {
 
 
 app.get("/export-residents2", isLogin, (req, res) => {
-    res.render("downloading2", { title: "", layout: "layout", activePage: ""} );
+    res.render("downloading2", { title: "Dashboard", layout: "layout", activePage: "dsb"} );
 });
 
 app.get("/download-residents2", isLogin, async (req, res) => {
@@ -8664,6 +8664,9 @@ worksheet.getCell(`D${lastRow}`).value = `Noted By:`;
 worksheet.getCell(`D${lastRow}`).font = { size: 12, italic: true };
 worksheet.getCell(`D${lastRow}`).alignment = { horizontal: "center" };
 
+// Row 3: Blank row for signature
+worksheet.addRow([]); // This will be the space for signature
+
 // Row 2: Names
 worksheet.mergeCells(`A${lastRow + 1}:C${lastRow + 1}`);
 worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
@@ -8675,11 +8678,8 @@ worksheet.getCell(`D${lastRow + 1}`).value = `Francisco Velasquez`;
 worksheet.getCell(`D${lastRow + 1}`).font = { size: 12, bold: true };
 worksheet.getCell(`D${lastRow + 1}`).alignment = { horizontal: "center" };
 
-// Row 3: Blank row for signature
-worksheet.addRow([]); // This will be the space for signature
-
 // Row 4: Positions
-const posRow = lastRow + 3; // Adjust after adding blank row
+const posRow = lastRow + 4; // Adjust after adding blank row
 worksheet.mergeCells(`A${posRow}:C${posRow}`);
 worksheet.getCell(`A${posRow}`).value = `Barangay Secretary`;
 worksheet.getCell(`A${posRow}`).font = { size: 12, italic: true };
