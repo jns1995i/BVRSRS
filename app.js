@@ -72,7 +72,8 @@ app.use(session({
     store: store,
     cookie: {
         secure: process.env.NODE_ENV === "production",
-        httpOnly: true
+        httpOnly: true,
+        sameSite: 'lax'
     }
 }));
 
@@ -8527,26 +8528,24 @@ app.get("/export-residents2", isLogin, (req, res) => {
 app.get("/download-residents2", isLogin, async (req, res) => {
   try {
     const residents = await db.collection("resident").find().toArray();
-
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Residents");
 
-    // 🟢 Add title row
+    // Title
     worksheet.mergeCells("A1:T1");
     worksheet.getCell("A1").value = "Barangay Valdefuente - Residents List";
     worksheet.getCell("A1").font = { size: 16, bold: true };
     worksheet.getCell("A1").alignment = { vertical: "middle", horizontal: "center" };
 
-    // 🟢 Subtitle row (date generated)
+    // Subtitle
     worksheet.mergeCells("A2:T2");
     worksheet.getCell("A2").value = `Generated on: ${new Date().toLocaleDateString()}`;
     worksheet.getCell("A2").font = { size: 12, italic: true };
     worksheet.getCell("A2").alignment = { vertical: "middle", horizontal: "center" };
 
-    // 🟢 Leave a gap before table
-    worksheet.addRow([]);
+    worksheet.addRow([]); // gap before table
 
-    // 🟢 Define columns
+    // Columns
     worksheet.columns = [
       { key: "completeName", width: 25 },
       { key: "address", width: 25 },
@@ -8570,134 +8569,91 @@ app.get("/download-residents2", isLogin, async (req, res) => {
       { key: "position", width: 20 }
     ];
 
-    // 🟢 Add header row
+    // Header row
     worksheet.addRow([
       "Complete Name", "Address", "Birthday", "Birth Place", "Phone", "Email",
       "Gender", "Civil Status", "Precinct", "Role", "Priority", "Priority Type",
       "Pregnant", "Solo Parent", "PWD", "PWD Type", "Employment Status", "Work",
       "Monthly Income", "Position"
     ]);
-
-    // 🟢 Style header row
     const headerRow = worksheet.lastRow;
     headerRow.font = { bold: true };
     headerRow.alignment = { vertical: "center", horizontal: "center" };
     headerRow.eachCell(cell => {
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: "FFD9D9D9" }
-      };
-      cell.border = {
-        top: { style: "thin" },
-        left: { style: "thin" },
-        bottom: { style: "thin" },
-        right: { style: "thin" }
-      };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFD9D9D9" } };
+      cell.border = { top: { style: "thin" }, left: { style: "thin" }, bottom: { style: "thin" }, right: { style: "thin" } };
     });
 
-    const monthNames = [
-      "", "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-
+    const monthNames = ["", "January","February","March","April","May","June","July","August","September","October","November","December"];
     const formattedData = [];
 
     for (const resident of residents) {
-      let houseNo = "";
-      let purok = "";
-
+      let houseNo = "", purok = "";
       if (resident.householdId) {
         const household = await db.collection("household").findOne({ _id: new ObjectId(resident.householdId) });
-        if (household) {
-          houseNo = household.houseNo || "";
-          purok = household.purok || "";
-        }
+        if (household) { houseNo = household.houseNo || ""; purok = household.purok || ""; }
       }
-
       const monthIndex = parseInt(resident.bMonth);
-      const monthName = !isNaN(monthIndex) && monthIndex >= 1 && monthIndex <= 12 ? monthNames[monthIndex] : "";
+      const monthName = !isNaN(monthIndex) && monthIndex >=1 && monthIndex <=12 ? monthNames[monthIndex] : "";
       const birthday = `${monthName} ${resident.bDay || ""}, ${resident.bYear || ""}`;
-
-      const formatSwitch = (val) => val === "on" ? "Yes" : val === "off" ? "No" : "";
+      const formatSwitch = val => val === "on" ? "Yes" : val === "off" ? "No" : "";
 
       formattedData.push({
         completeName: `${resident.firstName} ${resident.middleName || ""} ${resident.lastName} ${resident.extName || ""}`.trim(),
         address: `${houseNo}, Purok ${purok}`,
-        birthday,
-        birthPlace: resident.birthPlace || "",
-        phone: resident.phone || "",
-        email: resident.email || "",
-        gender: resident.gender || "",
-        civilStatus: resident.civilStatus || "",
-        precinct: resident.precinct || "",
-        role: resident.role || "",
-        pwd: formatSwitch(resident.pwd),
-        pwdType: resident.pwdType || "",
-        pregnant: formatSwitch(resident.pregnant),
-        soloParent: formatSwitch(resident.soloParent),
-        priorityType: resident.priorityType || "",
-        employmentStatus: resident.employmentStatus || "",
-        work: resident.work || "",
-        monthlyIncome: resident.monthlyIncome || "",
-        position: resident.position || ""
+        birthday, birthPlace: resident.birthPlace || "", phone: resident.phone || "", email: resident.email || "",
+        gender: resident.gender || "", civilStatus: resident.civilStatus || "", precinct: resident.precinct || "", role: resident.role || "",
+        pwd: formatSwitch(resident.pwd), pwdType: resident.pwdType || "", pregnant: formatSwitch(resident.pregnant),
+        soloParent: formatSwitch(resident.soloParent), priorityType: resident.priorityType || "", employmentStatus: resident.employmentStatus || "",
+        work: resident.work || "", monthlyIncome: resident.monthlyIncome || "", position: resident.position || ""
       });
     }
 
-    // 🟢 Add data rows
     worksheet.addRows(formattedData);
+    worksheet.addRow([]); worksheet.addRow([]);
 
-   worksheet.addRow([]);
-worksheet.addRow([]);
+    // Footer signatures
+    let footerStart = worksheet.lastRow.number + 1;
 
-// 🟢 Add footer signatures (side by side, 3 rows)
-const lastRow = worksheet.lastRow.number + 1;
+    // Labels
+    worksheet.mergeCells(`A${footerStart}:C${footerStart}`);
+    worksheet.getCell(`A${footerStart}`).value = "Prepared By:";
+    worksheet.getCell(`A${footerStart}`).font = { size: 12, italic: true };
+    worksheet.getCell(`A${footerStart}`).alignment = { horizontal: "center" };
 
-// Row 1: Labels
-worksheet.mergeCells(`A${lastRow}:C${lastRow}`);
-worksheet.getCell(`A${lastRow}`).value = `Prepared By:`;
-worksheet.getCell(`A${lastRow}`).font = { size: 12, italic: true };
-worksheet.getCell(`A${lastRow}`).alignment = { horizontal: "center" };
+    worksheet.mergeCells(`D${footerStart}:F${footerStart}`);
+    worksheet.getCell(`D${footerStart}`).value = "Noted By:";
+    worksheet.getCell(`D${footerStart}`).font = { size: 12, italic: true };
+    worksheet.getCell(`D${footerStart}`).alignment = { horizontal: "center" };
 
-worksheet.mergeCells(`D${lastRow}:F${lastRow}`);
-worksheet.getCell(`D${lastRow}`).value = `Noted By:`;
-worksheet.getCell(`D${lastRow}`).font = { size: 12, italic: true };
-worksheet.getCell(`D${lastRow}`).alignment = { horizontal: "center" };
+    // Blank row for signatures
+    worksheet.addRow([]).height = 20;
 
-// Row 3: Blank row for signature
-worksheet.addRow([]); // This will be the space for signature
+    // Names
+    let nameRowNum = worksheet.lastRow.number + 1;
+    worksheet.mergeCells(`A${nameRowNum}:C${nameRowNum}`);
+    worksheet.getCell(`A${nameRowNum}`).value = "Arnold Apan";
+    worksheet.getCell(`A${nameRowNum}`).font = { size: 12, bold: true };
+    worksheet.getCell(`A${nameRowNum}`).alignment = { horizontal: "center" };
 
-// Row 2: Names
-worksheet.mergeCells(`A${lastRow + 1}:C${lastRow + 1}`);
-worksheet.getCell(`A${lastRow + 1}`).value = `Arnold Apan`;
-worksheet.getCell(`A${lastRow + 1}`).font = { size: 12, bold: true };
-worksheet.getCell(`A${lastRow + 1}`).alignment = { horizontal: "center" };
+    worksheet.mergeCells(`D${nameRowNum}:F${nameRowNum}`);
+    worksheet.getCell(`D${nameRowNum}`).value = "Francisco Velasquez";
+    worksheet.getCell(`D${nameRowNum}`).font = { size: 12, bold: true };
+    worksheet.getCell(`D${nameRowNum}`).alignment = { horizontal: "center" };
 
-worksheet.mergeCells(`D${lastRow + 1}:F${lastRow + 1}`);
-worksheet.getCell(`D${lastRow + 1}`).value = `Francisco Velasquez`;
-worksheet.getCell(`D${lastRow + 1}`).font = { size: 12, bold: true };
-worksheet.getCell(`D${lastRow + 1}`).alignment = { horizontal: "center" };
+    // Positions
+    let posRowNum = nameRowNum + 1;
+    worksheet.mergeCells(`A${posRowNum}:C${posRowNum}`);
+    worksheet.getCell(`A${posRowNum}`).value = "Barangay Secretary";
+    worksheet.getCell(`A${posRowNum}`).font = { size: 12, italic: true };
+    worksheet.getCell(`A${posRowNum}`).alignment = { horizontal: "center" };
 
-// Row 4: Positions
-const posRow = lastRow + 4; // Adjust after adding blank row
-worksheet.mergeCells(`A${posRow}:C${posRow}`);
-worksheet.getCell(`A${posRow}`).value = `Barangay Secretary`;
-worksheet.getCell(`A${posRow}`).font = { size: 12, italic: true };
-worksheet.getCell(`A${posRow}`).alignment = { horizontal: "center" };
+    worksheet.mergeCells(`D${posRowNum}:F${posRowNum}`);
+    worksheet.getCell(`D${posRowNum}`).value = "Punong Barangay";
+    worksheet.getCell(`D${posRowNum}`).font = { size: 12, italic: true };
+    worksheet.getCell(`D${posRowNum}`).alignment = { horizontal: "center" };
 
-worksheet.mergeCells(`D${posRow}:F${posRow}`);
-worksheet.getCell(`D${posRow}`).value = `Punong Barangay`;
-worksheet.getCell(`D${posRow}`).font = { size: 12, italic: true };
-worksheet.getCell(`D${posRow}`).alignment = { horizontal: "center" };
-
-
-// Align everything nicely
-for (let i = 0; i < 3; i++) {
-  worksheet.getRow(lastRow + i).alignment = { vertical: "middle", horizontal: "center" };
-}
-
-
-    // 🟢 Send as downloadable Excel
+    // Send Excel
     const buffer = await workbook.xlsx.writeBuffer();
     res.setHeader("Content-Disposition", "attachment; filename=residents.xlsx");
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -8708,6 +8664,7 @@ for (let i = 0; i < 3; i++) {
     res.status(500).json({ message: "Error exporting residents data." });
   }
 });
+
 
 app.get("/export-business", isLogin, (req, res) => {
     res.render("exporting", { title: "", layout: "layout", activePage: ""} );
