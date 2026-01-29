@@ -290,22 +290,15 @@ const sumReq = async (req, res, next) => {
 
 const isAnn = async (req, res, next) => {
     try {
-        const oneMonthAgo = new Date();
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 6); // Get date 1 month ago
-
-        // Fetch announcements created within the last month
         const announcements = await db.collection("announcements")
-            .find({ createdAt: { $gte: oneMonthAgo } }) // Filter by createdAt
-            .sort({ createdAt: -1 }) // Sort by updatedAt in descending order
+            .find({}) // get ALL announcements
+            .sort({ createdAt: -1 }) // optional: latest first
             .toArray();
 
-        // Attach announcements data to the request object
+        // Attach announcements data
         req.announcements = announcements;
-
-        // Set announcements as a global variable for all views (accessible via res.locals.announcements)
         res.locals.announcements = announcements;
 
-        // Proceed to the next middleware or route handler
         next();
     } catch (err) {
         console.error("Error in isAnn middleware:", err.message);
